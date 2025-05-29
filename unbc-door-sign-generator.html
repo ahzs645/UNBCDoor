@@ -716,6 +716,7 @@
         
         // Helper function to wrap text based on character limit
         function wrapText(text, maxCharsPerLine) {
+            if (!text) return [''];
             const words = text.split(' ');
             let currentLine = '';
             const lines = [];
@@ -732,9 +733,11 @@
                     }
                 }
             });
-            lines.push(currentLine); // Add the last line
+            if (currentLine) {
+                lines.push(currentLine);
+            }
 
-            return lines; // Return array of lines
+            return lines;
         }
 
         function updateSign() {
@@ -748,23 +751,16 @@
 
             // Update header
             // Wrap the department text before setting it
-            const lines = wrapText(displayDept, 25); // Adjust 20 as needed
+            const lines = wrapText(displayDept, 25);
 
-            // Clear previous content and add tspans for wrapped text
-            svgDepartmentText.innerHTML = ''; // Clear existing content
-
-            let firstLine = true;
-            lines.forEach(line => {
-                const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-                tspan.textContent = line;
-                tspan.setAttribute('x', '0'); // Start at the same x position
-                if (!firstLine) {
-                    // Adjust dy based on font size if needed, 1.2em is a common line-height
-                    tspan.setAttribute('dy', '1.2em'); 
+            // Get the SVG element and update its text
+            const svgDoc = document.querySelector('.unbc-logo svg');
+            if (svgDoc) {
+                const svgText = svgDoc.querySelector('#svgDepartmentText tspan');
+                if (svgText) {
+                    svgText.textContent = displayDept || '';
                 }
-                svgDepartmentText.appendChild(tspan);
-                firstLine = false;
-            });
+            }
 
             alumniBadge.style.display = alumni ? 'flex' : 'none';
             
@@ -860,9 +856,9 @@
             }
         }
 
-        // Event listeners (moved here to ensure elements exist)
+        // Event listeners
         [signType, isAlumni, name, position, email, phone, roomName, mainDepartment, subDepartment].forEach(element => {
-            if (element) { // Check if element exists before adding listener
+            if (element) {
                 element.addEventListener('input', updateSign);
                 element.addEventListener('change', updateSign);
             }
