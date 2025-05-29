@@ -619,13 +619,40 @@
             contactInfo.innerHTML = '';
             designationsDisplay.innerHTML = '';
 
+            // Check if any input has been modified
+            const hasUserInput = name || position || email || phone || roomName || mainDept || subDept || isAlumni || enableDesignations;
+
             // Create and append content based on sign type
-            if (type === 'faculty' || type === 'staff') {
-                // Name and title
+            if (!hasUserInput) {
+                // Show template
                 const nameElement = document.createElement('div');
                 nameElement.className = 'main-title';
-                nameElement.textContent = name;
+                nameElement.textContent = 'Enter Name';
                 nameTitle.appendChild(nameElement);
+
+                const positionElement = document.createElement('div');
+                positionElement.className = 'position';
+                positionElement.textContent = 'Enter Position';
+                nameTitle.appendChild(positionElement);
+
+                contactInfo.innerHTML = `
+                    <div><span class="label">Email:</span> enter.email@unbc.ca</div>
+                    <div><span class="label">Phone:</span> 250-960-XXXX</div>
+                `;
+
+                designationsDisplay.textContent = 'PhD';
+                alumniBadge.style.display = 'block';
+                return;
+            }
+
+            if (type === 'faculty' || type === 'staff') {
+                // Name and title
+                if (name) {
+                    const nameElement = document.createElement('div');
+                    nameElement.className = 'main-title';
+                    nameElement.textContent = name;
+                    nameTitle.appendChild(nameElement);
+                }
 
                 if (position) {
                     const positionElement = document.createElement('div');
@@ -651,10 +678,12 @@
                     }
                 }
             } else if (type === 'lab' || type === 'general' || type === 'custodian') {
-                const roomElement = document.createElement('div');
-                roomElement.className = 'main-title';
-                roomElement.textContent = roomName;
-                nameTitle.appendChild(roomElement);
+                if (roomName) {
+                    const roomElement = document.createElement('div');
+                    roomElement.className = 'main-title';
+                    roomElement.textContent = roomName;
+                    nameTitle.appendChild(roomElement);
+                }
             }
         }
 
