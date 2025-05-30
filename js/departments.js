@@ -93,7 +93,9 @@ const departmentTypes = {
             "Vice-President, Research and Innovation": {
                 "Alumni Relations": ["Alumni Relations"],
                 "Communications and Marketing": ["Communications"],
-                "Office of Research and Innovation": ["Research"],
+                "Office of Research and Innovation": {
+                    "Northern Analytical Laboratory Services": ["NALS"]
+                },
                 "Development": ["Development"]
             }
         }

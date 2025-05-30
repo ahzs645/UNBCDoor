@@ -272,17 +272,24 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label for="mainDepartment">Department</label>
                     <select id="mainDepartment" name="mainDepartment">
                         <option value="">Select Department</option>
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label for="subDepartment">Sub-Department</label>
                     <select id="subDepartment" name="subDepartment">
                         <option value="">Select Sub-Department</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="display: none;">
+                    <label for="subSubDepartment">Unit</label>
+                    <select id="subSubDepartment" name="subSubDepartment">
+                        <option value="">Select Unit</option>
                     </select>
                 </div>
 
@@ -445,6 +452,7 @@
         const departmentSearch = document.getElementById('departmentSearch');
         const mainDepartment = document.getElementById('mainDepartment');
         const subDepartment = document.getElementById('subDepartment');
+        const subSubDepartment = document.getElementById('subSubDepartment');
         const nameInput = document.getElementById('name');
         const positionInput = document.getElementById('position');
         const emailInput = document.getElementById('email');
@@ -610,16 +618,32 @@
                         });
                     }
                     
-                    Object.entries(subDepts).forEach(([subDept, _]) => {
-                        if (subDept.toLowerCase().includes(query)) {
-                            results.push({
-                                type,
-                                mainDept,
-                                subDept,
-                                path: `${typeData.name} > ${mainDept} > ${subDept}`
-                            });
-                        }
-                    });
+                    if (typeof subDepts === 'object' && !Array.isArray(subDepts)) {
+                        Object.entries(subDepts).forEach(([subDept, subSubDepts]) => {
+                            if (subDept.toLowerCase().includes(query)) {
+                                results.push({
+                                    type,
+                                    mainDept,
+                                    subDept,
+                                    path: `${typeData.name} > ${mainDept} > ${subDept}`
+                                });
+                            }
+
+                            if (typeof subSubDepts === 'object' && !Array.isArray(subSubDepts)) {
+                                Object.entries(subSubDepts).forEach(([subSubDept, _]) => {
+                                    if (subSubDept.toLowerCase().includes(query)) {
+                                        results.push({
+                                            type,
+                                            mainDept,
+                                            subDept,
+                                            subSubDept,
+                                            path: `${typeData.name} > ${mainDept} > ${subDept} > ${subSubDept}`
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
                 });
             });
             
@@ -644,6 +668,10 @@
                         populateSubDepartments(result.mainDept);
                         if (result.subDept) {
                             subDepartment.value = result.subDept;
+                            populateSubSubDepartments(result.mainDept, result.subDept);
+                            if (result.subSubDept) {
+                                subSubDepartment.value = result.subSubDept;
+                            }
                         }
                         updateSign();
                         resultsContainer.style.display = 'none';
@@ -691,6 +719,7 @@
         function populateMainDepartments() {
             mainDepartment.innerHTML = '<option value="">Select Department</option>';
             subDepartment.innerHTML = '<option value="">Select Sub-Department</option>';
+            subSubDepartment.innerHTML = '<option value="">Select Unit</option>';
             
             const selectedType = departmentType.value;
             if (selectedType && departmentTypes[selectedType]) {
@@ -701,22 +730,61 @@
                     option.textContent = dept;
                     mainDepartment.appendChild(option);
                 });
+                mainDepartment.parentElement.style.display = 'block';
+            } else {
+                mainDepartment.parentElement.style.display = 'none';
+                subDepartment.parentElement.style.display = 'none';
+                subSubDepartment.parentElement.style.display = 'none';
             }
         }
 
         // Populate sub-departments
         function populateSubDepartments(mainDept) {
             subDepartment.innerHTML = '<option value="">Select Sub-Department</option>';
+            subSubDepartment.innerHTML = '<option value="">Select Unit</option>';
             const selectedType = departmentType.value;
             
             if (selectedType && mainDept && departmentTypes[selectedType].departments[mainDept]) {
                 const subDepts = departmentTypes[selectedType].departments[mainDept];
-                Object.keys(subDepts).forEach(subDept => {
-                    const option = document.createElement('option');
-                    option.value = subDept;
-                    option.textContent = subDept;
-                    subDepartment.appendChild(option);
-                });
+                if (typeof subDepts === 'object' && !Array.isArray(subDepts)) {
+                    Object.keys(subDepts).forEach(subDept => {
+                        const option = document.createElement('option');
+                        option.value = subDept;
+                        option.textContent = subDept;
+                        subDepartment.appendChild(option);
+                    });
+                    subDepartment.parentElement.style.display = 'block';
+                } else {
+                    subDepartment.parentElement.style.display = 'none';
+                }
+            } else {
+                subDepartment.parentElement.style.display = 'none';
+                subSubDepartment.parentElement.style.display = 'none';
+            }
+        }
+
+        // Populate sub-sub-departments
+        function populateSubSubDepartments(mainDept, subDept) {
+            subSubDepartment.innerHTML = '<option value="">Select Unit</option>';
+            const selectedType = departmentType.value;
+            
+            if (selectedType && mainDept && subDept && 
+                departmentTypes[selectedType].departments[mainDept] &&
+                departmentTypes[selectedType].departments[mainDept][subDept]) {
+                const subSubDepts = departmentTypes[selectedType].departments[mainDept][subDept];
+                if (typeof subSubDepts === 'object' && !Array.isArray(subSubDepts)) {
+                    Object.keys(subSubDepts).forEach(subSubDept => {
+                        const option = document.createElement('option');
+                        option.value = subSubDept;
+                        option.textContent = subSubDept;
+                        subSubDepartment.appendChild(option);
+                    });
+                    subSubDepartment.parentElement.style.display = 'block';
+                } else {
+                    subSubDepartment.parentElement.style.display = 'none';
+                }
+            } else {
+                subSubDepartment.parentElement.style.display = 'none';
             }
         }
 
@@ -725,6 +793,7 @@
             const type = signType.value;
             const mainDept = mainDepartment.value;
             const subDept = subDepartment.value;
+            const subSubDept = subSubDepartment.value;
             const name = nameInput.value;
             const position = positionInput.value;
             const email = emailInput.value;
@@ -734,7 +803,13 @@
             const enableDesignations = designationsToggle.classList.contains('active');
 
             // Update SVG text with department
-            const displayDept = subDept && subDept !== 'none' ? subDept : mainDept;
+            let displayDept = mainDept;
+            if (subDept && subDept !== 'none') {
+                displayDept = subDept;
+                if (subSubDept && subSubDept !== 'none') {
+                    displayDept = subSubDept;
+                }
+            }
             updateSVGText(displayDept);
 
             // Update alumni badge visibility
@@ -849,7 +924,12 @@
             updateSign();
         });
 
-        subDepartment.addEventListener('change', updateSign);
+        subDepartment.addEventListener('change', () => {
+            populateSubSubDepartments(mainDepartment.value, subDepartment.value);
+            updateSign();
+        });
+
+        subSubDepartment.addEventListener('change', updateSign);
 
         [nameInput, positionInput, emailInput, phoneInput, roomNameInput].forEach(input => {
             input.addEventListener('input', updateSign);
