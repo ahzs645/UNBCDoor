@@ -61,7 +61,7 @@ const departmentTypes = {
         }
     },
     administrative: {
-        name: "Administrative Departments",
+        name: "🌐 Administrative Departments",
         departments: {
             "President": {
                 "Athletics": ["Athletics"],
