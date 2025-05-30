@@ -192,130 +192,104 @@ function wrapText(text, maxWidth) {
 
 // Update sign preview
 function updateSign() {
-    const signContent = doorSign.querySelector('.sign-content');
-    signContent.innerHTML = '';
-
     const type = signType.value;
-    const dept = mainDepartment.value;
+    const mainDept = mainDepartment.value;
     const subDept = subDepartment.value;
     const name = nameInput.value;
     const position = positionInput.value;
     const email = emailInput.value;
     const phone = phoneInput.value;
-    const room = roomNameInput.value;
+    const roomName = roomNameInput.value;
     const isAlumni = isAlumniCheckbox.checked;
-    const showDesignations = enableDesignationsCheckbox.checked;
+    const enableDesignations = enableDesignationsCheckbox.checked;
 
-    // Create content based on sign type
+    // Update SVG text with department
+    const displayDept = subDept && subDept !== 'none' ? subDept : mainDept;
+    updateSVGText(displayDept);
+
+    // Update alumni badge visibility
+    const alumniBadge = document.querySelector('.alumni-badge');
+    alumniBadge.style.display = isAlumni ? 'block' : 'none';
+
+    // Clear previous content
+    const nameTitle = document.querySelector('.name-title');
+    const contactInfo = document.querySelector('.contact-info');
+    const designationsDisplay = document.querySelector('.designations-display');
+    
+    nameTitle.innerHTML = '';
+    contactInfo.innerHTML = '';
+    designationsDisplay.innerHTML = '';
+
+    // Check if any input has been modified
+    const hasUserInput = name || position || email || phone || roomName || mainDept || subDept || isAlumni || enableDesignations;
+
+    // Create and append content based on sign type
     if (type === 'faculty' || type === 'staff') {
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'name';
-        nameDiv.textContent = name;
-        signContent.appendChild(nameDiv);
-
+        // Faculty/Staff template
+        nameTitle.textContent = name;
         if (position) {
             const positionDiv = document.createElement('div');
             positionDiv.className = 'position';
             positionDiv.textContent = position;
-            signContent.appendChild(positionDiv);
+            nameTitle.appendChild(positionDiv);
         }
-
-        const deptDiv = document.createElement('div');
-        deptDiv.className = 'department';
-        deptDiv.textContent = subDept ? `${subDept}, ${dept}` : dept;
-        signContent.appendChild(deptDiv);
-
-        if (email) {
-            const emailDiv = document.createElement('div');
-            emailDiv.className = 'email';
-            emailDiv.textContent = email;
-            signContent.appendChild(emailDiv);
-        }
-
-        if (phone) {
-            const phoneDiv = document.createElement('div');
-            phoneDiv.className = 'phone';
-            phoneDiv.textContent = phone;
-            signContent.appendChild(phoneDiv);
-        }
-
-        if (room) {
-            const roomDiv = document.createElement('div');
-            roomDiv.className = 'room';
-            roomDiv.textContent = room;
-            signContent.appendChild(roomDiv);
-        }
-
-        if (showDesignations) {
-            const designations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
-                .map(cb => cb.value);
-            const customDesignation = document.getElementById('customDesignation').value;
-            
-            if (customDesignation) {
-                designations.push(...customDesignation.split(',').map(d => d.trim()));
+        
+        if (email || phone) {
+            contactInfo.style.display = 'block';
+            if (email) {
+                const emailDiv = document.createElement('div');
+                emailDiv.className = 'email';
+                emailDiv.textContent = `Email: ${email}`;
+                contactInfo.appendChild(emailDiv);
             }
-
-            if (designations.length > 0) {
-                const designationsDiv = document.createElement('div');
-                designationsDiv.className = 'designations';
-                designationsDiv.textContent = designations.join(', ');
-                signContent.appendChild(designationsDiv);
+            if (phone) {
+                const phoneDiv = document.createElement('div');
+                phoneDiv.className = 'phone';
+                phoneDiv.textContent = `Phone: ${phone}`;
+                contactInfo.appendChild(phoneDiv);
             }
+        } else {
+            contactInfo.style.display = 'none';
         }
 
-        if (isAlumni) {
-            const alumniBadge = document.createElement('img');
-            alumniBadge.src = 'components/alumni-badge.svg';
-            alumniBadge.className = 'alumni-badge';
-            alumniBadge.alt = 'UNBC Alumni';
-            signContent.appendChild(alumniBadge);
+        if (enableDesignations) {
+            const selectedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
+                .map(checkbox => checkbox.value);
+            if (selectedDesignations.length > 0) {
+                designationsDisplay.textContent = `(${selectedDesignations.join(', ')})`;
+            }
         }
     } else if (type === 'student') {
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'name';
-        nameDiv.textContent = name;
-        signContent.appendChild(nameDiv);
-
-        const deptDiv = document.createElement('div');
-        deptDiv.className = 'department';
-        deptDiv.textContent = subDept ? `${subDept}, ${dept}` : dept;
-        signContent.appendChild(deptDiv);
-
-        if (room) {
-            const roomDiv = document.createElement('div');
-            roomDiv.className = 'room';
-            roomDiv.textContent = room;
-            signContent.appendChild(roomDiv);
+        // Student template
+        nameTitle.textContent = name;
+        if (email) {
+            contactInfo.style.display = 'block';
+            const emailDiv = document.createElement('div');
+            emailDiv.className = 'email';
+            emailDiv.textContent = `Email: ${email}`;
+            contactInfo.appendChild(emailDiv);
+        } else {
+            contactInfo.style.display = 'none';
         }
     } else if (type === 'lab') {
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'name';
-        nameDiv.textContent = name;
-        signContent.appendChild(nameDiv);
-
-        const deptDiv = document.createElement('div');
-        deptDiv.className = 'department';
-        deptDiv.textContent = subDept ? `${subDept}, ${dept}` : dept;
-        signContent.appendChild(deptDiv);
-
-        if (room) {
+        // Lab template
+        nameTitle.textContent = name;
+        if (roomName) {
             const roomDiv = document.createElement('div');
             roomDiv.className = 'room';
-            roomDiv.textContent = room;
-            signContent.appendChild(roomDiv);
+            roomDiv.textContent = roomName;
+            nameTitle.appendChild(roomDiv);
         }
+    } else if (type === 'general-room' || type === 'custodian-closet') {
+        // Room template
+        nameTitle.textContent = roomName || (type === 'custodian-closet' ? 'Custodian Closet' : 'Room Name');
+    }
+
+    // Update the sign preview
+    if (hasUserInput) {
+        doorSign.style.display = 'block';
     } else {
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'name';
-        nameDiv.textContent = name;
-        signContent.appendChild(nameDiv);
-
-        if (room) {
-            const roomDiv = document.createElement('div');
-            roomDiv.className = 'room';
-            roomDiv.textContent = room;
-            signContent.appendChild(roomDiv);
-        }
+        doorSign.style.display = 'none';
     }
 }
 

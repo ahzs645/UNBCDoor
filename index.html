@@ -194,6 +194,51 @@
             width: 80px;
             height: auto;
         }
+
+        .preview {
+            position: sticky;
+            top: 50%;
+            transform: translateY(-50%);
+            height: fit-content;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-results {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-result-item:hover {
+            background-color: #f7fafc;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -208,9 +253,23 @@
                         <option value="staff">Staff</option>
                         <option value="student">Student</option>
                         <option value="lab">Lab</option>
-                        <option value="general">General Room</option>
-                        <option value="custodian">Custodian Closet</option>
+                        <option value="general-room">General Room</option>
+                        <option value="custodian-closet">Custodian Closet</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="departmentType">Department Type</label>
+                    <select id="departmentType" name="departmentType">
+                        <option value="">Select Department Type</option>
+                        <option value="academic">🎓 Academic Departments</option>
+                        <option value="administrative">🌐 Administrative Departments</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="departmentSearch">Search Departments</label>
+                    <input type="text" id="departmentSearch" placeholder="Search departments..." class="search-input">
                 </div>
 
                 <div class="form-group">
@@ -377,63 +436,13 @@
     </div>
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="js/departments.js"></script>
     <script>
-        // Department data structure
-        const departmentData = {
-            "Faculty of Business and Economics": {
-                "Accounting": ["Accounting"],
-                "Finance": ["Finance"],
-                "Marketing": ["Marketing"],
-                "Management": ["Management"],
-                "Economics": ["Economics"]
-            },
-            "Faculty of Environment": {
-                "Ecosystem Science and Management": ["Ecosystem Science and Management"],
-                "Environmental Planning": ["Environmental Planning"],
-                "Environmental Science": ["Environmental Science"],
-                "Forestry": ["Forestry"],
-                "Geography": ["Geography"],
-                "Natural Resources Management": ["Natural Resources Management"],
-                "Outdoor Recreation and Tourism Management": ["Outdoor Recreation and Tourism Management"],
-                "Wildlife and Fisheries": ["Wildlife and Fisheries"]
-            },
-            "Faculty of Human and Health Sciences": {
-                "Health Sciences": ["Health Sciences"],
-                "Nursing": ["Nursing"],
-                "Psychology": ["Psychology"],
-                "Social Work": ["Social Work"]
-            },
-            "Faculty of Indigenous Studies, Social Sciences and Humanities": {
-                "Anthropology": ["Anthropology"],
-                "English": ["English"],
-                "First Nations Studies": ["First Nations Studies"],
-                "History": ["History"],
-                "International Studies": ["International Studies"],
-                "Political Science": ["Political Science"],
-                "Sociology": ["Sociology"],
-                "Women's Studies": ["Women's Studies"]
-            },
-            "Faculty of Science and Engineering": {
-                "Biology": ["Biology"],
-                "Chemistry": ["Chemistry"],
-                "Computer Science": ["Computer Science"],
-                "Environmental Engineering": ["Environmental Engineering"],
-                "Mathematics": ["Mathematics"],
-                "Physics": ["Physics"]
-            },
-            "School of Education": {
-                "Education": ["Education"]
-            },
-            "School of Planning and Sustainability": {
-                "Community Planning": ["Community Planning"],
-                "Environmental Planning": ["Environmental Planning"],
-                "Sustainability": ["Sustainability"]
-            }
-        };
-
         // DOM Elements
         const signForm = document.getElementById('signForm');
         const signType = document.getElementById('signType');
+        const departmentType = document.getElementById('departmentType');
+        const departmentSearch = document.getElementById('departmentSearch');
         const mainDepartment = document.getElementById('mainDepartment');
         const subDepartment = document.getElementById('subDepartment');
         const nameInput = document.getElementById('name');
@@ -540,6 +549,7 @@
         // Update SVG text
         function updateSVGText(department) {
             const svgDoc = document.querySelector('.unbc-logo svg');
+            const logoContainer = document.querySelector('.unbc-logo');
             if (svgDoc) {
                 const svgText = svgDoc.querySelector('#svgDepartmentText');
                 if (svgText) {
@@ -573,53 +583,141 @@
                             tspan.textContent = line;
                             svgText.appendChild(tspan);
                         });
+
+                        // Adjust logo position if there are 3 or more lines
+                        if (lines.length >= 3) {
+                            logoContainer.style.transform = 'translate(0px, -10px)';
+                        } else {
+                            logoContainer.style.transform = 'translate(0px, 0px)';
+                        }
                     }
                 }
             }
         }
 
-        // Populate main departments
+        // Search functionality
+        function searchDepartments(query) {
+            query = query.toLowerCase();
+            const results = [];
+            
+            Object.entries(departmentTypes).forEach(([type, typeData]) => {
+                Object.entries(typeData.departments).forEach(([mainDept, subDepts]) => {
+                    if (mainDept.toLowerCase().includes(query)) {
+                        results.push({
+                            type,
+                            mainDept,
+                            path: `${typeData.name} > ${mainDept}`
+                        });
+                    }
+                    
+                    Object.entries(subDepts).forEach(([subDept, _]) => {
+                        if (subDept.toLowerCase().includes(query)) {
+                            results.push({
+                                type,
+                                mainDept,
+                                subDept,
+                                path: `${typeData.name} > ${mainDept} > ${subDept}`
+                            });
+                        }
+                    });
+                });
+            });
+            
+            return results;
+        }
+
+        // Create and show search results
+        function showSearchResults(query) {
+            const results = searchDepartments(query);
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'search-results';
+            
+            if (results.length > 0) {
+                results.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = 'search-result-item';
+                    div.textContent = result.path;
+                    div.addEventListener('click', () => {
+                        departmentType.value = result.type;
+                        populateMainDepartments();
+                        mainDepartment.value = result.mainDept;
+                        populateSubDepartments(result.mainDept);
+                        if (result.subDept) {
+                            subDepartment.value = result.subDept;
+                        }
+                        updateSign();
+                        resultsContainer.style.display = 'none';
+                    });
+                    resultsContainer.appendChild(div);
+                });
+                resultsContainer.style.display = 'block';
+            } else {
+                resultsContainer.style.display = 'none';
+            }
+            
+            // Remove existing results container if any
+            const existingResults = document.querySelector('.search-results');
+            if (existingResults) {
+                existingResults.remove();
+            }
+            
+            departmentSearch.parentNode.appendChild(resultsContainer);
+        }
+
+        // Event listener for search
+        departmentSearch.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length > 0) {
+                showSearchResults(query);
+            } else {
+                const resultsContainer = document.querySelector('.search-results');
+                if (resultsContainer) {
+                    resultsContainer.style.display = 'none';
+                }
+            }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-input') && !e.target.closest('.search-results')) {
+                const resultsContainer = document.querySelector('.search-results');
+                if (resultsContainer) {
+                    resultsContainer.style.display = 'none';
+                }
+            }
+        });
+
+        // Populate main departments based on department type
         function populateMainDepartments() {
             mainDepartment.innerHTML = '<option value="">Select Department</option>';
-            Object.keys(departmentData).forEach(dept => {
-                const option = document.createElement('option');
-                option.value = dept;
-                option.textContent = dept;
-                mainDepartment.appendChild(option);
-            });
+            subDepartment.innerHTML = '<option value="">Select Sub-Department</option>';
+            
+            const selectedType = departmentType.value;
+            if (selectedType && departmentTypes[selectedType]) {
+                const departments = departmentTypes[selectedType].departments;
+                Object.keys(departments).forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept;
+                    option.textContent = dept;
+                    mainDepartment.appendChild(option);
+                });
+            }
         }
 
         // Populate sub-departments
         function populateSubDepartments(mainDept) {
             subDepartment.innerHTML = '<option value="">Select Sub-Department</option>';
-            if (mainDept && departmentData[mainDept]) {
-                Object.keys(departmentData[mainDept]).forEach(subDept => {
+            const selectedType = departmentType.value;
+            
+            if (selectedType && mainDept && departmentTypes[selectedType].departments[mainDept]) {
+                const subDepts = departmentTypes[selectedType].departments[mainDept];
+                Object.keys(subDepts).forEach(subDept => {
                     const option = document.createElement('option');
                     option.value = subDept;
                     option.textContent = subDept;
                     subDepartment.appendChild(option);
                 });
             }
-        }
-
-        // Wrap text function
-        function wrapText(text, maxWidth) {
-            const words = text.split(' ');
-            const lines = [];
-            let currentLine = words[0];
-
-            for (let i = 1; i < words.length; i++) {
-                const word = words[i];
-                const width = currentLine.length + word.length + 1;
-                if (width < maxWidth) {
-                    currentLine += " " + word;
-                } else {
-                    lines.push(currentLine);
-                    currentLine = word;
-                }
-            }
-            lines.push(currentLine);
-            return lines;
         }
 
         // Update sign preview
@@ -651,82 +749,98 @@
             contactInfo.innerHTML = '';
             designationsDisplay.innerHTML = '';
 
-            // Check if any input has been modified
-            const hasUserInput = name || position || email || phone || roomName || mainDept || subDept || isAlumni || enableDesignations;
-
             // Create and append content based on sign type
-            if (!hasUserInput) {
-                // Show template
+            if (type === 'faculty' || type === 'staff') {
+                // Faculty/Staff template
                 const nameElement = document.createElement('div');
                 nameElement.className = 'main-title';
-                nameElement.textContent = 'Enter Name';
+                nameElement.textContent = name || 'Enter Name';
                 nameTitle.appendChild(nameElement);
-
-                const positionElement = document.createElement('div');
-                positionElement.className = 'position';
-                positionElement.textContent = 'Enter Position';
-                nameTitle.appendChild(positionElement);
-
-                contactInfo.innerHTML = `
-                    <div><span class="label">Email:</span> enter.email@unbc.ca</div>
-                    <div><span class="label">Phone:</span> 250-960-XXXX</div>
-                `;
-
-                designationsDisplay.textContent = 'PhD';
-                alumniBadge.style.display = 'block';
-                return;
-            }
-
-            if (type === 'faculty' || type === 'staff') {
-                // Name and title
-                if (name) {
-                    const nameElement = document.createElement('div');
-                    nameElement.className = 'main-title';
-                    nameElement.textContent = name;
-                    nameTitle.appendChild(nameElement);
-                }
 
                 if (position) {
                     const positionElement = document.createElement('div');
                     positionElement.className = 'position';
                     positionElement.textContent = position;
                     nameTitle.appendChild(positionElement);
+                } else {
+                    const positionElement = document.createElement('div');
+                    positionElement.className = 'position';
+                    positionElement.textContent = 'Enter Position';
+                    nameTitle.appendChild(positionElement);
                 }
 
-                // Contact info
-                if (email || phone || roomName) {
+                if (email || phone) {
                     if (email) contactInfo.innerHTML += `<div><span class="label">Email:</span> ${email}</div>`;
                     if (phone) contactInfo.innerHTML += `<div><span class="label">Phone:</span> ${phone}</div>`;
-                    if (roomName) contactInfo.innerHTML += `<div>${roomName}</div>`;
+                } else {
+                    contactInfo.innerHTML = `
+                        <div><span class="label">Email:</span> enter.email@unbc.ca</div>
+                        <div><span class="label">Phone:</span> 250-960-XXXX</div>
+                    `;
                 }
 
-                // Designations
-                if (enableDesignations) {
-                    const selectedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
-                        .map(checkbox => checkbox.value);
-                    if (selectedDesignations.length > 0) {
-                        const designationsText = selectedDesignations.join(', ');
-                        designationsDisplay.textContent = designationsText;
-                    }
+                // Always show designations for faculty/staff template
+                const selectedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
+                    .map(checkbox => checkbox.value);
+                if (selectedDesignations.length > 0) {
+                    designationsDisplay.textContent = selectedDesignations.join(', ');
+                } else {
+                    designationsDisplay.textContent = 'PhD';
                 }
-            } else if (type === 'lab' || type === 'general' || type === 'custodian') {
-                if (roomName) {
-                    const roomElement = document.createElement('div');
-                    roomElement.className = 'main-title';
-                    roomElement.textContent = roomName;
-                    nameTitle.appendChild(roomElement);
+
+                // Always show alumni badge for faculty/staff template
+                alumniBadge.style.display = 'block';
+            } else if (type === 'student') {
+                // Student template
+                const nameElement = document.createElement('div');
+                nameElement.className = 'main-title';
+                nameElement.textContent = name || 'Enter Name';
+                nameTitle.appendChild(nameElement);
+
+                if (email) {
+                    contactInfo.innerHTML = `<div><span class="label">Email:</span> ${email}</div>`;
+                } else {
+                    contactInfo.innerHTML = `<div><span class="label">Email:</span> enter.email@unbc.ca</div>`;
                 }
+            } else if (type === 'lab') {
+                // Lab template
+                const nameElement = document.createElement('div');
+                nameElement.className = 'main-title';
+                nameElement.textContent = name || 'Enter Lab Name';
+                nameTitle.appendChild(nameElement);
+            } else if (type === 'general-room') {
+                // General Room template
+                const nameElement = document.createElement('div');
+                nameElement.className = 'main-title';
+                nameElement.textContent = roomName || 'Enter Room Name';
+                nameTitle.appendChild(nameElement);
+            } else if (type === 'custodian-closet') {
+                // Custodian Closet template
+                const nameElement = document.createElement('div');
+                nameElement.className = 'main-title';
+                nameElement.textContent = roomName || 'Custodian Closet';
+                nameTitle.appendChild(nameElement);
             }
         }
 
         // Event Listeners
         signType.addEventListener('change', () => {
             const type = signType.value;
-            positionInput.parentElement.style.display = type === 'faculty' || type === 'staff' ? 'block' : 'none';
-            emailInput.parentElement.style.display = type === 'faculty' || type === 'staff' ? 'block' : 'none';
-            phoneInput.parentElement.style.display = type === 'faculty' || type === 'staff' ? 'block' : 'none';
-            alumniToggle.parentElement.style.display = type === 'faculty' || type === 'staff' ? 'block' : 'none';
-            designationsToggle.parentElement.style.display = type === 'faculty' || type === 'staff' ? 'block' : 'none';
+            
+            // Show/hide fields based on sign type
+            nameInput.parentElement.style.display = (type === 'faculty' || type === 'staff' || type === 'student' || type === 'lab') ? 'block' : 'none';
+            positionInput.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
+            emailInput.parentElement.style.display = (type === 'faculty' || type === 'staff' || type === 'student') ? 'block' : 'none';
+            phoneInput.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
+            roomNameInput.parentElement.style.display = (type === 'lab' || type === 'general-room' || type === 'custodian-closet') ? 'block' : 'none';
+            alumniToggle.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
+            designationsToggle.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
+            
+            updateSign();
+        });
+
+        departmentType.addEventListener('change', () => {
+            populateMainDepartments();
             updateSign();
         });
 
