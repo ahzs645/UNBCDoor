@@ -250,7 +250,9 @@
         }
 
         .preview {
-            /* Removed sticky, container is now sticky */
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
             background: white;
             border-radius: 20px;
             padding: 20px;
@@ -265,7 +267,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow: hidden;
             position: relative;
-            margin: 0 auto;
         }
 
         /* Remove conflicting style from media query if it exists and causes issues */
@@ -343,22 +344,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             position: sticky;
             top: 20px;
-        }
-
-        .preview {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .door-sign {
-            width: 500px;
-            height: 300px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-            position: relative;
+            height: fit-content;
         }
 
         #designationsContainer {
@@ -447,17 +433,6 @@
                     <input type="text" id="roomName" name="roomName" placeholder="Enter room name">
                 </div>
 
-                <div class="form-group toggle-buttons-container">
-                    <button type="button" id="alumniToggle" class="toggle-button">
-                        <i>🎓</i>
-                        Show Alumni Badge
-                    </button>
-                    <button type="button" id="designationsToggle" class="toggle-button">
-                        <i>📜</i>
-                        Enable Designations
-                    </button>
-                </div>
-
                 <button type="button" id="exportBtn" class="export-btn">Export Sign</button>
             </form>
         </div>
@@ -470,17 +445,6 @@
                     <option value="">Select Card Holder Type</option>
                 </select>
                 <div id="cardHolderInfo" class="card-holder-info" style="display: none; margin-top: 8px; font-size: 0.9em; color: #666;"></div>
-            </div>
-
-            <div id="designationsContainer" class="form-group" style="display: none;">
-                <div class="designation-options">
-                    <!-- Designations will be populated here -->
-                </div>
-                <div class="custom-designation">
-                    <input type="text" id="customDesignation" placeholder="Enter custom designation">
-                    <button type="button" id="addCustomDesignation">Add</button>
-                </div>
-                <div id="selectedDesignations" class="selected-designations"></div>
             </div>
 
             <div class="preview">
@@ -502,6 +466,28 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="toggle-buttons-container" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                <button type="button" id="alumniToggle" class="toggle-button">
+                    <i>🎓</i>
+                    Show Alumni Badge
+                </button>
+                <button type="button" id="designationsToggle" class="toggle-button">
+                    <i>📜</i>
+                    Enable Designations
+                </button>
+            </div>
+
+            <div id="designationsContainer" class="form-group" style="display: none;">
+                <div class="designation-options">
+                    <!-- Designations will be populated here -->
+                </div>
+                <div class="custom-designation">
+                    <input type="text" id="customDesignation" placeholder="Enter custom designation">
+                    <button type="button" id="addCustomDesignation">Add</button>
+                </div>
+                <div id="selectedDesignations" class="selected-designations"></div>
             </div>
         </div>
     </div>
@@ -1079,6 +1065,13 @@
                 const container = document.getElementById('designationsContainer');
                 if (container) {
                     container.style.display = designationsToggle.classList.contains('active') ? 'block' : 'none';
+                    // Move the container after the toggle buttons if it's being shown
+                    if (container.style.display === 'block') {
+                        const toggleButtonsContainer = document.querySelector('.toggle-buttons-container');
+                        if (toggleButtonsContainer && toggleButtonsContainer.nextSibling !== container) {
+                            toggleButtonsContainer.parentNode.insertBefore(container, toggleButtonsContainer.nextSibling);
+                        }
+                    }
                 }
             });
         }
