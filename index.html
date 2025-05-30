@@ -22,6 +22,23 @@
             padding: 20px;
         }
 
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns for form and preview */
+            gap: 30px;
+            align-items: start; /* Align items to the top */
+        }
+
+        .controls {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
         .label {
             font-style: italic;
             font-weight: 500;
@@ -54,28 +71,23 @@
         }
 
         .toggle-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             padding: 10px 20px;
-            border-radius: 4px;
-            border: none;
-            background: #035b42;
-            color: white;
-            font-weight: 500;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
             cursor: pointer;
-            transition: all 0.2s ease;
-            margin: 0;
-            flex: 1;
-            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
 
         .toggle-button.active {
-            background: #023d2c;
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
         }
 
         .toggle-button:hover {
-            background: #023d2c;
+            background: #f7fafc;
         }
 
         .toggle-button i {
@@ -85,7 +97,7 @@
         .toggle-buttons-container {
             display: flex;
             gap: 10px;
-            margin: 16px 0;
+            margin-bottom: 20px;
         }
 
         .designation-option:hover {
@@ -130,9 +142,20 @@
 
         .designation-options {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 8px;
-            margin-bottom: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .custom-designation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .selected-designations {
+            font-size: 0.9em;
+            color: #4a5568;
         }
 
         .sign-header {
@@ -164,6 +187,7 @@
             flex-shrink: 0;
             height: fit-content;
             margin-left: 20px;
+            align-self: center;
         }
         
         .alumni-badge svg {
@@ -176,32 +200,99 @@
             align-items: center;
             padding: 20px;
             background: white;
+            min-height: 200px;
         }
 
         .main-content {
             flex: 1;
+            font-family: 'Inter', sans-serif;
         }
 
-        .alumni-badge {
-            display: none;
-            flex-shrink: 0;
-            height: fit-content;
-            margin-left: 20px;
-            align-self: center;
+        .main-content .name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #333;
         }
 
-        .alumni-badge svg {
-            width: 80px;
-            height: auto;
+        .main-content .position {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #666;
+        }
+
+        .main-content .room-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .main-content .department {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #666;
+        }
+
+        .main-content .contact-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 12px;
+        }
+
+        .main-content .designations {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            margin-top: 8px;
         }
 
         .preview {
-            position: sticky;
-            top: 50%;
-            transform: translateY(-50%);
-            height: fit-content;
+            /* Removed sticky, container is now sticky */
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
+        .door-sign {
+            width: 500px;
+            height: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        /* Remove conflicting style from media query if it exists and causes issues */
+        @media (max-width: 1200px) {
+            .door-sign {
+                transform: scale(0.8); /* Keep or adjust as needed for responsiveness */
+                transform-origin: center;
+            }
+        }
+
+        /* Add styles for card holder info */
+        .card-holder-info {
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-holder-info p {
+            margin: 4px 0;
+        }
+
+        .card-holder-info strong {
+            color: #4a5568;
+        }
+
+        /* Add styles for search results */
         .search-input {
             width: 100%;
             padding: 12px;
@@ -223,7 +314,12 @@
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             margin-top: 5px;
-            display: none;
+            display: none; /* Hidden by default */
+            background-color: white; /* Ensure results are readable */
+            position: absolute; /* Position over other content */
+            width: calc(100% - 60px); /* Match form width minus padding */
+            z-index: 10; /* Ensure it appears above other elements */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .search-result-item {
@@ -238,6 +334,39 @@
 
         .search-result-item:last-child {
             border-bottom: none;
+        }
+
+        .card-holder-selector-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .preview {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .door-sign {
+            width: 500px;
+            height: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        #designationsContainer {
+            margin-top: 10px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
         }
     </style>
 </head>
@@ -263,7 +392,7 @@
                     <input type="text" id="departmentSearch" placeholder="Search departments..." class="search-input">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label for="departmentType">Department Type</label>
                     <select id="departmentType" name="departmentType">
                         <option value="">Select Department Type</option>
@@ -329,113 +458,97 @@
                     </button>
                 </div>
 
-                <div id="designationsContainer" class="form-group" style="display: none;">
-                    <div class="designation-options">
-                        <!-- Designations will be populated here -->
-                    </div>
-                    <div class="custom-designation">
-                        <input type="text" id="customDesignation" placeholder="Enter custom designation">
-                        <button type="button" id="addCustomDesignation">Add</button>
-                    </div>
-                    <div id="selectedDesignations" class="selected-designations"></div>
-                </div>
-
                 <button type="button" id="exportBtn" class="export-btn">Export Sign</button>
             </form>
         </div>
 
-        <div class="preview">
-            <div class="door-sign">
-                <div class="sign-header">
-                    <div class="unbc-logo">
-                        <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" width="178" height="80" viewBox="0 0 178 80">
-                            <g id="Layer_1-2" data-name="Layer 1">
-                                <g id="logoAndTextGroup" transform="translate(0, 15)">
-                                    <text transform="translate(57.73 36.56)" fill="#fff" font-family="HelveticaNeue-Black, 'Helvetica Neue'" font-size="8.23" font-weight="800" id="svgDepartmentText" xml:space="preserve"><tspan x="0" y="0"></tspan></text>
-                                    <g>
+        <!-- Container for card holder selection and preview -->
+        <div class="card-holder-selector-container">
+            <div class="form-group">
+                <label for="cardHolderType">Card Holder Type</label>
+                <select id="cardHolderType" name="cardHolderType">
+                    <option value="">Select Card Holder Type</option>
+                </select>
+                <div id="cardHolderInfo" class="card-holder-info" style="display: none; margin-top: 8px; font-size: 0.9em; color: #666;"></div>
+            </div>
+
+            <div id="designationsContainer" class="form-group" style="display: none;">
+                <div class="designation-options">
+                    <!-- Designations will be populated here -->
+                </div>
+                <div class="custom-designation">
+                    <input type="text" id="customDesignation" placeholder="Enter custom designation">
+                    <button type="button" id="addCustomDesignation">Add</button>
+                </div>
+                <div id="selectedDesignations" class="selected-designations"></div>
+            </div>
+
+            <div class="preview">
+                <div class="door-sign">
+                    <div class="sign-header">
+                        <div class="unbc-logo">
+                            <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" width="178" height="80" viewBox="0 0 178 80">
+                                <g id="Layer_1-2" data-name="Layer 1">
+                                    <g id="logoAndTextGroup" transform="translate(0, 15)">
+                                        <text transform="translate(57.73 36.56)" fill="#fff" font-family="HelveticaNeue-Black, 'Helvetica Neue'" font-size="8.23" font-weight="800" id="svgDepartmentText" xml:space="preserve"><tspan x="0" y="0"></tspan></text>
                                         <g>
-                                            <polygon points="17.3 6.57 12.41 30.68 16.66 30.68 19.93 14.87 22.34 23.75 26.4 23.75 31.22 0 27.13 0 24.14 14.98 21.39 6.57 17.3 6.57" fill="#fff"/>
-                                            <path d="M33.14,17.24l.41-2.01h1.83c1.14,0,1.98.57,1.89,2.04-.12,1.97-1.62,2.7-2.3,2.69h-2.39l.56-2.72-3.98-1.24-1.59,7.75h7.79c2.43,0,5.84-2.22,6.09-6.1.2-3.15-.73-4.02-2.1-5.03.98-.93,1.24-1.59,1.21-3.06-.04-1.74-1.25-2.96-2.59-3h-6.88l-.68,3.3,4.05.81.27-1.31h.97c.67.08.97.55.92,1.13-.1,1.1-.88,1.7-1.56,1.71h-.9l.31-1.53-4.05-.81-1.26,6.14,3.98,1.24Z" fill="#fff"/>
-                                            <path d="M6.81,20.09c-1.01,0-2.4-.25-2.21-1.31l2.61-12.26H2.89S.53,17.64.06,19.84c-.47,2.2,1.65,4.35,5.84,4.35s6.91-2.07,7.41-4.44c.5-2.37,2.81-13.23,2.81-13.23h-4.35l-2.6,12.22c-.24.93-1.34,1.35-2.36,1.35" fill="#fff" fill-rule="evenodd"/>
-                                            <path d="M54.97,6.3c-3.69-.47-11.12,1.16-12.75,8.84-1.63,7.68,5.29,9.62,9.03,9.06l1.08-5.09c-3.62.82-6.22-.35-5.44-4.01.77-3.62,4.08-5,7.08-4.31l1-4.48" fill="#fff" fill-rule="evenodd"/>
-                                            <path d="M63.66,8.1l-.78,3.66c-.25,1.16-1.18,2.13-2.72,2.13s-1.96-.97-1.74-2.03l.8-3.76h.76l-.76,3.55c-.26,1.23.41,1.56,1.1,1.56s1.55-.32,1.81-1.55l.76-3.57h.76Z" fill="#fff"/>
-                                            <path d="M68.61,8.1h.74l-1.2,5.64h-.86l-1.9-4.56h-.02l-.97,4.56h-.74l1.2-5.64h.9l1.85,4.56h.02l.97-4.56Z" fill="#fff"/>
-                                            <path d="M70.22,13.74h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
-                                            <path d="M76.35,8.1h.86l-3.26,5.64h-.81l-.86-5.64h.85l.59,4.81h.02l2.62-4.81Z" fill="#fff"/>
-                                            <path d="M81.01,13.74h-4.17l1.2-5.64h4.11l-.14.68h-3.35l-.37,1.73h3.09l-.14.68h-3.09l-.4,1.89h3.4l-.14.68Z" fill="#fff"/>
-                                            <path d="M83.93,8.75h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM83.38,11.32h1.85c.91,0,.89.54.79,1.01-.05.21-.2,1.07-.17,1.41h.93l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
-                                            <path d="M91.93,9.75c.15-.87-.52-1.15-1.16-1.15-.48,0-1.32.13-1.5.99-.1.48.2.64.52.72l1.53.37c.69.17,1.15.61.96,1.51-.28,1.34-1.6,1.71-2.57,1.71-1.05,0-1.39-.31-1.59-.54-.39-.43-.38-.9-.27-1.43h.72c-.22,1.02.55,1.32,1.28,1.32.55,0,1.51-.14,1.68-.95.13-.59-.11-.78-.99-1l-1.1-.27c-.35-.09-1.13-.35-.92-1.33.19-.88.94-1.74,2.31-1.74,1.97,0,1.92,1.18,1.82,1.8h-.72Z" fill="#fff"/>
-                                            <path d="M93.8,13.74h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
-                                            <path d="M95.82,8.1h4.58l-.14.68h-1.91l-1.06,4.97h-.76l1.06-4.97h-1.91l.14-.68Z" fill="#fff"/>
-                                            <path d="M102.31,13.74h-.76l.48-2.27-1.41-3.37h.89l1.04,2.71,2.2-2.71h.9l-2.85,3.37-.48,2.27Z" fill="#fff"/>
-                                            <path d="M112.36,10.92c-.28,1.33-1.23,2.29-2.45,2.29s-1.76-.97-1.48-2.29c.28-1.33,1.23-2.29,2.45-2.29s1.76.97,1.48,2.29ZM113.15,10.92c.26-1.22-.01-2.97-2.12-2.97s-3.12,1.75-3.38,2.97c-.26,1.22.01,2.97,2.12,2.97s3.12-1.75,3.38-2.97Z" fill="#fff"/>
-                                            <path d="M114.29,13.74h-.76l1.2-5.64h3.91l-.14.68h-3.14l-.37,1.73h2.77l-.14.68h-2.77l-.54,2.56Z" fill="#fff"/>
-                                            <path d="M62.93,17.59h.74l-1.2,5.64h-.86l-1.9-4.56h-.02l-.97,4.56h-.74l1.2-5.64h.9l1.85,4.56h.02l.97-4.56Z" fill="#fff"/>
-                                            <path d="M68.69,20.42c-.28,1.33-1.23,2.29-2.45,2.29s-1.76-.97-1.48-2.29c.28-1.33,1.23-2.29,2.45-2.29s1.76.97,1.48,2.29ZM69.48,20.42c.26-1.22-.01-2.97-2.12-2.97s-3.12,1.75-3.38,2.97c-.26,1.22.01,2.97,2.12,2.97s3.12-1.75,3.38-2.97Z" fill="#fff"/>
-                                            <path d="M71.7,18.25h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM71.15,20.82h1.85c.91,0,.89.54.79,1.01-.04.21-.2,1.07-.17,1.41h.94l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
-                                            <path d="M75.93,17.59h4.58l-.14.68h-1.91l-1.06,4.97h-.76l1.06-4.97h-1.91l.14-.68Z" fill="#fff"/>
-                                            <path d="M84.94,17.59h.76l-1.2,5.64h-.76l.56-2.63h-2.95l-.56,2.63h-.76l1.2-5.64h.76l-.5,2.33h2.95l.5-2.33Z" fill="#fff"/>
-                                            <path d="M89.94,23.24h-4.16l1.2-5.64h4.11l-.14.68h-3.35l-.37,1.73h3.09l-.14.68h-3.09l-.4,1.89h3.4l-.14.68Z" fill="#fff"/>
-                                            <path d="M92.85,18.25h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM92.31,20.82h1.85c.91,0,.89.54.79,1.01-.04.21-.2,1.07-.17,1.41h.94l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
-                                            <path d="M101.55,17.59h.74l-1.2,5.64h-.86l-1.9-4.56h-.02l-.97,4.56h-.74l1.2-5.64h.9l1.85,4.56h.02l.97-4.56Z" fill="#fff"/>
-                                            <path d="M106.28,18.25h1.38c.85,0,1.11.3,1,.82-.15.69-.64.91-1.37.91h-1.38l.37-1.74ZM104.45,23.24h2.43c1.25,0,2.08-.76,2.27-1.67.21-.97-.39-1.23-.73-1.37.68-.29.93-.81,1-1.18.16-.77-.24-1.42-1.29-1.42h-2.48l-1.2,5.64ZM105.78,20.6h1.5c.62,0,1.29.16,1.12.95-.13.63-.62,1.03-1.41,1.03h-1.63l.42-1.98Z" fill="#fff"/>
-                                            <path d="M111.63,18.25h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM111.08,20.82h1.85c.91,0,.89.54.79,1.01-.05.21-.2,1.07-.17,1.41h.94l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
-                                            <path d="M116.26,23.24h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
-                                            <path d="M118.28,17.59h4.58l-.14.68h-1.91l-1.06,4.97h-.76l1.06-4.97h-1.91l.14-.68Z" fill="#fff"/>
-                                            <path d="M123.25,23.24h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
-                                            <path d="M128.81,19.24c.15-.87-.52-1.15-1.15-1.15-.48,0-1.32.13-1.5.99-.1.48.2.64.52.72l1.53.37c.69.17,1.15.61.96,1.51-.28,1.34-1.6,1.71-2.57,1.71-1.05,0-1.39-.31-1.59-.54-.39-.43-.38-.9-.27-1.43h.72c-.22,1.02.55,1.32,1.28,1.32.55,0,1.51-.14,1.68-.95.13-.59-.11-.78-.99-1l-1.1-.27c-.35-.09-1.13-.35-.92-1.33.19-.88.94-1.74,2.31-1.74,1.97,0,1.92,1.18,1.82,1.8h-.72Z" fill="#fff"/>
-                                            <path d="M134.71,17.59h.76l-1.2,5.64h-.76l.56-2.63h-2.95l-.56,2.63h-.76l1.2-5.64h.76l-.5,2.33h2.95l.5-2.33Z" fill="#fff"/>
-                                            <path d="M142.45,19.29c0-.99-.79-1.17-1.33-1.17-1.02,0-2.01.75-2.32,2.24-.28,1.33-.03,2.35,1.37,2.35.5,0,1.4-.24,1.94-1.55h.74c-.77,2.13-2.52,2.22-2.94,2.22-1.28,0-2.36-.83-1.9-3,.37-1.74,1.61-2.94,3.26-2.94,1.45,0,2.02.9,1.93,1.85h-.74Z" fill="#fff"/>
-                                            <path d="M148.35,20.42c-.28,1.33-1.23,2.29-2.45,2.29s-1.76-.97-1.48-2.29c.28-1.33,1.23-2.29,2.45-2.29s1.76.97,1.48,2.29ZM149.14,20.42c.26-1.22-.01-2.97-2.12-2.97s-3.12,1.75-3.38,2.97c-.26,1.22.01,2.97,2.12,2.97s3.12-1.75,3.38-2.97Z" fill="#fff"/>
-                                            <path d="M150.35,22.56h2.86l-.14.68h-3.62l1.2-5.64h.76l-1.06,4.97Z" fill="#fff"/>
-                                            <path d="M159.48,17.59l-.78,3.66c-.25,1.16-1.18,2.13-2.72,2.13s-1.96-.97-1.74-2.03l.8-3.76h.76l-.76,3.55c-.26,1.23.41,1.56,1.1,1.56s1.55-.32,1.81-1.55l.76-3.57h.76Z" fill="#fff"/>
-                                            <path d="M164.13,23.24l.71-3.33c.03-.17.2-.88.31-1.41h-.02l-2.59,4.74h-.75l-.58-4.73h-.02c-.11.52-.25,1.23-.28,1.4l-.71,3.33h-.74l1.2-5.64h1.09l.6,4.77h.02l2.62-4.77h1.08l-1.2,5.64h-.74Z" fill="#fff"/>
-                                            <path d="M167.84,18.25h1.38c.85,0,1.11.3,1,.82-.15.69-.64.91-1.37.91h-1.38l.37-1.74ZM166.02,23.24h2.43c1.25,0,2.08-.76,2.27-1.67.21-.97-.39-1.23-.73-1.37.68-.29.93-.81,1-1.18.16-.77-.24-1.42-1.29-1.42h-2.48l-1.2,5.64ZM167.34,20.6h1.5c.62,0,1.29.16,1.12.95-.13.63-.62,1.03-1.41,1.03h-1.63l.42-1.98Z" fill="#fff"/>
-                                            <path d="M172.15,23.24h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
-                                            <path d="M175.08,20.92l1.43-2.48h.02l.3,2.48h-1.75ZM176.96,21.59l.21,1.64h.83l-.84-5.64h-.86l-3.32,5.64h.79l.94-1.64h2.26Z" fill="#fff"/>
+                                            <g>
+                                                <polygon points="17.3 6.57 12.41 30.68 16.66 30.68 19.93 14.87 22.34 23.75 26.4 23.75 31.22 0 27.13 0 24.14 14.98 21.39 6.57 17.3 6.57" fill="#fff"/>
+                                                <path d="M33.14,17.24l.41-2.01h1.83c1.14,0,1.98.57,1.89,2.04-.12,1.97-1.62,2.7-2.3,2.69h-2.39l.56-2.72-3.98-1.24-1.59,7.75h7.79c2.43,0,5.84-2.22,6.09-6.1.2-3.15-.73-4.02-2.1-5.03.98-.93,1.24-1.59,1.21-3.06-.04-1.74-1.25-2.96-2.59-3h-6.88l-.68,3.3,4.05.81.27-1.31h.97c.67.08.97.55.92,1.13-.1,1.1-.88,1.7-1.56,1.71h-.9l.31-1.53-4.05-.81-1.26,6.14,3.98,1.24Z" fill="#fff"/>
+                                                <path d="M6.81,20.09c-1.01,0-2.4-.25-2.21-1.31l2.61-12.26H2.89S.53,17.64.06,19.84c-.47,2.2,1.65,4.35,5.84,4.35s6.91-2.07,7.41-4.44c.5-2.37,2.81-13.23,2.81-13.23h-4.35l-2.6,12.22c-.24.93-1.34,1.35-2.36,1.35" fill="#fff" fill-rule="evenodd"/>
+                                                <path d="M54.97,6.3c-3.69-.47-11.12,1.16-12.75,8.84-1.63,7.68,5.29,9.62,9.03,9.06l1.08-5.09c-3.62.82-6.22-.35-5.44-4.01.77-3.62,4.08-5,7.08-4.31l1-4.48" fill="#fff" fill-rule="evenodd"/>
+                                                <path d="M63.66,8.1l-.78,3.66c-.25,1.16-1.18,2.13-2.72,2.13s-1.96-.97-1.74-2.03l.8-3.76h.76l-.76,3.55c-.26,1.23.41,1.56,1.1,1.56s1.55-.32,1.81-1.55l.76-3.57h.76Z" fill="#fff"/>
+                                                <path d="M68.61,8.1h.74l-1.2,5.64h-.86l-1.9-4.56h-.02l-.97,4.56h-.74l1.2-5.64h.9l1.85,4.56h.02l.97-4.56Z" fill="#fff"/>
+                                                <path d="M70.22,13.74h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
+                                                <path d="M76.35,8.1h.86l-3.26,5.64h-.81l-.86-5.64h.85l.59,4.81h.02l2.62-4.81Z" fill="#fff"/>
+                                                <path d="M81.01,13.74h-4.17l1.2-5.64h4.11l-.14.68h-3.35l-.37,1.73h3.09l-.14.68h-3.09l-.4,1.89h3.4l-.14.68Z" fill="#fff"/>
+                                                <path d="M83.93,8.75h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM83.38,11.32h1.85c.91,0,.89.54.79,1.01-.05.21-.2,1.07-.17,1.41h.93l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
+                                                <path d="M91.93,9.75c.15-.87-.52-1.15-1.16-1.15-.48,0-1.32.13-1.5.99-.1.48.2.64.52.72l1.53.37c.69.17,1.15.61.96,1.51-.28,1.34-1.6,1.71-2.57,1.71-1.05,0-1.39-.31-1.59-.54-.39-.43-.38-.9-.27-1.43h.72c-.22,1.02.55,1.32,1.28,1.32.55,0,1.51-.14,1.68-.95.13-.59-.11-.78-.99-1l-1.1-.27c-.35-.09-1.13-.35-.92-1.33.19-.88.94-1.74,2.31-1.74,1.97,0,1.92,1.18,1.82,1.8h-.72Z" fill="#fff"/>
+                                                <path d="M93.8,13.74h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
+                                                <path d="M95.82,8.1h4.58l-.14.68h-1.91l-1.06,4.97h-.76l1.06-4.97h-1.91l.14-.68Z" fill="#fff"/>
+                                                <path d="M102.31,13.74h-.76l.48-2.27-1.41-3.37h.89l1.04,2.71,2.2-2.71h.9l-2.85,3.37-.48,2.27Z" fill="#fff"/>
+                                                <path d="M112.36,10.92c-.28,1.33-1.23,2.29-2.45,2.29s-1.76-.97-1.48-2.29c.28-1.33,1.23-2.29,2.45-2.29s1.76.97,1.48,2.29ZM113.15,10.92c.26-1.22-.01-2.97-2.12-2.97s-3.12,1.75-3.38,2.97c-.26,1.22.01,2.97,2.12,2.97s3.12-1.75,3.38-2.97Z" fill="#fff"/>
+                                                <path d="M114.29,13.74h-.76l1.2-5.64h3.91l-.14.68h-3.14l-.37,1.73h2.77l-.14.68h-2.77l-.54,2.56Z" fill="#fff"/>
+                                                <path d="M62.93,17.59h.74l-1.2,5.64h-.86l-1.9-4.56h-.02l-.97,4.56h-.74l1.2-5.64h.9l1.85,4.56h.02l.97-4.56Z" fill="#fff"/>
+                                                <path d="M68.69,20.42c-.28,1.33-1.23,2.29-2.45,2.29s-1.76-.97-1.48-2.29c.28-1.33,1.23-2.29,2.45-2.29s1.76.97,1.48,2.29ZM69.48,20.42c.26-1.22-.01-2.97-2.12-2.97s-3.12,1.75-3.38,2.97c-.26,1.22.01,2.97,2.12,2.97s3.12-1.75,3.38-2.97Z" fill="#fff"/>
+                                                <path d="M71.7,18.25h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM71.15,20.82h1.85c.91,0,.89.54.79,1.01-.04.21-.2,1.07-.17,1.41h.94l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
+                                                <path d="M75.93,17.59h4.58l-.14.68h-1.91l-1.06,4.97h-.76l1.06-4.97h-1.91l.14-.68Z" fill="#fff"/>
+                                                <path d="M84.94,17.59h.76l-1.2,5.64h-.76l.56-2.63h-2.95l-.56,2.63h-.76l1.2-5.64h.76l-.5,2.33h2.95l.5-2.33Z" fill="#fff"/>
+                                                <path d="M89.94,23.24h-4.16l1.2-5.64h4.11l-.14.68h-3.35l-.37,1.73h3.09l-.14.68h-3.09l-.4,1.89h3.4l-.14.68Z" fill="#fff"/>
+                                                <path d="M92.85,18.25h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM92.31,20.82h1.85c.91,0,.89.54.79,1.01-.04.21-.2,1.07-.17,1.41h.94l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
+                                                <path d="M101.55,17.59h.74l-1.2,5.64h-.86l-1.9-4.56h-.02l-.97,4.56h-.74l1.2-5.64h.9l1.85,4.56h.02l.97-4.56Z" fill="#fff"/>
+                                                <path d="M106.28,18.25h1.38c.85,0,1.11.3,1,.82-.15.69-.64.91-1.37.91h-1.38l.37-1.74ZM104.45,23.24h2.43c1.25,0,2.08-.76,2.27-1.67.21-.97-.39-1.23-.73-1.37.68-.29.93-.81,1-1.18.16-.77-.24-1.42-1.29-1.42h-2.48l-1.2,5.64ZM105.78,20.6h1.5c.62,0,1.29.16,1.12.95-.13.63-.62,1.03-1.41,1.03h-1.63l.42-1.98Z" fill="#fff"/>
+                                                <path d="M111.63,18.25h1.9c.38,0,1,.07.81.94-.18.83-.8.97-1.35.97h-1.77l.41-1.92ZM111.08,20.82h1.85c.91,0,.89.54.79,1.01-.05.21-.2,1.07-.17,1.41h.94l.03-.13c-.21-.13-.22-.25-.16-.57l.17-1.02c.14-.79-.16-.93-.45-1.06.41-.21.9-.52,1.07-1.35.25-1.19-.6-1.52-1.53-1.52h-2.61l-1.2,5.64h.76l.51-2.42Z" fill="#fff"/>
+                                                <path d="M116.26,23.24h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
+                                                <path d="M118.28,17.59h4.58l-.14.68h-1.91l-1.06,4.97h-.76l1.06-4.97h-1.91l.14-.68Z" fill="#fff"/>
+                                                <path d="M123.25,23.24h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
+                                                <path d="M128.81,19.24c.15-.87-.52-1.15-1.15-1.15-.48,0-1.32.13-1.5.99-.1.48.2.64.52.72l1.53.37c.69.17,1.15.61.96,1.51-.28,1.34-1.6,1.71-2.57,1.71-1.05,0-1.39-.31-1.59-.54-.39-.43-.38-.9-.27-1.43h.72c-.22,1.02.55,1.32,1.28,1.32.55,0,1.51-.14,1.68-.95.13-.59-.11-.78-.99-1l-1.1-.27c-.35-.09-1.13-.35-.92-1.33.19-.88.94-1.74,2.31-1.74,1.97,0,1.92,1.18,1.82,1.8h-.72Z" fill="#fff"/>
+                                                <path d="M134.71,17.59h.76l-1.2,5.64h-.76l.56-2.63h-2.95l-.56,2.63h-.76l1.2-5.64h.76l-.5,2.33h2.95l.5-2.33Z" fill="#fff"/>
+                                                <path d="M142.45,19.29c0-.99-.79-1.17-1.33-1.17-1.02,0-2.01.75-2.32,2.24-.28,1.33-.03,2.35,1.37,2.35.5,0,1.4-.24,1.94-1.55h.74c-.77,2.13-2.52,2.22-2.94,2.22-1.28,0-2.36-.83-1.9-3,.37-1.74,1.61-2.94,3.26-2.94,1.45,0,2.02.9,1.93,1.85h-.74Z" fill="#fff"/>
+                                                <path d="M148.35,20.42c-.28,1.33-1.23,2.29-2.45,2.29s-1.76-.97-1.48-2.29c.28-1.33,1.23-2.29,2.45-2.29s1.76.97,1.48,2.29ZM149.14,20.42c.26-1.22-.01-2.97-2.12-2.97s-3.12,1.75-3.38,2.97c-.26,1.22.01,2.97,2.12,2.97s3.12-1.75,3.38-2.97Z" fill="#fff"/>
+                                                <path d="M150.35,22.56h2.86l-.14.68h-3.62l1.2-5.64h.76l-1.06,4.97Z" fill="#fff"/>
+                                                <path d="M159.48,17.59l-.78,3.66c-.25,1.16-1.18,2.13-2.72,2.13s-1.96-.97-1.74-2.03l.8-3.76h.76l-.76,3.55c-.26,1.23.41,1.56,1.1,1.56s1.55-.32,1.81-1.55l.76-3.57h.76Z" fill="#fff"/>
+                                                <path d="M164.13,23.24l.71-3.33c.03-.17.2-.88.31-1.41h-.02l-2.59,4.74h-.75l-.58-4.73h-.02c-.11.52-.25,1.23-.28,1.4l-.71,3.33h-.74l1.2-5.64h1.09l.6,4.77h.02l2.62-4.77h1.08l-1.2,5.64h-.74Z" fill="#fff"/>
+                                                <path d="M167.84,18.25h1.38c.85,0,1.11.3,1,.82-.15.69-.64.91-1.37.91h-1.38l.37-1.74ZM166.02,23.24h2.43c1.25,0,2.08-.76,2.27-1.67.21-.97-.39-1.23-.73-1.37.68-.29.93-.81,1-1.18.16-.77-.24-1.42-1.29-1.42h-2.48l-1.2,5.64ZM167.34,20.6h1.5c.62,0,1.29.16,1.12.95-.13.63-.62,1.03-1.41,1.03h-1.63l.42-1.98Z" fill="#fff"/>
+                                                <path d="M172.15,23.24h-.76l1.2-5.64h.76l-1.2,5.64Z" fill="#fff"/>
+                                                <path d="M175.08,20.92l1.43-2.48h.02l.3,2.48h-1.75ZM176.96,21.59l.21,1.64h.83l-.84-5.64h-.86l-3.32,5.64h.79l.94-1.64h2.26Z" fill="#fff"/>
+                                            </g>
                                         </g>
                                     </g>
                                 </g>
-                            </g>
-                        </svg>
+                            </svg>
+                        </div>
                     </div>
-                </div>
-                <div class="sign-content">
-                    <div class="main-content">
-                        <div class="name-title"></div>
-                        <div class="department-info"></div>
-                        <div class="contact-info"></div>
-                        <div class="designations-display"></div>
-                    </div>
-                    <div class="alumni-badge">
-                        <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.27 67.82">
-                            <defs>
-                                <style>
-                                    .cls-1 { fill: #c2952d; }
-                                    .cls-2 { fill: #231f20; }
-                                    .cls-3 { fill: #fff; }
-                                    .cls-4 { fill: #055b42; }
-                                </style>
-                            </defs>
-                            <g id="Layer_1-2" data-name="Layer 1">
-                                <g>
-                                    <rect class="cls-1" x=".47" y="36.17" width="58.33" height="11.08"/>
-                                    <path class="cls-2" d="M58.34,36.17v11.08l.46-.47H.47l.46.47v-11.08l-.46.47h58.33l-.46-.47ZM0,36.17v11.54h59.27v-12.01H0v.47Z"/>
-                                    <path class="cls-4" d="M7.3,2.21v28.04c.23,5.53,1.73,16.08,9.29,24.44,5.9,6.52,8.28,8.89,13.2,12.56,5.06-3.76,7.59-6.18,13.19-12.55,8.91-10.15,9.17-22.65,9.17-24.04V2.21H7.3Z"/>
-                                    <path class="cls-2" d="M51.69,2.21v28.45c0,1.37-.25,13.72-9.05,23.74-5.62,6.4-8.08,8.73-13.12,12.48h.56c-4.93-3.67-7.23-5.96-13.13-12.5-7.46-8.24-8.95-18.66-9.17-24.14,0,.02,0-28.02,0-28.02l-.47.47h44.85l-.46-.47ZM6.84,2.21v28.04c.23,5.62,1.76,16.29,9.41,24.75,5.86,6.48,8.32,8.93,13.27,12.62l.28.21.28-.21c5.05-3.75,7.65-6.23,13.26-12.61,9.02-10.28,9.28-22.94,9.28-24.35V1.74H6.84v.47Z"/>
-                                    <path class="cls-1" d="M30,33.04s.43.85.85,1.02c.43.17.43.51.34.94-.08.43-.17.68.09,1.02.26.34.17,1.02,0,1.36-.17.34.17.6.68.43.51-.17,1.02.43.85.68-.17.25-.77,1.88-.08,1.88s1.11.51.85.85c-.25.34.26,1.36-.34,1.62-.6.26-.43.68-.43.68,0,0,1.36,0,1.62.43.26.43.51.77.09,1.19-.43.43-.17,1.02-.17,1.02,0,0,.43.17.77.09.34-.09.77.51.34.77-.43.26-.17.68-.17.68,0,0,.43.34.76.17.34-.17.69.85.18,1.11-.51.26-.77.77-.77.77,0,0,.77-.08.77.34s-.51.77-.43,1.11c.09.34.6.6.94.43.34-.17,1.36.09.94.51-.43.43-.68,1.11-1.02,1.19,0,0,.08.34.08.68s-.68.6-1.19.51c-.51-.08-1.96-.08-2.39.17-.43.25-.85.51-1.36.43-.51-.09-1.19-.17-1.19-.17,0,0,.14,1.7.41,1.76.66.17,2.06.45,2.66.88.6.43,1.11.94,1.02,2.13,0,0-.51-1.36-1.96-1.36.6.94,1.28,2.73-.68,4.09.17-.68.26-2.13-.94-2.9-.34,1.28-.77,3.49-2.22,3.75,0,0,1.62-2.81.08-3.92-.94.68-1.87,1.79-1.7,2.64-.51-.26-1.62-1.62-.17-2.98-1.02-.17-2.05-.17-2.73.94.26-1.36,1.22-3.01,3.26-2.93,0,0,.95-1.13.6-1.82-1.45.17-2.33-.37-2.85-.11-.51.26-.85.6-1.28.51-.43-.08-.34-.85,0-1.11,0,0,0-.51-.43-.43-.43.08-.77-.17-.68-.43.09-.26-.68-.09-1.19-.34-.51-.26.43-.68.77-.68s1.28-.94,1.62-.94c0,0-.34-.68-.94-.85-.6-.17-1.02-.85-1.02-1.11s.26-.34.68-.43c.43-.09,1.19-.34,1.19-.34,0,0,.94-.77,1.45-.43.51.34.6-.09.6-.09,0,0-.34-.43-.77-.94-.43-.51-.34-.85-.34-.85,0,0-.34,0-.68-.34-.34-.34.17-.77.68-.77s1.11-.09,1.11-.09l.43-.51s-.26-.17-1.11-.43c-.85-.26-.85-.51-.43-.94.43-.43.09-.68.09-.68,0,0-.51-.34-.6-.68-.09-.34.6-1.02,1.02-.77.43.25.68,0,.68,0v-.94s-.51-.77-.34-1.11c.17-.34-.17-.51,1.02-.09l.43-.43s-.08-.43-.25-.85c-.17-.43-.34-.85,0-1.28.34-.43.85-.77.85-.77l.68-.94s-.6-.26-.43-.6c.17-.34,1.28-1.36,1.79-1.45"/>
-                                    <rect class="cls-3" x="2.94" y="40.38" width="53.43" height="11.07"/>
-                                    <polygon class="cls-3" points="23.31 13.42 20.24 28.6 22.91 28.6 24.97 18.65 26.48 24.24 29.04 24.24 32.08 9.29 29.5 9.29 27.62 18.71 25.89 13.42 23.31 13.42"/>
-                                    <path class="cls-3" d="M33.29,20.14l.26-1.26h1.15c.72,0,1.24.36,1.19,1.28-.08,1.24-1.02,1.7-1.45,1.69h-1.51l.35-1.72-2.5-.78-1,4.88h4.91c1.53,0,3.68-1.39,3.83-3.84.13-1.98-.46-2.53-1.32-3.16.62-.59.78-1,.76-1.93-.02-1.1-.78-1.87-1.63-1.89h-4.33l-.43,2.07,2.55.51.17-.83h.61c.42.05.61.35.58.71-.06.69-.55,1.07-.98,1.07h-.57l.2-.96-2.55-.51-.79,3.86,2.5.78Z"/>
-                                    <path class="cls-3" d="M16.71,21.94c-.64,0-1.51-.16-1.39-.82l1.64-7.72h-2.72s-1.49,7-1.78,8.38c-.29,1.38,1.04,2.74,3.68,2.74s4.35-1.3,4.67-2.79c.32-1.49,1.77-8.33,1.77-8.33h-2.74l-1.63,7.69c-.15.59-.85.85-1.48.85"/>
-                                    <path class="cls-3" d="M47.03,13.25c-2.33-.3-7,.73-8.03,5.57-1.03,4.83,3.33,6.05,5.68,5.7l.68-3.2c-2.28.52-3.92-.22-3.43-2.53.48-2.28,2.57-3.15,4.46-2.72l.63-2.82Z"/>
-                                    <rect class="cls-1" x="7.3" y=".47" width="44.85" height="4.02"/>
-                                    <path class="cls-2" d="M51.69.47v4.02l.46-.47H7.31l.46.47V.47l-.46.47h44.85l-.46-.47ZM6.84.47v4.49h45.79V0H6.84v.47Z"/>
-                                    <path class="cls-2" d="M12.86,48.96h1.33l.47-1.33h2.24l.45,1.33h1.37l-2.24-5.99h-1.35l-2.27,5.99ZM15.79,44.45h.02l.75,2.2h-1.55l.78-2.2ZM19.33,48.96h4.24v-1.11h-2.92v-4.88h-1.32v5.99ZM29.46,42.97h-1.32v3.72c0,.89-.3,1.3-1.24,1.3-1.06,0-1.23-.65-1.23-1.3v-3.72h-1.32v3.72c0,1.63.94,2.41,2.55,2.41s2.56-.79,2.56-2.41v-3.72ZM30.68,48.96h1.23v-4.2h.02l1.47,4.2h1.02l1.47-4.24h.02v4.24h1.23v-5.99h-1.85l-1.32,4.12h-.02l-1.4-4.12h-1.85v5.99ZM38.37,48.96h1.23v-4.01h.02l2.49,4.01h1.32v-5.99h-1.23v4.02h-.02l-2.5-4.02h-1.31v5.99ZM44.66,48.96h1.32v-5.99h-1.32v5.99Z"/>
-                                    <path class="cls-2" d="M55.9,50.98H3.4v-10.14h52.5v10.14ZM56.81,39.91l-5.47-2.41c-.1.5-.23,1.02-.36,1.56H8.56c-.14-.56-.27-1.12-.38-1.66l-5.69,2.52h-.02v12h54.36v-12h-.02Z"/>
-                                </g>
-                            </g>
-                        </svg>
+                    <div class="sign-content">
+                        <div class="main-content">
+                            <div class="name-title"></div>
+                            <div class="department-info"></div>
+                            <div class="contact-info"></div>
+                            <div class="designations-display"></div>
+                        </div>
+                        <div class="alumni-badge">
+                            <img src="components/alumni-badge.svg" alt="UNBC Alumni Badge" width="80" height="auto">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -444,6 +557,7 @@
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="js/departments.js"></script>
+    <script src="js/cardHolders.js"></script>
     <script>
         // DOM Elements
         const signForm = document.getElementById('signForm');
@@ -464,6 +578,9 @@
         const exportBtn = document.getElementById('exportBtn');
         const signContent = document.querySelector('.sign-content .main-content');
         const alumniBadge = document.querySelector('.alumni-badge');
+        const doorSign = document.querySelector('.door-sign');
+        const cardHolderTypeSelect = document.getElementById('cardHolderType');
+        const cardHolderInfoDiv = document.getElementById('cardHolderInfo');
 
         // Designation list
         const designationList = [
@@ -501,57 +618,25 @@
 
         // Initialize designation options
         function initializeDesignationOptions() {
-            const designationOptions = document.querySelector('.designation-options');
-            designationOptions.innerHTML = '';
-            
+            const container = document.querySelector('.designation-options');
+            if (!container) return;
+
             designationList.forEach(designation => {
-                const div = document.createElement('div');
-                div.className = 'designation-option';
+                const label = document.createElement('label');
+                label.className = 'designation-option';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.name = 'designations';
                 checkbox.value = designation;
-                checkbox.id = `designation-${designation}`;
-                checkbox.addEventListener('change', updateSelectedDesignations);
                 
-                const label = document.createElement('label');
-                label.htmlFor = `designation-${designation}`;
-                label.textContent = designation;
-                
-                div.appendChild(checkbox);
-                div.appendChild(label);
-                designationOptions.appendChild(div);
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(designation));
+                container.appendChild(label);
             });
 
-            // Add custom designation functionality
-            const customDesignationInput = document.getElementById('customDesignation');
-            const addCustomDesignationBtn = document.getElementById('addCustomDesignation');
-            
-            addCustomDesignationBtn.addEventListener('click', () => {
-                const customValue = customDesignationInput.value.trim();
-                if (customValue) {
-                    const div = document.createElement('div');
-                    div.className = 'designation-option';
-                    
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.name = 'designations';
-                    checkbox.value = customValue;
-                    checkbox.id = `designation-${customValue}`;
-                    checkbox.addEventListener('change', updateSelectedDesignations);
-                    
-                    const label = document.createElement('label');
-                    label.htmlFor = `designation-${customValue}`;
-                    label.textContent = customValue;
-                    
-                    div.appendChild(checkbox);
-                    div.appendChild(label);
-                    designationOptions.appendChild(div);
-                    
-                    customDesignationInput.value = '';
-                }
-            });
+            // Add event listeners for designation changes
+            container.addEventListener('change', updateSelectedDesignations);
         }
 
         // Update SVG text
@@ -564,9 +649,25 @@
                     // Clear existing tspans
                     svgText.innerHTML = '';
                     
-                    if (department) {
+                    // Get the full department path
+                    const deptType = departmentType.value;
+                    const mainDept = mainDepartment.value;
+                    const subDept = subDepartment.value;
+                    const subSubDept = subSubDepartment.value;
+
+                    // Use the most specific department level available
+                    let displayText = '';
+                    if (subSubDept) {
+                        displayText = subSubDept;
+                    } else if (subDept) {
+                        displayText = subDept;
+                    } else if (mainDept) {
+                        displayText = mainDept;
+                    }
+                    
+                    if (displayText) {
                         // Split text into words
-                        const words = department.split(' ');
+                        const words = displayText.split(' ');
                         let currentLine = '';
                         let lines = [];
                         
@@ -603,41 +704,114 @@
             }
         }
 
+        // Populate card holder types dropdown
+        function populateCardHolderTypes() {
+            cardHolderTypeSelect.innerHTML = '<option value="">Select Card Holder Type</option>';
+            if (typeof cardHolders !== 'undefined') {
+                Object.entries(cardHolders).forEach(([type, spec]) => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = `${spec.name} (${spec.viewableArea.width}" × ${spec.viewableArea.height}")`;
+                    cardHolderTypeSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Update card holder info display
+        function updateCardHolderInfo(type) {
+            if (cardHolderInfoDiv) {
+                if (type && cardHolders[type]) {
+                    const spec = cardHolders[type];
+                    cardHolderInfoDiv.innerHTML = `
+                        <p><strong>Description:</strong> ${spec.description}</p>
+                        <p><strong>Viewable Area:</strong> ${spec.viewableArea.width}" × ${spec.viewableArea.height}"</p>
+                        <p><strong>Total Area:</strong> ${spec.totalArea.width}" × ${spec.totalArea.height}"</p>
+                        <p><strong>Border Width:</strong> ${spec.borderWidth}"</p>
+                    `;
+                    cardHolderInfoDiv.style.display = 'block';
+                } else {
+                    cardHolderInfoDiv.style.display = 'none';
+                }
+            }
+        }
+
+        // Update door sign scaling based on card holder type
+        function updateDoorSignDimensions(type) {
+            const baseWidthPx = 500;
+            const baseHeightPx = 300;
+
+            if (doorSign) {
+                if (type && cardHolders[type]) {
+                    const spec = cardHolders[type];
+                    const viewableWidthIn = spec.viewableArea.width;
+                    const viewableHeightIn = spec.viewableArea.height;
+
+                    const targetWidthPx = viewableWidthIn * 96;
+                    const targetHeightPx = viewableHeightIn * 96;
+
+                    const scaleX = targetWidthPx / baseWidthPx;
+                    const scaleY = targetHeightPx / baseHeightPx;
+                    const scaleFactor = Math.min(scaleX, scaleY);
+
+                    doorSign.style.transform = `scale(${scaleFactor})`;
+                    doorSign.style.transformOrigin = 'center';
+
+                } else {
+                    doorSign.style.transform = 'none';
+                    doorSign.style.transformOrigin = '';
+                }
+            }
+        }
+
+        // Event listener for card holder type change
+        if (cardHolderTypeSelect) {
+            cardHolderTypeSelect.addEventListener('change', (e) => {
+                const type = e.target.value;
+                updateCardHolderInfo(type);
+                updateDoorSignDimensions(type);
+                updateSign();
+            });
+        }
+
         // Search functionality
         function searchDepartments(query) {
             query = query.toLowerCase();
             const results = [];
-            
-            Object.entries(departmentTypes).forEach(([type, typeData]) => {
-                Object.entries(typeData.departments).forEach(([mainDept, subDepts]) => {
-                    if (mainDept.toLowerCase().includes(query)) {
-                        results.push({
-                            type,
-                            mainDept,
-                            path: `${typeData.name} > ${mainDept}`
-                        });
-                    }
-                    
-                    if (typeof subDepts === 'object' && !Array.isArray(subDepts)) {
-                        Object.entries(subDepts).forEach(([subDept, subSubDepts]) => {
-                            if (subDept.toLowerCase().includes(query)) {
+
+            if (typeof departmentTypes !== 'undefined') {
+                Object.entries(departmentTypes).forEach(([type, typeData]) => {
+                    if (typeData.departments && typeof typeData.departments === 'object') {
+                        Object.entries(typeData.departments).forEach(([mainDept, subDepts]) => {
+                            if (mainDept.toLowerCase().includes(query)) {
                                 results.push({
                                     type,
                                     mainDept,
-                                    subDept,
-                                    path: `${typeData.name} > ${mainDept} > ${subDept}`
+                                    path: `${typeData.name} > ${mainDept}`
                                 });
                             }
 
-                            if (typeof subSubDepts === 'object' && !Array.isArray(subSubDepts)) {
-                                Object.entries(subSubDepts).forEach(([subSubDept, _]) => {
-                                    if (subSubDept.toLowerCase().includes(query)) {
+                            if (typeof subDepts === 'object' && !Array.isArray(subDepts)) {
+                                Object.entries(subDepts).forEach(([subDept, subSubDepts]) => {
+                                    if (subDept.toLowerCase().includes(query)) {
                                         results.push({
                                             type,
                                             mainDept,
                                             subDept,
-                                            subSubDept,
-                                            path: `${typeData.name} > ${mainDept} > ${subDept} > ${subSubDept}`
+                                            path: `${typeData.name} > ${mainDept} > ${subDept}`
+                                        });
+                                    }
+
+                                    if (typeof subSubDepts === 'object' && !Array.isArray(subSubDepts)) {
+                                        Object.entries(subSubDepts).forEach(([subSubDept, _]) => {
+                                            if (subSubDept.toLowerCase().includes(query)) {
+                                                results.push({
+                                                    type,
+                                                    mainDept,
+                                                    subDept,
+                                                    subSubDept,
+                                                    path: `${typeData.name} > ${mainDept} > ${subDept} > ${subSubDept}`
+                                                });
+                                            }
                                         });
                                     }
                                 });
@@ -645,65 +819,80 @@
                         });
                     }
                 });
-            });
-            
+            }
+
             return results;
         }
 
         // Create and show search results
         function showSearchResults(query) {
+            const existingResults = document.querySelector('.search-results');
+            if (existingResults) {
+                existingResults.remove();
+            }
+
             const results = searchDepartments(query);
             const resultsContainer = document.createElement('div');
             resultsContainer.className = 'search-results';
-            
+
             if (results.length > 0) {
                 results.forEach(result => {
                     const div = document.createElement('div');
                     div.className = 'search-result-item';
                     div.textContent = result.path;
                     div.addEventListener('click', () => {
-                        departmentType.value = result.type;
+                        if (departmentType) departmentType.value = result.type;
                         populateMainDepartments();
-                        mainDepartment.value = result.mainDept;
-                        populateSubDepartments(result.mainDept);
-                        if (result.subDept) {
-                            subDepartment.value = result.subDept;
-                            populateSubSubDepartments(result.mainDept, result.subDept);
-                            if (result.subSubDept) {
-                                subSubDepartment.value = result.subSubDept;
-                            }
-                        }
-                        updateSign();
+                        setTimeout(() => {
+                             if (mainDepartment) mainDepartment.value = result.mainDept;
+                            populateSubDepartments(result.mainDept);
+                            setTimeout(() => {
+                                if (result.subDept) {
+                                    if (subDepartment) subDepartment.value = result.subDept;
+                                    populateSubSubDepartments(result.mainDept, result.subDept);
+                                    setTimeout(() => {
+                                        if (result.subSubDept) {
+                                            if (subSubDepartment) subSubDepartment.value = result.subSubDept;
+                                        }
+                                        updateSign();
+                                    }, 0);
+                                } else {
+                                     updateSign();
+                                }
+                            }, 0);
+                        }, 0);
+
                         resultsContainer.style.display = 'none';
                     });
                     resultsContainer.appendChild(div);
                 });
                 resultsContainer.style.display = 'block';
             } else {
-                resultsContainer.style.display = 'none';
+                 resultsContainer.style.display = 'none';
             }
-            
-            // Remove existing results container if any
-            const existingResults = document.querySelector('.search-results');
-            if (existingResults) {
-                existingResults.remove();
+
+            if (departmentSearch && departmentSearch.parentNode) {
+                departmentSearch.parentNode.appendChild(resultsContainer);
             }
-            
-            departmentSearch.parentNode.appendChild(resultsContainer);
         }
 
-        // Event listener for search
-        departmentSearch.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            if (query.length > 0) {
-                showSearchResults(query);
-            } else {
-                const resultsContainer = document.querySelector('.search-results');
-                if (resultsContainer) {
-                    resultsContainer.style.display = 'none';
+        // Event listener for search input
+        if (departmentSearch) {
+            departmentSearch.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                if (query.length > 0) {
+                    showSearchResults(query);
+                } else {
+                    const resultsContainer = document.querySelector('.search-results');
+                    if (resultsContainer) {
+                        resultsContainer.style.display = 'none';
+                    }
+                     departmentType.value = '';
+                    populateMainDepartments();
+                    updateSign();
                 }
-            }
-        });
+            });
+        }
 
         // Close search results when clicking outside
         document.addEventListener('click', (e) => {
@@ -720,21 +909,23 @@
             mainDepartment.innerHTML = '<option value="">Select Department</option>';
             subDepartment.innerHTML = '<option value="">Select Sub-Department</option>';
             subSubDepartment.innerHTML = '<option value="">Select Unit</option>';
-            
+
             const selectedType = departmentType.value;
             if (selectedType && departmentTypes[selectedType]) {
                 const departments = departmentTypes[selectedType].departments;
-                Object.keys(departments).forEach(dept => {
-                    const option = document.createElement('option');
-                    option.value = dept;
-                    option.textContent = dept;
-                    mainDepartment.appendChild(option);
-                });
-                mainDepartment.parentElement.style.display = 'block';
+                if (departments && typeof departments === 'object') {
+                     Object.keys(departments).forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept;
+                        option.textContent = dept;
+                        if (mainDepartment) mainDepartment.appendChild(option);
+                    });
+                }
+                if (mainDepartment && mainDepartment.parentElement) mainDepartment.parentElement.style.display = 'block';
             } else {
-                mainDepartment.parentElement.style.display = 'none';
-                subDepartment.parentElement.style.display = 'none';
-                subSubDepartment.parentElement.style.display = 'none';
+                if (mainDepartment && mainDepartment.parentElement) mainDepartment.parentElement.style.display = 'none';
+                if (subDepartment && subDepartment.parentElement) subDepartment.parentElement.style.display = 'none';
+                if (subSubDepartment && subSubDepartment.parentElement) subSubDepartment.parentElement.style.display = 'none';
             }
         }
 
@@ -743,23 +934,23 @@
             subDepartment.innerHTML = '<option value="">Select Sub-Department</option>';
             subSubDepartment.innerHTML = '<option value="">Select Unit</option>';
             const selectedType = departmentType.value;
-            
-            if (selectedType && mainDept && departmentTypes[selectedType].departments[mainDept]) {
+
+            if (selectedType && mainDept && departmentTypes[selectedType].departments && departmentTypes[selectedType].departments[mainDept]) {
                 const subDepts = departmentTypes[selectedType].departments[mainDept];
                 if (typeof subDepts === 'object' && !Array.isArray(subDepts)) {
                     Object.keys(subDepts).forEach(subDept => {
                         const option = document.createElement('option');
                         option.value = subDept;
                         option.textContent = subDept;
-                        subDepartment.appendChild(option);
+                        if (subDepartment) subDepartment.appendChild(option);
                     });
-                    subDepartment.parentElement.style.display = 'block';
+                    if (subDepartment && subDepartment.parentElement) subDepartment.parentElement.style.display = 'block';
                 } else {
-                    subDepartment.parentElement.style.display = 'none';
+                     if (subDepartment && subDepartment.parentElement) subDepartment.parentElement.style.display = 'none';
                 }
             } else {
-                subDepartment.parentElement.style.display = 'none';
-                subSubDepartment.parentElement.style.display = 'none';
+                if (subDepartment && subDepartment.parentElement) subDepartment.parentElement.style.display = 'none';
+                if (subSubDepartment && subSubDepartment.parentElement) subSubDepartment.parentElement.style.display = 'none';
             }
         }
 
@@ -767,211 +958,314 @@
         function populateSubSubDepartments(mainDept, subDept) {
             subSubDepartment.innerHTML = '<option value="">Select Unit</option>';
             const selectedType = departmentType.value;
-            
-            if (selectedType && mainDept && subDept && 
-                departmentTypes[selectedType].departments[mainDept] &&
+
+            if (selectedType && mainDept && departmentTypes[selectedType].departments && 
+                departmentTypes[selectedType].departments[mainDept] && 
                 departmentTypes[selectedType].departments[mainDept][subDept]) {
+                
                 const subSubDepts = departmentTypes[selectedType].departments[mainDept][subDept];
-                if (typeof subSubDepts === 'object' && !Array.isArray(subSubDepts)) {
-                    Object.keys(subSubDepts).forEach(subSubDept => {
+                
+                if (Array.isArray(subSubDepts)) {
+                    subSubDepts.forEach(unit => {
                         const option = document.createElement('option');
-                        option.value = subSubDept;
-                        option.textContent = subSubDept;
-                        subSubDepartment.appendChild(option);
+                        option.value = unit;
+                        option.textContent = unit;
+                        if (subSubDepartment) subSubDepartment.appendChild(option);
                     });
+                } else if (typeof subSubDepts === 'object') {
+                    Object.entries(subSubDepts).forEach(([unitName, unitArray]) => {
+                        if (Array.isArray(unitArray)) {
+                            const option = document.createElement('option');
+                            option.value = unitName; // Use the full name as the value
+                            option.textContent = unitName; // Use the full name as the display text
+                            if (subSubDepartment) subSubDepartment.appendChild(option);
+                        }
+                    });
+                }
+                
+                if (subSubDepartment && subSubDepartment.parentElement) {
                     subSubDepartment.parentElement.style.display = 'block';
-                } else {
-                    subSubDepartment.parentElement.style.display = 'none';
                 }
             } else {
-                subSubDepartment.parentElement.style.display = 'none';
+                if (subSubDepartment && subSubDepartment.parentElement) {
+                    subSubDepartment.parentElement.style.display = 'none';
+                }
             }
         }
+
+        // Event Listeners for progressive display
+        if (departmentType) {
+            departmentType.addEventListener('change', () => {
+                populateMainDepartments();
+                updateSign();
+            });
+        }
+
+        if (mainDepartment) {
+            mainDepartment.addEventListener('change', () => {
+                populateSubDepartments(mainDepartment.value);
+                updateSign();
+            });
+        }
+
+        if (subDepartment) {
+            subDepartment.addEventListener('change', () => {
+                populateSubSubDepartments(mainDepartment.value, subDepartment.value);
+                updateSign();
+            });
+        }
+
+        if (subSubDepartment) {
+            subSubDepartment.addEventListener('change', updateSign);
+        }
+
+        // Event Listeners for other form elements
+        if (signType) {
+            signType.addEventListener('change', () => {
+                const type = signType.value;
+                console.log('Sign type changed to:', type); // Debug log
+
+                // Show/hide form elements based on sign type
+                const formElements = {
+                    name: type === 'faculty' || type === 'staff' || type === 'student' || type === 'lab',
+                    position: type === 'faculty' || type === 'staff',
+                    email: type === 'faculty' || type === 'staff' || type === 'student',
+                    phone: type === 'faculty' || type === 'staff',
+                    roomName: type === 'lab' || type === 'general-room' || type === 'custodian-closet',
+                    alumniToggle: type === 'faculty' || type === 'staff',
+                    designationsToggle: type === 'faculty' || type === 'staff'
+                };
+
+                // Update visibility of form elements
+                Object.entries(formElements).forEach(([elementId, shouldShow]) => {
+                    const element = document.getElementById(elementId);
+                    if (element && element.parentElement) {
+                        element.parentElement.style.display = shouldShow ? 'block' : 'none';
+                    }
+                });
+
+                // Update designations container visibility
+                if (designationsContainer) {
+                    designationsContainer.style.display = 
+                        (type === 'faculty' || type === 'staff') && 
+                        designationsToggle.classList.contains('active') ? 'block' : 'none';
+                }
+
+                updateSign();
+            });
+        }
+
+        // Initialize form elements
+        function initializeFormElements() {
+            // Create form groups for inputs if they don't exist
+            const formGroups = [
+                { id: 'name', label: 'Name', type: 'text' },
+                { id: 'position', label: 'Position', type: 'text' },
+                { id: 'email', label: 'Email', type: 'email' },
+                { id: 'phone', label: 'Phone', type: 'tel' },
+                { id: 'roomName', label: 'Room Name', type: 'text' }
+            ];
+
+            formGroups.forEach(group => {
+                if (!document.getElementById(group.id)) {
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = group.id;
+                    label.textContent = group.label;
+                    
+                    const input = document.createElement('input');
+                    input.type = group.type;
+                    input.id = group.id;
+                    input.name = group.id;
+                    
+                    formGroup.appendChild(label);
+                    formGroup.appendChild(input);
+                    signForm.insertBefore(formGroup, document.querySelector('.toggle-buttons-container'));
+                }
+            });
+
+            // Add event listeners to inputs
+            [nameInput, positionInput, emailInput, phoneInput, roomNameInput].forEach(input => {
+                if (input) {
+                    input.addEventListener('input', updateSign);
+                }
+            });
+
+            // Show/hide form elements based on initial sign type
+            if (signType) {
+                signType.dispatchEvent(new Event('change'));
+            }
+        }
+
+        if (alumniToggle) {
+            alumniToggle.addEventListener('click', () => {
+                alumniToggle.classList.toggle('active');
+                updateSign();
+            });
+        }
+
+        if (designationsToggle) {
+            designationsToggle.addEventListener('click', () => {
+                designationsToggle.classList.toggle('active');
+                const container = document.getElementById('designationsContainer');
+                if (container) {
+                    container.style.display = designationsToggle.classList.contains('active') ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Add event listener for custom designation
+        const addCustomDesignation = document.getElementById('addCustomDesignation');
+        const customDesignation = document.getElementById('customDesignation');
+        if (addCustomDesignation && customDesignation) {
+            addCustomDesignation.addEventListener('click', () => {
+                const value = customDesignation.value.trim();
+                if (value) {
+                    const container = document.querySelector('.designation-options');
+                    if (container) {
+                        const label = document.createElement('label');
+                        label.className = 'designation-option';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = 'designations';
+                        checkbox.value = value;
+                        checkbox.checked = true;
+                        
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(value));
+                        container.appendChild(label);
+                        
+                        customDesignation.value = '';
+                        updateSelectedDesignations();
+                    }
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDesignationOptions();
+            populateCardHolderTypes();
+            initializeFormElements();
+
+            // Show initial form elements
+            if (signType && signType.parentElement) signType.parentElement.style.display = 'block';
+            if (departmentSearch && departmentSearch.parentElement) departmentSearch.parentElement.style.display = 'block';
+            if (departmentType && departmentType.parentElement) departmentType.parentElement.style.display = 'block';
+            if (mainDepartment && mainDepartment.parentElement) mainDepartment.parentElement.style.display = 'none';
+            if (subDepartment && subDepartment.parentElement) subDepartment.parentElement.style.display = 'none';
+            if (subSubDepartment && subSubDepartment.parentElement) subSubDepartment.parentElement.style.display = 'none';
+
+            // Move designations container to the card holder selector container
+            const designationsContainer = document.getElementById('designationsContainer');
+            const cardHolderSelectorContainer = document.querySelector('.card-holder-selector-container');
+            if (designationsContainer && cardHolderSelectorContainer) {
+                // Remove from current location if it exists
+                designationsContainer.parentNode?.removeChild(designationsContainer);
+                // Insert after the card holder info
+                const cardHolderInfo = document.getElementById('cardHolderInfo');
+                if (cardHolderInfo) {
+                    cardHolderInfo.parentNode.insertBefore(designationsContainer, cardHolderInfo.nextSibling);
+                } else {
+                    cardHolderSelectorContainer.insertBefore(designationsContainer, cardHolderSelectorContainer.firstChild);
+                }
+            }
+
+            // Trigger initial sign type change to set up form
+            if (signType) {
+                signType.dispatchEvent(new Event('change'));
+            }
+
+            updateSign();
+        });
 
         // Update sign preview
         function updateSign() {
+            const signContent = document.querySelector('.sign-content .main-content');
+            if (!signContent) return;
+
             const type = signType.value;
+            let content = '';
+
+            // Add name and position for faculty/staff
+            if (type === 'faculty' || type === 'staff') {
+                const name = document.getElementById('name')?.value || '';
+                const position = document.getElementById('position')?.value || '';
+                if (name) content += `<div class="name">${name}</div>`;
+                if (position) content += `<div class="position">${position}</div>`;
+            }
+
+            // Add room name for lab/general room/custodian closet
+            if (type === 'lab' || type === 'general-room' || type === 'custodian-closet') {
+                const roomName = document.getElementById('roomName')?.value || '';
+                if (roomName) content += `<div class="room-name">${roomName}</div>`;
+            }
+
+            // Add contact info for faculty/staff/student
+            if (type === 'faculty' || type === 'staff' || type === 'student') {
+                const email = document.getElementById('email')?.value || '';
+                const phone = document.getElementById('phone')?.value || '';
+                if (email || phone) {
+                    content += '<div class="contact-info">';
+                    if (email) content += `<div>Email: ${email}</div>`;
+                    if (phone) content += `<div>Phone: ${phone}</div>`;
+                    content += '</div>';
+                }
+            }
+
+            // Add designations
+            if (type === 'faculty' || type === 'staff') {
+                const checkedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
+                    .map(checkbox => checkbox.value);
+                if (checkedDesignations.length > 0) {
+                    content += `<div class="designations">${checkedDesignations.join(', ')}</div>`;
+                }
+            }
+
+            // Update the content
+            signContent.innerHTML = content;
+
+            // Update alumni badge visibility
+            if (alumniBadge) {
+                alumniBadge.style.display = (type === 'faculty' || type === 'staff') && 
+                    alumniToggle.classList.contains('active') ? 'block' : 'none';
+            }
+
+            // Update SVG text with department info
+            const deptType = departmentType.value;
             const mainDept = mainDepartment.value;
             const subDept = subDepartment.value;
             const subSubDept = subSubDepartment.value;
-            const name = nameInput.value;
-            const position = positionInput.value;
-            const email = emailInput.value;
-            const phone = phoneInput.value;
-            const roomName = roomNameInput.value;
-            const isAlumni = alumniToggle.classList.contains('active');
-            const enableDesignations = designationsToggle.classList.contains('active');
 
-            // Update SVG text with department
-            let displayDept = mainDept;
-            if (subDept && subDept !== 'none') {
+            // Use the most specific department level available for display
+            let displayDept = '';
+            if (subSubDept) {
+                displayDept = subSubDept;
+            } else if (subDept) {
                 displayDept = subDept;
-                if (subSubDept && subSubDept !== 'none') {
-                    displayDept = subSubDept;
-                }
+            } else if (mainDept) {
+                displayDept = mainDept;
             }
-            updateSVGText(displayDept);
 
-            // Update alumni badge visibility
-            alumniBadge.style.display = isAlumni ? 'block' : 'none';
-
-            // Clear previous content
-            const nameTitle = document.querySelector('.name-title');
-            const contactInfo = document.querySelector('.contact-info');
-            const designationsDisplay = document.querySelector('.designations-display');
-            
-            nameTitle.innerHTML = '';
-            contactInfo.innerHTML = '';
-            designationsDisplay.innerHTML = '';
-
-            // Create and append content based on sign type
-            if (type === 'faculty' || type === 'staff') {
-                // Faculty/Staff template
-                const nameElement = document.createElement('div');
-                nameElement.className = 'main-title';
-                nameElement.textContent = name || 'Enter Name';
-                nameTitle.appendChild(nameElement);
-
-                if (position) {
-                    const positionElement = document.createElement('div');
-                    positionElement.className = 'position';
-                    positionElement.textContent = position;
-                    nameTitle.appendChild(positionElement);
-                } else {
-                    const positionElement = document.createElement('div');
-                    positionElement.className = 'position';
-                    positionElement.textContent = 'Enter Position';
-                    nameTitle.appendChild(positionElement);
-                }
-
-                if (email || phone) {
-                    if (email) contactInfo.innerHTML += `<div><span class="label">Email:</span> ${email}</div>`;
-                    if (phone) contactInfo.innerHTML += `<div><span class="label">Phone:</span> ${phone}</div>`;
-                } else {
-                    contactInfo.innerHTML = `
-                        <div><span class="label">Email:</span> enter.email@unbc.ca</div>
-                        <div><span class="label">Phone:</span> 250-960-XXXX</div>
-                    `;
-                }
-
-                // Always show designations for faculty/staff template
-                const selectedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
-                    .map(checkbox => checkbox.value);
-                if (selectedDesignations.length > 0) {
-                    designationsDisplay.textContent = selectedDesignations.join(', ');
-                } else {
-                    designationsDisplay.textContent = 'PhD';
-                }
-
-                // Always show alumni badge for faculty/staff template
-                alumniBadge.style.display = 'block';
-            } else if (type === 'student') {
-                // Student template
-                const nameElement = document.createElement('div');
-                nameElement.className = 'main-title';
-                nameElement.textContent = name || 'Enter Name';
-                nameTitle.appendChild(nameElement);
-
-                if (email) {
-                    contactInfo.innerHTML = `<div><span class="label">Email:</span> ${email}</div>`;
-                } else {
-                    contactInfo.innerHTML = `<div><span class="label">Email:</span> enter.email@unbc.ca</div>`;
-                }
-            } else if (type === 'lab') {
-                // Lab template
-                const nameElement = document.createElement('div');
-                nameElement.className = 'main-title';
-                nameElement.textContent = name || 'Enter Lab Name';
-                nameTitle.appendChild(nameElement);
-            } else if (type === 'general-room') {
-                // General Room template
-                const nameElement = document.createElement('div');
-                nameElement.className = 'main-title';
-                nameElement.textContent = roomName || 'Enter Room Name';
-                nameTitle.appendChild(nameElement);
-            } else if (type === 'custodian-closet') {
-                // Custodian Closet template
-                const nameElement = document.createElement('div');
-                nameElement.className = 'main-title';
-                nameElement.textContent = roomName || 'Custodian Closet';
-                nameTitle.appendChild(nameElement);
+            if (deptType && displayDept) {
+                updateSVGText();
             }
         }
-
-        // Event Listeners
-        signType.addEventListener('change', () => {
-            const type = signType.value;
-            
-            // Show/hide fields based on sign type
-            nameInput.parentElement.style.display = (type === 'faculty' || type === 'staff' || type === 'student' || type === 'lab') ? 'block' : 'none';
-            positionInput.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
-            emailInput.parentElement.style.display = (type === 'faculty' || type === 'staff' || type === 'student') ? 'block' : 'none';
-            phoneInput.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
-            roomNameInput.parentElement.style.display = (type === 'lab' || type === 'general-room' || type === 'custodian-closet') ? 'block' : 'none';
-            alumniToggle.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
-            designationsToggle.parentElement.style.display = (type === 'faculty' || type === 'staff') ? 'block' : 'none';
-            
-            updateSign();
-        });
-
-        departmentType.addEventListener('change', () => {
-            populateMainDepartments();
-            updateSign();
-        });
-
-        mainDepartment.addEventListener('change', () => {
-            populateSubDepartments(mainDepartment.value);
-            updateSign();
-        });
-
-        subDepartment.addEventListener('change', () => {
-            populateSubSubDepartments(mainDepartment.value, subDepartment.value);
-            updateSign();
-        });
-
-        subSubDepartment.addEventListener('change', updateSign);
-
-        [nameInput, positionInput, emailInput, phoneInput, roomNameInput].forEach(input => {
-            input.addEventListener('input', updateSign);
-        });
-
-        alumniToggle.addEventListener('click', () => {
-            alumniToggle.classList.toggle('active');
-            updateSign();
-        });
-
-        designationsToggle.addEventListener('click', () => {
-            designationsToggle.classList.toggle('active');
-            designationsContainer.style.display = designationsToggle.classList.contains('active') ? 'block' : 'none';
-        });
-
-        // Export functionality
-        exportBtn.addEventListener('click', () => {
-            const doorSign = document.querySelector('.door-sign');
-            html2canvas(doorSign).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'unbc-door-sign.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        });
-
-        // Event Listeners
-        phoneInput.addEventListener('input', function() {
-            formatPhoneNumber(this);
-        });
-
-        phoneInput.addEventListener('blur', function() {
-            if (this.value && !this.value.match(/^\d{3}-\d{3}-\d{4}$/)) {
-                this.value = '';
-            }
-        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initializeDesignationOptions();
             populateMainDepartments();
             updateSign();
+            // Move toggle buttons under the preview
+            const toggleButtonsContainer = document.querySelector('.toggle-buttons-container');
+            const preview = document.querySelector('.preview');
+            if (toggleButtonsContainer && preview) {
+                preview.parentNode.insertBefore(toggleButtonsContainer, preview.nextSibling);
+            }
         });
     </script>
 </body>

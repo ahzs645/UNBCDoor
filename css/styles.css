@@ -45,6 +45,7 @@ h1 {
 
 .form-group {
     margin-bottom: 25px;
+    position: relative;
 }
 
 label {
@@ -55,6 +56,7 @@ label {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: color 0.3s ease;
 }
 
 select, input {
@@ -65,10 +67,76 @@ select, input {
     font-size: 1rem;
     transition: all 0.3s ease;
     background: white;
+    font-family: 'Inter', sans-serif;
 }
 
 select:focus, input:focus {
     outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Placeholder styling */
+input::placeholder {
+    color: #a0aec0;
+    font-style: italic;
+    opacity: 1;
+}
+
+input::-webkit-input-placeholder {
+    color: #a0aec0;
+    font-style: italic;
+}
+
+input::-moz-placeholder {
+    color: #a0aec0;
+    font-style: italic;
+    opacity: 1;
+}
+
+input:-ms-input-placeholder {
+    color: #a0aec0;
+    font-style: italic;
+}
+
+/* Hover effects */
+select:hover, input:hover {
+    border-color: #cbd5e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Focus state for labels */
+.form-group:focus-within label {
+    color: #667eea;
+}
+
+/* Invalid input styling */
+input:invalid {
+    border-color: #fed7d7;
+}
+
+input:invalid:focus {
+    border-color: #fc8181;
+    box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.1);
+}
+
+/* Valid input styling */
+input:valid:not(:placeholder-shown) {
+    border-color: #c6f6d5;
+}
+
+/* Specific styling for phone input */
+input[type="tel"] {
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+/* Search input specific styling */
+.search-input {
+    position: relative;
+}
+
+.search-input:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
