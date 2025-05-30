@@ -143,7 +143,19 @@ function initializeDesignationOptions() {
 // Populate main departments
 function populateMainDepartments() {
     mainDepartment.innerHTML = '<option value="">Select Department</option>';
-    Object.keys(departmentData).forEach(dept => {
+    
+    // Add academic departments
+    const academicDepts = departmentTypes.academic.departments["Provost and Vice-President, Academic"];
+    Object.keys(academicDepts).forEach(dept => {
+        const option = document.createElement('option');
+        option.value = dept;
+        option.textContent = dept;
+        mainDepartment.appendChild(option);
+    });
+
+    // Add administrative departments
+    const adminDepts = departmentTypes.administrative.departments;
+    Object.keys(adminDepts).forEach(dept => {
         const option = document.createElement('option');
         option.value = dept;
         option.textContent = dept;
@@ -154,19 +166,44 @@ function populateMainDepartments() {
 // Populate sub-departments
 function populateSubDepartments(mainDept) {
     subDepartment.innerHTML = '<option value="">Select Sub-Department</option>';
-    const subDepts = departmentData[mainDept] || [];
     
-    if (subDepts.length > 0) {
-        subDepts.forEach(subDept => {
-            const option = document.createElement('option');
-            option.value = subDept;
-            option.textContent = subDept;
-            subDepartment.appendChild(option);
-        });
-        subDepartmentGroup.style.display = 'block';
-    } else {
-        subDepartmentGroup.style.display = 'none';
+    // Check academic departments
+    const academicDepts = departmentTypes.academic.departments["Provost and Vice-President, Academic"];
+    if (academicDepts[mainDept]) {
+        const subDepts = academicDepts[mainDept];
+        if (typeof subDepts === 'object' && !Array.isArray(subDepts)) {
+            Object.keys(subDepts).forEach(subDept => {
+                const option = document.createElement('option');
+                option.value = subDept;
+                option.textContent = subDept;
+                subDepartment.appendChild(option);
+            });
+            subDepartmentGroup.style.display = 'block';
+        } else {
+            subDepartmentGroup.style.display = 'none';
+        }
+        return;
     }
+
+    // Check administrative departments
+    const adminDepts = departmentTypes.administrative.departments;
+    if (adminDepts[mainDept]) {
+        const subDepts = adminDepts[mainDept];
+        if (typeof subDepts === 'object' && !Array.isArray(subDepts)) {
+            Object.keys(subDepts).forEach(subDept => {
+                const option = document.createElement('option');
+                option.value = subDept;
+                option.textContent = subDept;
+                subDepartment.appendChild(option);
+            });
+            subDepartmentGroup.style.display = 'block';
+        } else {
+            subDepartmentGroup.style.display = 'none';
+        }
+        return;
+    }
+
+    subDepartmentGroup.style.display = 'none';
 }
 
 // Wrap text to fit width
@@ -341,7 +378,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDesignationOptions();
     populateMainDepartments();
     updateSign();
-});
-
-// Make department data available globally
-window.departmentData = departmentData; 
+}); 
