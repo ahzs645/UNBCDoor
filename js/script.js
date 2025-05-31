@@ -83,4 +83,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (alumniBadge) {
         alumniBadge.style.display = 'none';
     }
+
+    // Add designation event handling
+    const container = document.querySelector('.designation-options');
+    if (container) {
+        container.addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox' && e.target.name === 'designations') {
+                const designationOption = e.target.closest('.designation-option');
+                if (e.target.checked) {
+                    designationOption.classList.add('selected');
+                } else {
+                    designationOption.classList.remove('selected');
+                }
+            }
+            updateSelectedDesignations();
+        });
+    }
 }); 

@@ -11,6 +11,8 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .container {
@@ -20,6 +22,9 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     align-items: start;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .controls {
@@ -28,6 +33,16 @@ body {
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
+}
+
+.card-holder-selector-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 20px;
+    height: fit-content;
 }
 
 .preview {
@@ -142,6 +157,83 @@ input[type="tel"] {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+/* Search results */
+.search-results {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-top: 5px;
+    display: none;
+    background-color: white;
+    position: absolute;
+    width: calc(100% - 60px);
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.search-result-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.search-result-item:hover {
+    background-color: #f7fafc;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+/* Card holder info */
+.card-holder-info {
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.card-holder-info p {
+    margin: 4px 0;
+}
+
+.card-holder-info strong {
+    color: #4a5568;
+}
+
+/* Toggle buttons */
+.toggle-buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.toggle-button {
+    padding: 10px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.toggle-button.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.toggle-button:hover {
+    background: #f7fafc;
+}
+
+.toggle-button i {
+    margin-right: 8px;
+}
+
 .door-sign {
     width: 500px;
     height: 300px;
@@ -177,6 +269,27 @@ input[type="tel"] {
     margin-bottom: -10px;
 }
 
+.unbc-logo img {
+    display: block;
+    width: 200px;
+    flex-shrink: 0;
+    margin-bottom: -10px;
+}
+
+.alumni-badge {
+    display: none;
+    flex-shrink: 0;
+    height: fit-content;
+    margin-left: 20px;
+    align-self: center;
+}
+
+.alumni-badge object {
+    width: 80px;
+    height: auto;
+    display: block;
+}
+
 .sign-content {
     padding: 25px;
     height: 220px;
@@ -188,6 +301,47 @@ input[type="tel"] {
 
 .main-content {
     flex: 1;
+}
+
+.main-content .name {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.main-content .position {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #666;
+}
+
+.main-content .room-name {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.main-content .department {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #666;
+}
+
+.main-content .contact-info {
+    font-size: 14px;
+    color: #666;
+    margin-top: 12px;
+}
+
+.main-content .designations {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    margin-top: 8px;
 }
 
 .main-title {
@@ -256,6 +410,43 @@ input[type="tel"] {
     display: flex;
     align-items: center;
     gap: 5px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    margin: 2px 0;
+}
+
+.designation-option:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.designation-option input[type="checkbox"] {
+    margin-right: 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.designation-option label {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4a5568;
+    text-transform: none;
+    letter-spacing: normal;
+    margin: 0;
+}
+
+.designation-option input[type="checkbox"]:checked + label {
+    color: #2b6cb0;
+    font-weight: 600;
 }
 
 .custom-designation {
@@ -281,7 +472,7 @@ input[type="tel"] {
 }
 
 .custom-designation button:hover {
-    background-color: #004d26;
+    background-color: #024d38;
 }
 
 .selected-designations {
@@ -292,35 +483,44 @@ input[type="tel"] {
     font-size: 0.9em;
 }
 
-.designation-option input[type="checkbox"] {
-    display: none;
-}
-
-.designation-option label {
-    display: block;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #4a5568;
-    text-transform: none;
-    letter-spacing: normal;
-    margin: 0;
-}
-
-.designation-option input[type="checkbox"]:checked + label {
-    color: #2b6cb0;
-    font-weight: 600;
-}
-
+/* Fix designations container styling */
 #designationsContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+    display: block;
     margin-top: 15px;
-    padding: 15px;
+    padding: 20px;
     background: #f8fafc;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+}
+
+.designation-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.designation-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: white;
+    border: 1px solid #e2e8f0;
+}
+
+.designation-option:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+.designation-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
 }
 
 .export-btn {
@@ -422,15 +622,137 @@ input[type="tel"] {
     margin: 0;
 }
 
-@media (max-width: 1200px) {
+/* Mobile responsive styles */
+@media (max-width: 1024px) {
+    body {
+        padding: 15px;
+    }
+    
     .container {
         grid-template-columns: 1fr;
         gap: 20px;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
     }
     
-    .door-sign {
+    .controls, .card-holder-selector-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    
+    .card-holder-selector-container {
+        position: relative;
+        top: 0;
+        order: 2;
+    }
+    
+    .controls {
+        order: 1;
+    }
+    
+    .toggle-buttons-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .toggle-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        gap: 15px;
+        padding: 0;
+    }
+    
+    .controls, .card-holder-selector-container {
+        padding: 20px;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    /* Scale regular door signs (non-card-holder) */
+    .door-sign:not(.card-holder-preview) {
         transform: scale(0.8);
         transform-origin: center;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .preview {
+        padding: 10px;
+        overflow-x: auto;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* For card holder previews - let JavaScript handle ALL scaling */
+    .door-sign.card-holder-preview {
+        /* Remove all dimension overrides - let JavaScript handle everything */
+        margin: 0 auto !important;
+        border-radius: 8px !important;
+        /* No max-width or max-height constraints that break aspect ratio */
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    .container {
+        padding: 0;
+    }
+    
+    .controls, .card-holder-selector-container {
+        padding: 15px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    
+    /* Scale regular door signs even smaller */
+    .door-sign:not(.card-holder-preview) {
+        transform: scale(0.7);
+        max-width: 350px;
+    }
+    
+    select, input {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    /* Card holder previews - let JavaScript handle scaling */
+    .door-sign.card-holder-preview {
+        margin: 0 auto !important;
+        /* No dimension constraints */
     }
 }
 
@@ -448,4 +770,33 @@ select:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     transform: translateY(-1px);
-} 
+}
+
+/* Prevent container expansion for card holder previews */
+.preview {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 400px;
+    padding: 10px;
+}
+
+.door-sign.card-holder-preview {
+    max-width: calc(100% - 20px) !important;
+    max-height: 350px !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 10px auto !important;
+    box-sizing: border-box !important;
+    object-fit: contain !important;
+}
+
+.card-holder-selector-container {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}

@@ -7,404 +7,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
+        /* Only keep the unique styles specific to your HTML structure */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Two columns for form and preview */
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
-            align-items: start; /* Align items to the top */
-        }
-
-        .controls {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .label {
-            font-style: italic;
-            font-weight: 500;
-        }
-
-        .contact-info {
-            font-style: italic;
-            line-height: 1.2;
-        }
-
-        .contact-info div {
-            margin-bottom: 4px;
-        }
-
-        .label {
-            font-style: italic;
-            font-weight: 500;
-            margin-right: 4px;
-        }
-
-        .designation-option {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            position: relative;
-            margin: 2px 0;
-        }
-
-        .toggle-button {
-            padding: 10px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .toggle-button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .toggle-button:hover {
-            background: #f7fafc;
-        }
-
-        .toggle-button i {
-            margin-right: 8px;
-        }
-
-        .toggle-buttons-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .designation-option:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .designation-option input[type="checkbox"] {
-            margin-right: 8px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .designation-option label {
-            cursor: pointer;
-            user-select: none;
-            transition: color 0.2s ease;
-            position: relative;
-            z-index: 2;
-            flex: 1;
-        }
-
-        .designation-option input[type="checkbox"]:checked + label {
-            color: #666;
-            font-weight: 500;
-        }
-
-        .designation-option input[type="checkbox"]:checked ~ .designation-option {
-            background-color: transparent;
-        }
-
-        .designation-option input[type="checkbox"]:checked + label::before {
-            content: '';
-            position: absolute;
-            top: -8px;
-            left: -12px;
-            right: -12px;
-            bottom: -8px;
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            z-index: -1;
-        }
-
-        .designation-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .custom-designation {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .selected-designations {
-            font-size: 0.9em;
-            color: #4a5568;
-        }
-
-        .sign-header {
-            background: #035b42;
-            color: white;
-            padding: 15px 20px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .unbc-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0px;
-        }
-        
-        .unbc-logo object {
-            display: block;
-            width: 200px;
-            flex-shrink: 0;
-            margin-bottom: -10px;
-        }
-        
-        .alumni-badge {
-            display: none;
-            flex-shrink: 0;
-            height: fit-content;
-            margin-left: 20px;
-            align-self: center;
-        }
-        
-        .alumni-badge object {
-            width: 80px;
-            height: auto;
-            display: block;
-        }
-
-        .sign-content {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background: white;
-            min-height: 200px;
-        }
-
-        .main-content {
-            flex: 1;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .main-content .name {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .main-content .position {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            color: #666;
-        }
-
-        .main-content .room-name {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #333;
-        }
-
-        .main-content .department {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            color: #666;
-        }
-
-        .main-content .contact-info {
-            font-size: 14px;
-            color: #666;
-            margin-top: 12px;
-        }
-
-        .main-content .designations {
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            margin-top: 8px;
-        }
-
-        .preview {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            background: transparent;
-            border-radius: 20px;
-            padding: 20px;
-        }
-
-        .door-sign {
-            width: 500px;
-            height: 300px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-            position: relative;
+            align-items: start;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 0 20px;
         }
 
         .door-sign.card-holder-preview {
             transform: none !important;
         }
 
-        /* Remove conflicting style from media query if it exists and causes issues */
-        @media (max-width: 1200px) {
-            .door-sign {
-                transform: scale(0.8); /* Keep or adjust as needed for responsiveness */
-                transform-origin: center;
-            }
-        }
-
-        /* Add styles for card holder info */
-        .card-holder-info {
-            background: #f8fafc;
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .card-holder-info p {
-            margin: 4px 0;
-        }
-
-        .card-holder-info strong {
-            color: #4a5568;
-        }
-
-        /* Add styles for search results */
-        .search-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .search-results {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            margin-top: 5px;
-            display: none; /* Hidden by default */
-            background-color: white; /* Ensure results are readable */
-            position: absolute; /* Position over other content */
-            width: calc(100% - 60px); /* Match form width minus padding */
-            z-index: 10; /* Ensure it appears above other elements */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .search-result-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .search-result-item:hover {
-            background-color: #f7fafc;
-        }
-
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-
-        .card-holder-selector-container {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-        }
-
-        #designationsContainer {
-            margin-top: 10px;
-            padding: 15px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: #f8fafc;
-        }
-
-        /* Add styles for input with toggle */
-        .input-with-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input-with-toggle input[type="email"],
-        .input-with-toggle input[type="tel"] {
-            flex: 1;
-            min-width: 0; /* Prevents input from overflowing */
-        }
-
-        .toggle-checkbox {
-            display: flex; /* Use flex to align checkbox and label */
-            align-items: center;
-            justify-content: flex-end; /* Align content to the right */
-            gap: 5px;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            padding: 4px 8px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            margin-top: 8px; /* Add space between input and toggle */
-            width: 100%; /* Make the toggle span the width of the form group */
-        }
-
-        .toggle-checkbox:hover {
-            background: #edf2f7;
-        }
-
-        .toggle-checkbox input[type="checkbox"] {
-            margin: 0;
-            cursor: pointer;
-        }
-
-        .toggle-label {
-            font-size: 0.9em;
-            color: #4a5568;
-            cursor: pointer;
-        }
-
-        /* Add styles for contact info group */
+        /* Contact info group specific layout */
         .contact-info-group {
             display: flex;
             gap: 20px;
@@ -415,16 +35,34 @@
             flex: 1;
             margin-bottom: 0;
             display: flex;
-            flex-direction: column; /* Stack label, input, and toggle vertically */
+            flex-direction: column;
         }
 
         .contact-info-group .form-group label:first-child {
-            margin-bottom: 8px; /* Space below the Email/Phone label */
+            margin-bottom: 8px;
         }
 
         .contact-info-group .form-group input[type="email"],
         .contact-info-group .form-group input[type="tel"] {
-             margin-bottom: 0; /* Remove default margin */
+            margin-bottom: 0;
+        }
+
+        /* Mobile container layout */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr !important;
+                gap: 20px;
+            }
+            
+            .card-holder-selector-container {
+                position: relative !important;
+                top: 0 !important;
+                order: 2;
+            }
+            
+            .controls {
+                order: 1;
+            }
         }
     </style>
 </head>
@@ -757,223 +395,207 @@
             }
         }
 
-// Update door sign scaling based on card holder type
-function updateDoorSignDimensions(type) {
-    const doorSign = document.querySelector('.door-sign');
-    if (!doorSign) return;
+        // Update door sign scaling based on card holder type
+        function updateDoorSignDimensions(type) {
+            const doorSign = document.querySelector('.door-sign');
+            if (!doorSign) return;
 
-    // Reset to default state first
-    doorSign.style.transform = 'none';
-    doorSign.style.border = 'none';
-    doorSign.style.padding = '0';
-    doorSign.style.background = 'white';
-    doorSign.style.width = '500px';
-    doorSign.style.height = '300px';
-    doorSign.classList.remove('card-holder-preview');
+            // Reset to default state first
+            doorSign.style.transform = 'none';
+            doorSign.style.border = 'none';
+            doorSign.style.padding = '0';
+            doorSign.style.background = 'white';
+            doorSign.style.width = '500px';
+            doorSign.style.height = '300px';
+            doorSign.classList.remove('card-holder-preview');
 
-    // Reset all child elements to default
-    const signContent = doorSign.querySelector('.sign-content');
-    const signHeader = doorSign.querySelector('.sign-header');
+            // Reset all child elements to default
+            const signContent = doorSign.querySelector('.sign-content');
+            const signHeader = doorSign.querySelector('.sign-header');
 
-    if (signContent) {
-        signContent.style.boxShadow = 'none';
-        signContent.style.borderRadius = '';
-        signContent.style.padding = '20px';
-        signContent.style.minHeight = '200px';
-        signContent.style.background = 'white';
-        signContent.style.display = 'flex';
-        signContent.style.alignItems = 'center';
-    }
+            if (signContent) {
+                signContent.style.boxShadow = 'none';
+                signContent.style.borderRadius = '';
+                signContent.style.padding = '20px';
+                signContent.style.minHeight = '200px';
+                signContent.style.background = 'white';
+                signContent.style.display = 'flex';
+                signContent.style.alignItems = 'center';
+            }
 
-    if (signHeader) {
-        signHeader.style.boxShadow = 'none';
-        signHeader.style.height = '80px';
-        signHeader.style.padding = '15px 20px';
-        signHeader.style.background = '#035b42';
-        signHeader.style.borderRadius = '0';
-    }
+            if (signHeader) {
+                signHeader.style.boxShadow = 'none';
+                signHeader.style.height = '80px';
+                signHeader.style.padding = '15px 20px';
+                signHeader.style.background = '#035b42';
+                signHeader.style.borderRadius = '0';
+            }
 
-    // Reset font sizes
-    const nameElements = doorSign.querySelectorAll('.name, .room-name');
-    const positionElements = doorSign.querySelectorAll('.position');
-    const contactElements = doorSign.querySelectorAll('.contact-info');
-    const designationElements = doorSign.querySelectorAll('.designations');
+            // Reset font sizes
+            const nameElements = doorSign.querySelectorAll('.name, .room-name');
+            const positionElements = doorSign.querySelectorAll('.position');
+            const contactElements = doorSign.querySelectorAll('.contact-info');
+            const designationElements = doorSign.querySelectorAll('.designations');
 
-    nameElements.forEach(el => el.style.fontSize = '24px');
-    positionElements.forEach(el => el.style.fontSize = '18px');
-    contactElements.forEach(el => el.style.fontSize = '14px');
-    designationElements.forEach(el => el.style.fontSize = '14px');
+            nameElements.forEach(el => el.style.fontSize = '24px');
+            positionElements.forEach(el => el.style.fontSize = '18px');
+            contactElements.forEach(el => el.style.fontSize = '14px');
+            designationElements.forEach(el => el.style.fontSize = '14px');
 
-    // Remove any existing info element
-    const existingInfo = doorSign.querySelector('.card-holder-preview-info');
-    if (existingInfo) {
-        existingInfo.remove();
-    }
-    doorSign.style.position = '';
+            // Remove any existing info element
+            const existingInfo = doorSign.querySelector('.card-holder-preview-info');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+            doorSign.style.position = '';
 
-    if (type && cardHolders && cardHolders[type]) {
-        doorSign.classList.add('card-holder-preview');
-        
-        const spec = cardHolders[type];
-        const viewableWidthIn = spec.viewableArea.width;
-        const viewableHeightIn = spec.viewableArea.height;
-        const borderWidthIn = spec.borderWidth;
+            if (type && cardHolders && cardHolders[type]) {
+                doorSign.classList.add('card-holder-preview');
+                
+                const spec = cardHolders[type];
+                const viewableWidthIn = spec.viewableArea.width;
+                const viewableHeightIn = spec.viewableArea.height;
+                const borderWidthIn = spec.borderWidth;
 
-        // Calculate the aspect ratio of the viewable area
-        const viewableAspectRatio = viewableWidthIn / viewableHeightIn;
-        
-        // Keep preview at a reasonable size but maintain proportions
-        const maxPreviewWidth = 450;
-        const previewWidth = maxPreviewWidth;
-        const previewHeight = previewWidth / viewableAspectRatio;
-        
-        // Calculate scaling factor compared to original
-        const widthScale = previewWidth / 500; // 500 is original width
-        const heightScale = previewHeight / 300; // 300 is original height
-        const scale = Math.min(widthScale, heightScale);
-        
-        // Calculate border thickness based on ACTUAL border width relative to viewable area
-        const borderRatio = borderWidthIn / viewableWidthIn;
-        const borderThickness = borderRatio * previewWidth;
-        
-        // The door sign represents the total card holder (viewable + border)
-        const totalWidth = previewWidth + (borderThickness * 2);
-        const totalHeight = previewHeight + (borderThickness * 2);
-        
-        // Update door sign dimensions to represent the full card holder
-        doorSign.style.width = `${totalWidth}px`;
-        doorSign.style.height = `${totalHeight}px`;
-        doorSign.style.border = `${borderThickness}px solid #cbd5e0`;
-        doorSign.style.borderRadius = '12px';
-        doorSign.style.background = '#f7fafc'; // This represents the non-viewable border area
-        doorSign.style.position = 'relative';
-        doorSign.style.padding = '0'; // Remove any default padding
-        
-        // Style the content area to show it's the viewable area
-        if (signContent) {
-            signContent.style.background = 'white';
-            signContent.style.borderRadius = '0 0 8px 8px'; // Only bottom corners rounded
-            signContent.style.boxShadow = 'none'; // Remove shadow since it's part of the card
-            
-            // Scale padding proportionally to the viewable area
-            const scaledPadding = Math.max(8, 20 * scale);
-            signContent.style.padding = `${scaledPadding}px`;
-            
-            // Calculate available content height based on viewable area only
-            const headerHeight = signHeader ? (80 * scale) : 0;
-            const availableContentHeight = previewHeight - headerHeight;
-            
-            signContent.style.height = `${availableContentHeight}px`;
-            signContent.style.width = `${previewWidth}px`; // Fill the viewable area
-            signContent.style.boxSizing = 'border-box';
-            signContent.style.display = 'flex';
-            signContent.style.alignItems = 'center'; // Keep horizontal layout with alumni badge
-            signContent.style.margin = '0'; // Remove any margin
-            signContent.style.overflow = 'hidden'; // Prevent overflow
-            
-            // Add proper spacing between content elements
-            const mainContent = signContent.querySelector('.main-content');
-            if (mainContent) {
-                mainContent.style.flex = '1'; // Take up remaining space
-                mainContent.style.display = 'flex';
-                mainContent.style.flexDirection = 'column';
-                mainContent.style.justifyContent = 'flex-start'; // Start from top instead of center
-                mainContent.style.gap = `${Math.max(1, 2 * scale)}px`; // Very minimal gap between elements
-                mainContent.style.overflow = 'hidden'; // Prevent overflow
+                // Calculate the aspect ratio of the viewable area
+                const viewableAspectRatio = viewableWidthIn / viewableHeightIn;
+
+                // Keep preview at a reasonable size but maintain proportions
+                const maxPreviewWidth = 450;
+                const previewWidth = maxPreviewWidth;
+                const previewHeight = previewWidth / viewableAspectRatio;
+
+                // Calculate scaling factor compared to original DOOR SIGN (not card holder)
+                const doorSignAspectRatio = 500 / 300; // Original door sign ratio
+                const scaledDoorSignWidth = previewWidth;
+                const scaledDoorSignHeight = scaledDoorSignWidth / doorSignAspectRatio; // Maintain door sign ratio
+
+                // Calculate border thickness based on viewable area
+                const borderRatio = borderWidthIn / viewableWidthIn;
+                const borderThickness = borderRatio * previewWidth;
+
+                // The door sign represents the viewable area, border is visual only
+                const totalWidth = scaledDoorSignWidth + (borderThickness * 2);
+                const totalHeight = scaledDoorSignHeight + (borderThickness * 2);
+
+                // Set dimensions maintaining door sign aspect ratio
+                doorSign.style.width = `${scaledDoorSignWidth}px`;
+                doorSign.style.height = `${scaledDoorSignHeight}px`;
+                doorSign.style.border = `${borderThickness}px solid #cbd5e0`;
+                doorSign.style.borderRadius = '12px';
+                doorSign.style.background = '#f7fafc';
+                doorSign.style.position = 'relative';
+                doorSign.style.padding = '0';
+                doorSign.style.margin = '0 auto';
+
+                // Calculate scale based on door sign dimensions
+                const scale = scaledDoorSignWidth / 500; // Scale based on door sign width
+                
+                // Update content areas
+                if (signContent) {
+                    signContent.style.background = 'white';
+                    signContent.style.borderRadius = '0 0 8px 8px';
+                    signContent.style.boxShadow = 'none';
+                    
+                    const headerHeight = signHeader ? (80 * scale) : 0;
+                    const availableContentHeight = previewHeight - headerHeight;
+                    
+                    signContent.style.height = `${availableContentHeight}px`;
+                    signContent.style.width = `${previewWidth}px`;
+                    signContent.style.boxSizing = 'border-box';
+                    signContent.style.display = 'flex';
+                    signContent.style.alignItems = 'center';
+                    signContent.style.margin = '0';
+                    signContent.style.overflow = 'hidden';
+                    
+                    const mainContent = signContent.querySelector('.main-content');
+                    if (mainContent) {
+                        mainContent.style.flex = '1';
+                        mainContent.style.display = 'flex';
+                        mainContent.style.flexDirection = 'column';
+                        mainContent.style.justifyContent = 'flex-start';
+                        mainContent.style.gap = `${Math.max(1, 2 * scale)}px`;
+                        mainContent.style.overflow = 'hidden';
+                    }
+                }
+                
+                // Update header
+                if (signHeader) {
+                    signHeader.style.background = '#035b42';
+                    signHeader.style.borderRadius = '8px 8px 0 0';
+                    signHeader.style.boxShadow = 'inset 0 0 0 1px #035b42';
+                    
+                    const scaledHeaderHeight = Math.max(60, 80 * scale);
+                    const scaledHeaderPadding = Math.max(8, 15 * scale);
+                    
+                    signHeader.style.height = `${scaledHeaderHeight}px`;
+                    signHeader.style.padding = `${scaledHeaderPadding}px ${scaledHeaderPadding}px`;
+                    signHeader.style.width = `${previewWidth}px`;
+                    signHeader.style.boxSizing = 'border-box';
+                    signHeader.style.margin = '0';
+                    
+                    // Logo scaling
+                    const logoContainer = signHeader.querySelector('.unbc-logo');
+                    const logo = signHeader.querySelector('.unbc-logo img, .unbc-logo svg');
+                    if (logo) {
+                        const logoScale = Math.min(scale) * 0.7;
+                        const finalLogoScale = Math.max(0.25, Math.min(1.0, logoScale));
+                        logo.style.width = `${200 * finalLogoScale}px`;
+                        logo.style.height = 'auto';
+                    }
+                    if (logoContainer) {
+                        const containerScale = Math.min(scale, 1.0);
+                        logoContainer.style.transform = `scale(${Math.max(0.4, containerScale)})`;
+                        logoContainer.style.transformOrigin = 'center';
+                    }
+                }
+                
+                // Scale fonts
+                const fontScale = Math.max(0.5, scale * 0.8);
+
+                nameElements.forEach(el => {
+                    el.style.fontSize = `${24 * fontScale}px`;
+                    el.style.lineHeight = '1.1';
+                    el.style.marginBottom = `${2 * fontScale}px`;
+                });
+
+                positionElements.forEach(el => {
+                    el.style.fontSize = `${16 * fontScale}px`;
+                    el.style.lineHeight = '1.1';
+                    el.style.marginBottom = `${2 * fontScale}px`;
+                });
+
+                contactElements.forEach(el => {
+                    el.style.fontSize = `${11 * fontScale}px`;
+                    el.style.lineHeight = '1.1';
+                    el.style.marginTop = `${1 * fontScale}px`;
+                    
+                    const contactDivs = el.querySelectorAll('div');
+                    contactDivs.forEach(div => {
+                        div.style.marginBottom = `${1 * fontScale}px`;
+                    });
+                });
+
+                designationElements.forEach(el => {
+                    el.style.fontSize = `${11 * fontScale}px`;
+                    el.style.lineHeight = '1.1';
+                    el.style.marginTop = `${1 * fontScale}px`;
+                });
+
+                // Scale alumni badge
+                const alumniBadge = doorSign.querySelector('.alumni-badge');
+                if (alumniBadge) {
+                    const badgeScale = Math.max(0.3, scale * 0.5);
+                    alumniBadge.style.transform = `scale(${badgeScale})`;
+                    alumniBadge.style.transformOrigin = 'center';
+                    alumniBadge.style.marginLeft = `${5 * scale}px`;
+                    alumniBadge.style.flexShrink = '0';
+                    alumniBadge.style.alignSelf = 'flex-end';
+                    alumniBadge.style.marginBottom = `${scaledHeaderPadding}px`;
+                }
             }
         }
 
-        // Style the header with proper scaling - this fills the viewable area
-        if (signHeader) {
-            signHeader.style.background = '#047857';
-            signHeader.style.borderRadius = '8px 8px 0 0';
-            signHeader.style.boxShadow = 'inset 0 0 0 1px #065f46';
-            
-            const scaledHeaderHeight = Math.max(60, 80 * scale);
-            const scaledHeaderPadding = Math.max(8, 15 * scale);
-            
-            signHeader.style.height = `${scaledHeaderHeight}px`;
-            signHeader.style.padding = `${scaledHeaderPadding}px ${scaledPadding}px`;
-            signHeader.style.width = `${previewWidth}px`; // Fill the viewable area
-            signHeader.style.boxSizing = 'border-box';
-            signHeader.style.margin = '0'; // Remove any margin
-            
-            // Scale logo in header - make it more responsive to card size
-            const logoContainer = signHeader.querySelector('.unbc-logo');
-            const logo = signHeader.querySelector('.unbc-logo img, .unbc-logo svg');
-            if (logo) {
-                // More aggressive scaling based on both width and height constraints
-                const widthScale = previewWidth / 500; // Original width reference
-                const heightScale = previewHeight / 300; // Original height reference
-                const headerHeightScale = scaledHeaderHeight / 80; // Header height reference
-                
-                // Use the most restrictive scale factor to ensure logo fits well
-                const logoScale = Math.min(widthScale, heightScale, headerHeightScale) * 0.7; // Reduced from 0.9 to 0.7 for more room
-                const minLogoScale = 0.25; // Reduced from 0.3 to 0.25 for smaller minimum size
-                const maxLogoScale = 1.0; // Reduced from 1.2 to 1.0 to prevent it from being too large
-                
-                const finalLogoScale = Math.max(minLogoScale, Math.min(maxLogoScale, logoScale));
-                
-                logo.style.width = `${200 * finalLogoScale}px`;
-                logo.style.height = 'auto';
-                
-                // Debug info (you can remove this later)
-                console.log(`Logo scaling - Width: ${widthScale.toFixed(2)}, Height: ${heightScale.toFixed(2)}, Header: ${headerHeightScale.toFixed(2)}, Final: ${finalLogoScale.toFixed(2)}`);
-            }
-            if (logoContainer) {
-                // Scale the container proportionally as well
-                const containerScale = Math.min(scale, 1.0); // Don't make container larger than original
-                logoContainer.style.transform = `scale(${Math.max(0.4, containerScale)})`;
-                logoContainer.style.transformOrigin = 'center';
-            }
-        }
-
-        // Scale fonts proportionally
-        const fontScale = Math.max(0.5, scale * 0.8); // Smaller fonts and lower minimum
-        
-        nameElements.forEach(el => {
-            el.style.fontSize = `${24 * fontScale}px`;
-            el.style.lineHeight = '1.1';
-            el.style.marginBottom = `${2 * fontScale}px`; // Even smaller margin
-        });
-        
-        positionElements.forEach(el => {
-            el.style.fontSize = `${16 * fontScale}px`; // Smaller base font size
-            el.style.lineHeight = '1.1';
-            el.style.marginBottom = `${2 * fontScale}px`; // Much smaller margin
-        });
-        
-        contactElements.forEach(el => {
-            el.style.fontSize = `${11 * fontScale}px`; // Even smaller base font size
-            el.style.lineHeight = '1.1';
-            el.style.marginTop = `${1 * fontScale}px`; // Minimal margin
-            
-            // Scale spacing within contact info - make it very tight
-            const contactDivs = el.querySelectorAll('div');
-            contactDivs.forEach(div => {
-                div.style.marginBottom = `${1 * fontScale}px`; // Very tight spacing
-            });
-        });
-        
-        designationElements.forEach(el => {
-            el.style.fontSize = `${11 * fontScale}px`; // Even smaller base font size
-            el.style.lineHeight = '1.1';
-            el.style.marginTop = `${1 * fontScale}px`; // Minimal margin
-        });
-
-        // Scale alumni badge if present - position it relative to the content area
-        const alumniBadge = doorSign.querySelector('.alumni-badge');
-        if (alumniBadge) {
-            const badgeScale = Math.max(0.3, scale * 0.5); // Much smaller scaling
-            alumniBadge.style.transform = `scale(${badgeScale})`;
-            alumniBadge.style.transformOrigin = 'center';
-            alumniBadge.style.marginLeft = `${5 * scale}px`; // Minimal margin
-            alumniBadge.style.flexShrink = '0'; // Prevent shrinking
-            alumniBadge.style.alignSelf = 'flex-end'; // Align to bottom of content area
-            alumniBadge.style.marginBottom = `${scaledPadding}px`; // Align with content padding
-        }
-    }
-}
         // Event listener for card holder type change
         if (cardHolderTypeSelect) {
             cardHolderTypeSelect.addEventListener('change', (e) => {
@@ -1311,9 +933,12 @@ function updateDoorSignDimensions(type) {
                 designationsToggle.classList.toggle('active');
                 const container = document.getElementById('designationsContainer');
                 if (container) {
-                    container.style.display = designationsToggle.classList.contains('active') ? 'block' : 'none';
+                    const isActive = designationsToggle.classList.contains('active');
+                    container.style.display = isActive ? 'block' : 'none';
+                    console.log('Designations toggle:', isActive); // Debug line
+                    
                     // Move the container after the toggle buttons if it's being shown
-                    if (container.style.display === 'block') {
+                    if (isActive) {
                         const toggleButtonsContainer = document.querySelector('.toggle-buttons-container');
                         if (toggleButtonsContainer && toggleButtonsContainer.nextSibling !== container) {
                             toggleButtonsContainer.parentNode.insertBefore(container, toggleButtonsContainer.nextSibling);
@@ -1443,8 +1068,10 @@ function updateDoorSignDimensions(type) {
                 if (designationsToggle?.classList.contains('active')) {
                     const checkedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
                         .map(checkbox => checkbox.value);
-                    const designationsToShow = checkedDesignations.length > 0 ? checkedDesignations : ['PhD'];
-                    content += `<div class="designations">${designationsToShow.join(', ')}</div>`;
+                    const designationsToShow = checkedDesignations;
+                    if (designationsToShow.length > 0) {
+                        content += `<div class="designations">${designationsToShow.join(', ')}</div>`;
+                    }
                 }
             } 
             else if (type === 'student') {
