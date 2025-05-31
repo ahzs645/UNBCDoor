@@ -141,12 +141,13 @@ class UNBCDoorSignApp {
             }
         });
 
-        // Card holder selection should trigger sign updates
+        // Card holder selection should NOT trigger sign updates - only visual scaling
         const cardHolderSelect = document.getElementById('cardHolderType');
         if (cardHolderSelect) {
             cardHolderSelect.addEventListener('change', () => {
-                console.log('Card holder changed, updating sign');
-                this.components.signRenderer.updateSign();
+                console.log('Card holder changed - no sign update needed');
+                // Card holder manager will handle the visual scaling
+                // No need to call signRenderer.updateSign() here
             });
         }
 

@@ -680,22 +680,21 @@ input:not(:placeholder-shown)::placeholder {
         margin: 0 auto;
     }
 
+    /* Mobile-specific card holder preview adjustments */
     .preview {
-        padding: 10px;
-        overflow-x: auto;
-        width: 100%;
-        box-sizing: border-box;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        padding: 15px;
+        max-height: 350px;
     }
-
-    /* For card holder previews - let JavaScript handle ALL scaling */
+    
     .door-sign.card-holder-preview {
-        /* Remove all dimension overrides - let JavaScript handle everything */
-        margin: 0 auto !important;
-        border-radius: 8px !important;
-        /* No max-width or max-height constraints that break aspect ratio */
+        max-width: calc(100% - 30px) !important;
+        max-height: 300px !important;
+        margin: 5px auto !important;
+    }
+    
+    /* Adjust toggle buttons for mobile */
+    .toggle-buttons-container {
+        margin-top: 20px; /* Reduced from 30px */
     }
 }
 
@@ -732,10 +731,31 @@ input:not(:placeholder-shown)::placeholder {
         font-size: 1.3rem;
     }
 
-    /* Card holder previews - let JavaScript handle scaling */
+    /* Very small mobile card holder previews */
+    .preview {
+        padding: 10px;
+        max-height: 280px;
+    }
+    
     .door-sign.card-holder-preview {
-        margin: 0 auto !important;
-        /* No dimension constraints */
+        max-width: calc(100% - 20px) !important;
+        max-height: 250px !important;
+        margin: 5px auto !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important; /* Smaller shadow on mobile */
+    }
+    
+    /* Adjust toggle buttons for very small screens */
+    .toggle-buttons-container {
+        margin-top: 15px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .toggle-button {
+        width: 100%;
+        text-align: center;
+        padding: 8px 15px;
+        font-size: 0.9rem;
     }
 }
 
@@ -759,4 +779,32 @@ input:not(:placeholder-shown)::placeholder {
     box-sizing: border-box !important;
     object-fit: contain !important;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important; /* Add shadow back for card holders */
+}
+
+/* Mobile responsive adjustments for card holder previews */
+@media (max-width: 768px) {
+    .preview {
+        padding: 15px;
+        max-height: 350px;
+    }
+    
+    .door-sign.card-holder-preview {
+        max-width: calc(100% - 30px) !important;
+        max-height: 300px !important;
+        margin: 5px auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .preview {
+        padding: 10px;
+        max-height: 280px;
+    }
+    
+    .door-sign.card-holder-preview {
+        max-width: calc(100% - 20px) !important;
+        max-height: 250px !important;
+        margin: 5px auto !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important; /* Smaller shadow on mobile */
+    }
 }

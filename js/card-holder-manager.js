@@ -4,9 +4,25 @@ class CardHolderManager {
         this.cardHolderTypeSelect = document.getElementById('cardHolderType');
         this.cardHolderInfoDiv = document.getElementById('cardHolderInfo');
         this.doorSign = document.querySelector('.door-sign');
+        this.currentCardHolderType = null; // Track current type for resize handling
         
         this.setupEventListeners();
         this.populateCardHolderTypes();
+        this.setupResizeHandler();
+    }
+
+    setupResizeHandler() {
+        // Handle window resize to adjust card holder preview on mobile
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // Re-apply card holder preview if one is selected
+                if (this.currentCardHolderType) {
+                    this.updateDoorSignDimensions(this.currentCardHolderType);
+                }
+            }, 250); // Debounce resize events
+        });
     }
 
     setupEventListeners() {
@@ -14,6 +30,7 @@ class CardHolderManager {
             this.cardHolderTypeSelect.addEventListener('change', (e) => {
                 const type = e.target.value;
                 console.log('Card holder type changed to:', type);
+                this.currentCardHolderType = type || null; // Track current selection
                 this.updateCardHolderInfo(type);
                 this.updateDoorSignDimensions(type);
                 // Sign update will be handled by app.js cross-component events
@@ -95,7 +112,7 @@ class CardHolderManager {
 
         if (signContent) {
             signContent.style.boxShadow = 'none';
-            signContent.style.borderRadius = '0 0 8px 8px'; // Restore rounded bottom corners
+            signContent.style.borderRadius = '';
             signContent.style.padding = '25px';
             signContent.style.height = '220px';
             signContent.style.width = '';
@@ -124,7 +141,7 @@ class CardHolderManager {
             signHeader.style.padding = '15px 20px';
             signHeader.style.width = '';
             signHeader.style.background = '#035b42';
-            signHeader.style.borderRadius = '8px 8px 0 0'; // Restore rounded top corners
+            signHeader.style.borderRadius = '0';
             signHeader.style.margin = '';
             signHeader.style.boxSizing = '';
             signHeader.style.display = 'flex';
@@ -202,8 +219,8 @@ class CardHolderManager {
         // Calculate the aspect ratio of the viewable area
         const viewableAspectRatio = viewableWidthIn / viewableHeightIn;
 
-        // Keep preview at a reasonable size but maintain proportions
-        const maxPreviewWidth = 450;
+        // Responsive preview width based on screen size
+        const maxPreviewWidth = this.getResponsivePreviewWidth();
         const previewWidth = maxPreviewWidth;
         const previewHeight = previewWidth / viewableAspectRatio;
 
@@ -220,12 +237,12 @@ class CardHolderManager {
         this.doorSign.style.width = `${scaledDoorSignWidth}px`;
         this.doorSign.style.height = `${scaledDoorSignHeight}px`;
         this.doorSign.style.border = `${borderThickness}px solid #cbd5e0`;
-        this.doorSign.style.borderRadius = '12px'; // This represents the card holder frame
+        this.doorSign.style.borderRadius = '12px';
         this.doorSign.style.background = '#f7fafc';
         this.doorSign.style.position = 'relative';
         this.doorSign.style.padding = '0';
         this.doorSign.style.margin = '0 auto';
-        this.doorSign.style.overflow = 'hidden';
+        this.doorSign.style.overflow = 'hidden'; // Ensure content respects rounded corners
 
         // Calculate scale based on door sign dimensions
         const scale = scaledDoorSignWidth / 500; // Scale based on door sign width
@@ -233,19 +250,20 @@ class CardHolderManager {
         this.updateContentAreas(scale, previewWidth, previewHeight, scaledDoorSignHeight);
         this.scaleFonts(scale);
         this.scaleAlumniBadge(scale);
+    }
+
+    getResponsivePreviewWidth() {
+        const screenWidth = window.innerWidth;
         
-        // Ensure the actual door sign content fills completely to edges (no gaps)
-        const signHeader = this.doorSign.querySelector('.sign-header');
-        const signContent = this.doorSign.querySelector('.sign-content');
-        
-        if (signHeader) {
-            signHeader.style.borderRadius = '0';
-            signHeader.style.margin = '0';
-        }
-        
-        if (signContent) {
-            signContent.style.borderRadius = '0';
-            signContent.style.margin = '0';
+        // Mobile breakpoints with appropriate preview sizes
+        if (screenWidth <= 480) {
+            return Math.min(300, screenWidth - 60); // Very small screens
+        } else if (screenWidth <= 768) {
+            return Math.min(350, screenWidth - 80); // Mobile screens
+        } else if (screenWidth <= 1024) {
+            return 400; // Tablet screens
+        } else {
+            return 450; // Desktop screens
         }
     }
 
@@ -256,7 +274,7 @@ class CardHolderManager {
         // Update content areas
         if (signContent) {
             signContent.style.background = 'white';
-            signContent.style.borderRadius = '0'; // Square corners for card holder content
+            signContent.style.borderRadius = '0'; // Match container border radius
             signContent.style.boxShadow = 'none';
             
             const headerHeight = signHeader ? (80 * scale) : 0;
@@ -287,8 +305,8 @@ class CardHolderManager {
         // Update header
         if (signHeader) {
             signHeader.style.background = '#035b42';
-            signHeader.style.borderRadius = '0'; // Square corners for card holder content
-            signHeader.style.boxShadow = 'none';
+            signHeader.style.borderRadius = '0'; // Match container border radius
+            signHeader.style.boxShadow = 'none'; // Remove conflicting shadow
             
             const scaledHeaderHeight = Math.max(60, 80 * scale);
             // More conservative header padding scaling
@@ -326,9 +344,36 @@ class CardHolderManager {
         }
     }
 
-    scaleFonts(scale) {
-        // Less aggressive font scaling to maintain readability
-        const fontScale = Math.max(0.7, scale * 0.9);
+     scaleFonts(scale) {
+        // More responsive font scaling - allow smaller fonts on mobile
+        const screenWidth = window.innerWidth;
+        const isCardHolderPreview = this.doorSign.classList.contains('card-holder-preview');
+        let fontScale;
+        
+        if (isCardHolderPreview) {
+            // Card holder previews need more aggressive scaling
+            if (screenWidth <= 480) {
+                // Very small screens with card holder: very aggressive scaling
+                fontScale = Math.max(0.3, scale * 0.7);
+            } else if (screenWidth <= 768) {
+                // Mobile screens with card holder: aggressive scaling
+                fontScale = Math.max(0.4, scale * 0.75);
+            } else {
+                // Desktop screens with card holder: moderate scaling
+                fontScale = Math.max(0.6, scale * 0.85);
+            }
+        } else {
+            // Regular door sign scaling (non card holder)
+            if (screenWidth <= 480) {
+                fontScale = Math.max(0.4, scale * 0.8);
+            } else if (screenWidth <= 768) {
+                fontScale = Math.max(0.5, scale * 0.85);
+            } else {
+                fontScale = Math.max(0.7, scale * 0.9);
+            }
+        }
+        
+        console.log(`Font scaling - Screen: ${screenWidth}px, Scale: ${scale}, Font scale: ${fontScale}, Card holder: ${isCardHolderPreview}`);
 
         const nameElements = this.doorSign.querySelectorAll('.name, .room-name');
         const positionElements = this.doorSign.querySelectorAll('.position');
@@ -336,37 +381,39 @@ class CardHolderManager {
         const designationElements = this.doorSign.querySelectorAll('.designations');
 
         nameElements.forEach(el => {
-            el.style.fontSize = `${24 * fontScale}px`;
+            const fontSize = 24 * fontScale;
+            el.style.fontSize = `${fontSize}px`;
             el.style.lineHeight = '1.2';
-            // Keep original margin ratios - don't over-scale spacing
-            el.style.marginBottom = scale > 0.8 ? '8px' : `${Math.max(4, 8 * scale)}px`;
+            el.style.marginBottom = scale > 0.8 ? '8px' : `${Math.max(2, 8 * fontScale)}px`;
+            console.log(`Name font size set to: ${fontSize}px`);
         });
 
         positionElements.forEach(el => {
-            el.style.fontSize = `${18 * fontScale}px`;
+            const fontSize = 18 * fontScale;
+            el.style.fontSize = `${fontSize}px`;
             el.style.lineHeight = '1.2';
-            // Keep original margin ratios
-            el.style.marginBottom = scale > 0.8 ? '12px' : `${Math.max(6, 12 * scale)}px`;
+            el.style.marginBottom = scale > 0.8 ? '12px' : `${Math.max(3, 12 * fontScale)}px`;
+            console.log(`Position font size set to: ${fontSize}px`);
         });
 
         contactElements.forEach(el => {
-            el.style.fontSize = `${14 * fontScale}px`;
+            const fontSize = 14 * fontScale;
+            el.style.fontSize = `${fontSize}px`;
             el.style.lineHeight = '1.3';
-            // Keep original margin ratios
-            el.style.marginTop = scale > 0.8 ? '12px' : `${Math.max(6, 12 * scale)}px`;
+            el.style.marginTop = scale > 0.8 ? '12px' : `${Math.max(3, 12 * fontScale)}px`;
+            console.log(`Contact font size set to: ${fontSize}px`);
             
             const contactDivs = el.querySelectorAll('div');
             contactDivs.forEach(div => {
-                // Very conservative margin scaling for contact items
-                div.style.marginBottom = scale > 0.8 ? '3px' : `${Math.max(2, 3 * scale)}px`;
+                div.style.marginBottom = scale > 0.8 ? '3px' : `${Math.max(1, 3 * fontScale)}px`;
             });
         });
 
         designationElements.forEach(el => {
-            el.style.fontSize = `${14 * fontScale}px`;
+            const fontSize = 14 * fontScale;
+            el.style.fontSize = `${fontSize}px`;
             el.style.lineHeight = '1.3';
-            // Keep original margin ratios
-            el.style.marginTop = scale > 0.8 ? '8px' : `${Math.max(4, 8 * scale)}px`;
+            el.style.marginTop = scale > 0.8 ? '8px' : `${Math.max(2, 8 * fontScale)}px`;
         });
     }
 
@@ -389,6 +436,27 @@ class CardHolderManager {
             // Remove bottom margin that was pushing it off-center
             alumniBadge.style.marginBottom = '0';
             alumniBadge.style.marginTop = '0';
+        }
+    }
+
+    // Method to re-apply scaling after sign updates
+    reapplyScalingIfNeeded() {
+        if (this.currentCardHolderType && cardHolders && cardHolders[this.currentCardHolderType]) {
+            console.log('Re-applying card holder scaling after sign update');
+            const spec = cardHolders[this.currentCardHolderType];
+            const maxPreviewWidth = this.getResponsivePreviewWidth();
+            const scaledDoorSignWidth = maxPreviewWidth;
+            let scale = scaledDoorSignWidth / 500;
+            
+            // Apply the same aggressive scaling as in applyCardHolderPreview
+            const screenWidth = window.innerWidth;
+            if (screenWidth <= 480 && scale < 0.8) {
+                scale = scale * 0.8;
+            } else if (screenWidth <= 768 && scale < 0.9) {
+                scale = scale * 0.9;
+            }
+            
+            this.scaleFonts(scale);
         }
     }
 }

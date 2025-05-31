@@ -300,6 +300,11 @@ class SignRenderer {
         // Update department display
         this.updateDepartmentDisplay();
         
+        // Re-apply card holder scaling if a card holder is selected
+        if (window.cardHolderManager) {
+            window.cardHolderManager.reapplyScalingIfNeeded();
+        }
+        
         console.log('Sign update complete');
     }
 
