@@ -22,9 +22,9 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     align-items: start;
-    padding: 0;
-    width: 100%;
     box-sizing: border-box;
+    width: 100%;
+    padding: 0 20px;
 }
 
 .controls {
@@ -38,7 +38,7 @@ body {
 .card-holder-selector-container {
     background: white;
     border-radius: 20px;
-    padding: 20px;
+    padding: 20px 20px 30px 20px; /* Extra bottom padding for shadows */
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     position: sticky;
     top: 20px;
@@ -157,6 +157,11 @@ input[type="tel"] {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+/* Search input container to position results correctly */
+.form-group {
+    position: relative;
+}
+
 /* Search results */
 .search-results {
     max-height: 200px;
@@ -167,9 +172,11 @@ input[type="tel"] {
     display: none;
     background-color: white;
     position: absolute;
-    width: calc(100% - 60px);
-    z-index: 10;
+    width: 100%;
+    z-index: 1000;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    left: 0;
+    top: 100%;
 }
 
 .search-result-item {
@@ -184,6 +191,29 @@ input[type="tel"] {
 
 .search-result-item:last-child {
     border-bottom: none;
+}
+
+/* Contact info group specific layout */
+.contact-info-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.contact-info-group .form-group {
+    flex: 1;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-info-group .form-group label:first-child {
+    margin-bottom: 8px;
+}
+
+.contact-info-group .form-group input[type="email"],
+.contact-info-group .form-group input[type="tel"] {
+    margin-bottom: 0;
 }
 
 /* Card holder info */
@@ -207,6 +237,7 @@ input[type="tel"] {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+    margin-top: 30px; /* Extra space above buttons to prevent shadow clipping */
     justify-content: center;
 }
 
@@ -243,6 +274,10 @@ input[type="tel"] {
     overflow: hidden;
     position: relative;
     margin: 0 auto;
+}
+
+.door-sign.card-holder-preview {
+    transform: none !important;
 }
 
 .sign-header {
@@ -399,9 +434,19 @@ input[type="tel"] {
     font-style: italic;
 }
 
+/* Fix designations container styling */
+#designationsContainer {
+    display: block;
+    margin-top: 15px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
 .designation-options {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
     margin-bottom: 15px;
 }
@@ -409,23 +454,24 @@ input[type="tel"] {
 .designation-option {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     padding: 8px 12px;
-    border-radius: 4px;
+    border-radius: 6px;
     transition: all 0.2s ease;
     cursor: pointer;
-    position: relative;
-    margin: 2px 0;
+    background: white;
+    border: 1px solid #e2e8f0;
 }
 
 .designation-option:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
 }
 
 .designation-option input[type="checkbox"] {
-    margin-right: 8px;
-    position: relative;
-    z-index: 2;
+    width: 16px;
+    height: 16px;
+    margin: 0;
 }
 
 .designation-option label {
@@ -483,46 +529,6 @@ input[type="tel"] {
     font-size: 0.9em;
 }
 
-/* Fix designations container styling */
-#designationsContainer {
-    display: block;
-    margin-top: 15px;
-    padding: 20px;
-    background: #f8fafc;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-}
-
-.designation-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.designation-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    background: white;
-    border: 1px solid #e2e8f0;
-}
-
-.designation-option:hover {
-    background-color: #f7fafc;
-    border-color: #cbd5e0;
-}
-
-.designation-option input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-}
-
 .export-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -539,6 +545,12 @@ input[type="tel"] {
 
 .export-btn:hover {
     transform: translateY(-2px);
+}
+
+.export-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .general-room {
@@ -558,44 +570,6 @@ input[type="tel"] {
     font-size: 42px;
     line-height: 1;
     margin-bottom: 0;
-}
-
-.designation-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.9rem;
-    font-weight: normal;
-    text-transform: none;
-    letter-spacing: normal;
-}
-
-.designation-checkbox input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-}
-
-.toggle-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    user-select: none;
-    margin-top: 8px;
-    width: fit-content;
-}
-
-.toggle-checkbox input[type="checkbox"] {
-    margin: 0;
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
-}
-
-.toggle-label {
-    font-size: 0.9em;
-    color: #4a5568;
-    cursor: pointer;
 }
 
 .show-toggle {
@@ -622,6 +596,15 @@ input[type="tel"] {
     margin: 0;
 }
 
+input:focus::placeholder {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+input:not(:placeholder-shown)::placeholder {
+    opacity: 0;
+}
+
 /* Mobile responsive styles */
 @media (max-width: 1024px) {
     body {
@@ -629,7 +612,7 @@ input[type="tel"] {
     }
     
     .container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 20px;
         padding: 0;
         width: 100%;
@@ -644,8 +627,8 @@ input[type="tel"] {
     }
     
     .card-holder-selector-container {
-        position: relative;
-        top: 0;
+        position: relative !important;
+        top: 0 !important;
         order: 2;
     }
     
@@ -756,47 +739,24 @@ input[type="tel"] {
     }
 }
 
-input:focus::placeholder {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-input:not(:placeholder-shown)::placeholder {
-    opacity: 0;
-}
-
-select:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-}
-
 /* Prevent container expansion for card holder previews */
 .preview {
     width: 100%;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible to show shadows */
     display: flex;
     justify-content: center;
     align-items: center;
-    max-height: 400px;
-    padding: 10px;
+    max-height: 450px; /* Increased to accommodate shadows */
+    padding: 20px; /* Increased padding for shadow space */
 }
 
 .door-sign.card-holder-preview {
-    max-width: calc(100% - 20px) !important;
-    max-height: 350px !important;
+    max-width: calc(100% - 40px) !important; /* Account for increased padding */
+    max-height: 400px !important;
     width: auto !important;
     height: auto !important;
     margin: 10px auto !important;
     box-sizing: border-box !important;
     object-fit: contain !important;
-}
-
-.card-holder-selector-container {
-    min-width: 0;
-    max-width: 100%;
-    overflow: hidden;
-    width: 100%;
-    box-sizing: border-box;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important; /* Add shadow back for card holders */
 }
