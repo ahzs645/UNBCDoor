@@ -366,23 +366,62 @@
         .input-with-toggle input[type="email"],
         .input-with-toggle input[type="tel"] {
             flex: 1;
+            min-width: 0; /* Prevents input from overflowing */
         }
 
         .toggle-checkbox {
-            display: flex;
+            display: flex; /* Use flex to align checkbox and label */
             align-items: center;
+            justify-content: flex-end; /* Align content to the right */
             gap: 5px;
             cursor: pointer;
             user-select: none;
+            white-space: nowrap;
+            padding: 4px 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            margin-top: 8px; /* Add space between input and toggle */
+            width: 100%; /* Make the toggle span the width of the form group */
+        }
+
+        .toggle-checkbox:hover {
+            background: #edf2f7;
         }
 
         .toggle-checkbox input[type="checkbox"] {
             margin: 0;
+            cursor: pointer;
         }
 
         .toggle-label {
             font-size: 0.9em;
-            color: #666;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        /* Add styles for contact info group */
+        .contact-info-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .contact-info-group .form-group {
+            flex: 1;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column; /* Stack label, input, and toggle vertically */
+        }
+
+        .contact-info-group .form-group label:first-child {
+            margin-bottom: 8px; /* Space below the Email/Phone label */
+        }
+
+        .contact-info-group .form-group input[type="email"],
+        .contact-info-group .form-group input[type="tel"] {
+             margin-bottom: 0; /* Remove default margin */
         }
     </style>
 </head>
@@ -448,21 +487,19 @@
                     <input type="text" id="position" name="position" placeholder="Enter Position">
                 </div>
 
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <div class="input-with-toggle">
+                <div class="contact-info-group">
+                    <div class="form-group">
+                        <label for="email">Email</label>
                         <input type="email" id="email" name="email" placeholder="enter.email@unbc.ca">
                         <label class="toggle-checkbox">
                             <input type="checkbox" id="showEmail" checked>
                             <span class="toggle-label">Show</span>
                         </label>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <div class="input-with-toggle">
-                        <input type="tel" id="phone" name="phone" placeholder="250-960-XXXX" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone" placeholder="250-960-XXXX" pattern="[0-9]{3}-\d{3}-\d{4}">
                         <label class="toggle-checkbox">
                             <input type="checkbox" id="showPhone" checked>
                             <span class="toggle-label">Show</span>
@@ -1037,52 +1074,24 @@
             });
         }
 
-        // Initialize form elements
+        // Initialize form elements and event listeners
         function initializeFormElements() {
-            // Create form groups for inputs if they don't exist
-            const formGroups = [
-                { id: 'name', label: 'Name', type: 'text' },
-                { id: 'position', label: 'Position', type: 'text' },
-                { id: 'email', label: 'Email', type: 'email' },
-                { id: 'phone', label: 'Phone', type: 'tel' },
-                { id: 'roomName', label: 'Room Name', type: 'text' }
-            ];
-
-            formGroups.forEach(group => {
-                if (!document.getElementById(group.id)) {
-                    const formGroup = document.createElement('div');
-                    formGroup.className = 'form-group';
-                    
-                    const label = document.createElement('label');
-                    label.htmlFor = group.id;
-                    label.textContent = group.label;
-                    
-                    const input = document.createElement('input');
-                    input.type = group.type;
-                    input.id = group.id;
-                    input.name = group.id;
-                    
-                    formGroup.appendChild(label);
-                    formGroup.appendChild(input);
-                    signForm.insertBefore(formGroup, document.querySelector('.toggle-buttons-container'));
-                }
-            });
-
             // Add event listeners to all input fields
             const inputs = [
-                nameInput,
-                positionInput,
-                emailInput,
-                phoneInput,
-                roomNameInput,
-                showEmail,
-                showPhone
+                { element: nameInput, events: ['input', 'change'] },
+                { element: positionInput, events: ['input', 'change'] },
+                { element: emailInput, events: ['input', 'change'] },
+                { element: phoneInput, events: ['input', 'change'] },
+                { element: roomNameInput, events: ['input', 'change'] },
+                { element: document.getElementById('showEmail'), events: ['change'] },
+                { element: document.getElementById('showPhone'), events: ['change'] }
             ];
 
-            inputs.forEach(input => {
-                if (input) {
-                    input.addEventListener('input', updateSign);
-                    input.addEventListener('change', updateSign);
+            inputs.forEach(({ element, events }) => {
+                if (element) {
+                    events.forEach(eventType => {
+                        element.addEventListener(eventType, updateSign);
+                    });
                 }
             });
 
@@ -1158,6 +1167,8 @@
             
             initializeDesignationOptions();
             populateMainDepartments();
+            populateCardHolderTypes();
+            initializeFormElements();
             
             // Set initial state of alumni badge
             if (alumniBadge) {
@@ -1165,9 +1176,7 @@
             }
             
             // Ensure the sign shows default content immediately
-            setTimeout(() => {
-                updateSign();
-            }, 100); // Small delay to ensure DOM is ready
+            updateSign();
         });
 
         // Update sign preview
@@ -1303,18 +1312,6 @@
                     textElement.innerHTML = '';
                 }
             }
-        }
-
-        // Add event listeners for email and phone toggles
-        const showEmail = document.getElementById('showEmail');
-        const showPhone = document.getElementById('showPhone');
-
-        if (showEmail) {
-            showEmail.addEventListener('change', updateSign);
-        }
-
-        if (showPhone) {
-            showPhone.addEventListener('change', updateSign);
         }
     </script>
 </body>
