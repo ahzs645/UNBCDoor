@@ -1,3 +1,5 @@
+import DoorSign from './door-sign.js';
+
 // Department data structure
 const departmentData = {
     "Faculty of Business and Economics": [
@@ -103,8 +105,13 @@ const roomNameInput = document.getElementById('roomName');
 const isAlumniCheckbox = document.getElementById('isAlumni');
 const enableDesignationsCheckbox = document.getElementById('enableDesignations');
 const designationsContainer = document.getElementById('designationsContainer');
-const doorSign = document.getElementById('doorSign');
-const exportBtn = document.getElementById('exportBtn');
+const doorSignElement = document.querySelector('.door-sign');
+
+// Initialize door sign
+let doorSign;
+if (doorSignElement) {
+    doorSign = new DoorSign(doorSignElement);
+}
 
 // Designation list
 const designationList = [
@@ -229,6 +236,8 @@ function wrapText(text, maxWidth) {
 
 // Update sign preview
 function updateSign() {
+    if (!doorSign) return;
+
     const type = signType.value;
     const mainDept = mainDepartment.value;
     const subDept = subDepartment.value;
@@ -240,94 +249,41 @@ function updateSign() {
     const isAlumni = isAlumniCheckbox.checked;
     const enableDesignations = enableDesignationsCheckbox.checked;
 
-    // Update SVG text with department
-    const displayDept = subDept && subDept !== 'none' ? subDept : mainDept;
-    updateSVGText(displayDept);
+    // Get selected designations
+    const selectedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
+        .map(checkbox => checkbox.value);
 
-    // Update alumni badge visibility
-    const alumniBadge = document.querySelector('.alumni-badge');
-    alumniBadge.style.display = isAlumni ? 'block' : 'none';
-
-    // Clear previous content
-    const nameTitle = document.querySelector('.name-title');
-    const contactInfo = document.querySelector('.contact-info');
-    const designationsDisplay = document.querySelector('.designations-display');
+    // Set default values based on sign type
+    let defaultName, defaultPosition, defaultEmail, defaultPhone, defaultRoomName;
     
-    nameTitle.innerHTML = '';
-    contactInfo.innerHTML = '';
-    designationsDisplay.innerHTML = '';
-
-    // Check if any input has been modified
-    const hasUserInput = name || position || email || phone || roomName || mainDept || subDept || isAlumni || enableDesignations;
-
-    // Create and append content based on sign type
     if (type === 'faculty' || type === 'staff') {
-        // Faculty/Staff template
-        nameTitle.textContent = name;
-        if (position) {
-            const positionDiv = document.createElement('div');
-            positionDiv.className = 'position';
-            positionDiv.textContent = position;
-            nameTitle.appendChild(positionDiv);
-        }
-        
-        if (email || phone) {
-            contactInfo.style.display = 'block';
-            if (email) {
-                const emailDiv = document.createElement('div');
-                emailDiv.className = 'email';
-                emailDiv.textContent = `Email: ${email}`;
-                contactInfo.appendChild(emailDiv);
-            }
-            if (phone) {
-                const phoneDiv = document.createElement('div');
-                phoneDiv.className = 'phone';
-                phoneDiv.textContent = `Phone: ${phone}`;
-                contactInfo.appendChild(phoneDiv);
-            }
-        } else {
-            contactInfo.style.display = 'none';
-        }
-
-        if (enableDesignations) {
-            const selectedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
-                .map(checkbox => checkbox.value);
-            if (selectedDesignations.length > 0) {
-                designationsDisplay.textContent = `(${selectedDesignations.join(', ')})`;
-            }
-        }
+        defaultName = 'Dr. John Smith';
+        defaultPosition = 'Professor';
+        defaultEmail = 'john.smith@unbc.ca';
+        defaultPhone = '250-960-5555';
     } else if (type === 'student') {
-        // Student template
-        nameTitle.textContent = name;
-        if (email) {
-            contactInfo.style.display = 'block';
-            const emailDiv = document.createElement('div');
-            emailDiv.className = 'email';
-            emailDiv.textContent = `Email: ${email}`;
-            contactInfo.appendChild(emailDiv);
-        } else {
-            contactInfo.style.display = 'none';
-        }
+        defaultName = 'Student Name';
+        defaultEmail = 'student@unbc.ca';
     } else if (type === 'lab') {
-        // Lab template
-        nameTitle.textContent = name;
-        if (roomName) {
-            const roomDiv = document.createElement('div');
-            roomDiv.className = 'room';
-            roomDiv.textContent = roomName;
-            nameTitle.appendChild(roomDiv);
-        }
-    } else if (type === 'general-room' || type === 'custodian-closet') {
-        // Room template
-        nameTitle.textContent = roomName || (type === 'custodian-closet' ? 'Custodian Closet' : 'Room Name');
+        defaultRoomName = 'Research Lab';
+    } else {
+        defaultRoomName = 'Room 101';
     }
 
-    // Update the sign preview
-    if (hasUserInput) {
-        doorSign.style.display = 'block';
-    } else {
-        doorSign.style.display = 'none';
-    }
+    // Update door sign with new data
+    doorSign.update({
+        signType: type,
+        mainDepartment: mainDept,
+        subDepartment: subDept,
+        name: name || defaultName,
+        position: position || defaultPosition,
+        email: email || defaultEmail,
+        phone: phone || defaultPhone,
+        roomName: roomName || defaultRoomName,
+        isAlumni: isAlumni,
+        enableDesignations: enableDesignations,
+        selectedDesignations: selectedDesignations.length > 0 ? selectedDesignations : ['PhD']
+    }, DOOR_SIGN_TYPES[type]);
 }
 
 // Event Listeners
@@ -377,5 +333,9 @@ exportBtn.addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
     initializeDesignationOptions();
     populateMainDepartments();
+    // Trigger initial sign type change to set up form
+    if (signType) {
+        signType.dispatchEvent(new Event('change'));
+    }
     updateSign();
 }); 

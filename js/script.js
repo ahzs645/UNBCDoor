@@ -47,4 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formatPhoneNumber(this);
         });
     }
+
+    // Initialize card holder types
+    populateCardHolderTypes();
 }); 

@@ -190,9 +190,10 @@
             align-self: center;
         }
         
-        .alumni-badge svg {
+        .alumni-badge object {
             width: 80px;
             height: auto;
+            display: block;
         }
 
         .sign-content {
@@ -354,6 +355,35 @@
             border-radius: 8px;
             background: #f8fafc;
         }
+
+        /* Add styles for input with toggle */
+        .input-with-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-with-toggle input[type="email"],
+        .input-with-toggle input[type="tel"] {
+            flex: 1;
+        }
+
+        .toggle-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-checkbox input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .toggle-label {
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -420,12 +450,24 @@
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="enter.email@unbc.ca">
+                    <div class="input-with-toggle">
+                        <input type="email" id="email" name="email" placeholder="enter.email@unbc.ca">
+                        <label class="toggle-checkbox">
+                            <input type="checkbox" id="showEmail" checked>
+                            <span class="toggle-label">Show</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone</label>
-                    <input type="tel" id="phone" name="phone" placeholder="250-960-XXXX" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                    <div class="input-with-toggle">
+                        <input type="tel" id="phone" name="phone" placeholder="250-960-XXXX" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                        <label class="toggle-checkbox">
+                            <input type="checkbox" id="showPhone" checked>
+                            <span class="toggle-label">Show</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -451,18 +493,18 @@
                 <div class="door-sign">
                     <div class="sign-header">
                         <div class="unbc-logo">
-                            <!-- SVG will be loaded here -->
+                            <img src="components/unbc-logo.svg" alt="UNBC Logo">
                         </div>
                     </div>
                     <div class="sign-content">
                         <div class="main-content">
                             <div class="name-title"></div>
-                            <div class="department-info"></div>
+                            <div class="position"></div>
                             <div class="contact-info"></div>
-                            <div class="designations-display"></div>
+                            <div class="designations"></div>
                         </div>
                         <div class="alumni-badge">
-                            <img src="components/alumni-badge.svg" alt="UNBC Alumni Badge" width="80" height="auto">
+                            <object data="components/alumni-badge.svg" type="image/svg+xml" width="80" height="92"></object>
                         </div>
                     </div>
                 </div>
@@ -629,7 +671,7 @@
                 lines.forEach((line, index) => {
                     const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
                     tspan.setAttribute('x', '0');
-                    tspan.setAttribute('y', index * 10);
+                    tspan.setAttribute('dy', index === 0 ? '0' : '10');
                     tspan.textContent = line;
                     textElement.appendChild(tspan);
                 });
@@ -1026,10 +1068,21 @@
                 }
             });
 
-            // Add event listeners to inputs
-            [nameInput, positionInput, emailInput, phoneInput, roomNameInput].forEach(input => {
+            // Add event listeners to all input fields
+            const inputs = [
+                nameInput,
+                positionInput,
+                emailInput,
+                phoneInput,
+                roomNameInput,
+                showEmail,
+                showPhone
+            ];
+
+            inputs.forEach(input => {
                 if (input) {
                     input.addEventListener('input', updateSign);
+                    input.addEventListener('change', updateSign);
                 }
             });
 
@@ -1042,6 +1095,12 @@
         if (alumniToggle) {
             alumniToggle.addEventListener('click', () => {
                 alumniToggle.classList.toggle('active');
+                if (alumniBadge) {
+                    const type = signType?.value || 'faculty';
+                    const shouldShowAlumni = (type === 'faculty' || type === 'staff') && 
+                        alumniToggle.classList.contains('active');
+                    alumniBadge.style.display = shouldShowAlumni ? 'block' : 'none';
+                }
                 updateSign();
             });
         }
@@ -1092,44 +1151,23 @@
             });
         }
 
-        // Initialize
+        // Initialize when the DOM is loaded
         document.addEventListener('DOMContentLoaded', async () => {
             // Load the UNBC logo
             await loadUNBCLogo();
             
             initializeDesignationOptions();
-            populateCardHolderTypes();
-            initializeFormElements();
-
-            // Show initial form elements
-            if (signType && signType.parentElement) signType.parentElement.style.display = 'block';
-            if (departmentSearch && departmentSearch.parentElement) departmentSearch.parentElement.style.display = 'block';
-            if (departmentType && departmentType.parentElement) departmentType.parentElement.style.display = 'block';
-            if (mainDepartment && mainDepartment.parentElement) mainDepartment.parentElement.style.display = 'none';
-            if (subDepartment && subDepartment.parentElement) subDepartment.parentElement.style.display = 'none';
-            if (subSubDepartment && subSubDepartment.parentElement) subSubDepartment.parentElement.style.display = 'none';
-
-            // Move designations container to the card holder selector container
-            const designationsContainer = document.getElementById('designationsContainer');
-            const cardHolderSelectorContainer = document.querySelector('.card-holder-selector-container');
-            if (designationsContainer && cardHolderSelectorContainer) {
-                // Remove from current location if it exists
-                designationsContainer.parentNode?.removeChild(designationsContainer);
-                // Insert after the card holder info
-                const cardHolderInfo = document.getElementById('cardHolderInfo');
-                if (cardHolderInfo) {
-                    cardHolderInfo.parentNode.insertBefore(designationsContainer, cardHolderInfo.nextSibling);
-                } else {
-                    cardHolderSelectorContainer.insertBefore(designationsContainer, cardHolderSelectorContainer.firstChild);
-                }
+            populateMainDepartments();
+            
+            // Set initial state of alumni badge
+            if (alumniBadge) {
+                alumniBadge.style.display = 'none';
             }
-
-            // Trigger initial sign type change to set up form
-            if (signType) {
-                signType.dispatchEvent(new Event('change'));
-            }
-
-            updateSign();
+            
+            // Ensure the sign shows default content immediately
+            setTimeout(() => {
+                updateSign();
+            }, 100); // Small delay to ensure DOM is ready
         });
 
         // Update sign preview
@@ -1137,42 +1175,91 @@
             const signContent = document.querySelector('.sign-content .main-content');
             if (!signContent) return;
 
-            const type = signType.value;
+            const type = signType?.value || 'faculty';
             let content = '';
 
-            // Add name and position for faculty/staff
+            // Define default values based on sign type
+            const getDefaultValues = (signType) => {
+                switch(signType) {
+                    case 'faculty':
+                    case 'staff':
+                        return {
+                            name: 'Dr. John Smith',
+                            position: 'Professor',
+                            email: 'john.smith@unbc.ca',
+                            phone: '250-960-5555'
+                        };
+                    case 'student':
+                        return {
+                            name: 'Student Name',
+                            email: 'student@unbc.ca'
+                        };
+                    case 'lab':
+                        return {
+                            roomName: 'Research Lab'
+                        };
+                    case 'general-room':
+                        return {
+                            roomName: 'Conference Room'
+                        };
+                    case 'custodian-closet':
+                        return {
+                            roomName: 'Storage Room'
+                        };
+                    default:
+                        return {};
+                }
+            };
+
+            const defaults = getDefaultValues(type);
+
+            // Get actual values or use defaults
+            const getName = () => document.getElementById('name')?.value || defaults.name || '';
+            const getPosition = () => document.getElementById('position')?.value || defaults.position || '';
+            const getEmail = () => document.getElementById('email')?.value || defaults.email || '';
+            const getPhone = () => document.getElementById('phone')?.value || defaults.phone || '';
+            const getRoomName = () => document.getElementById('roomName')?.value || defaults.roomName || '';
+
+            // Build content based on sign type
             if (type === 'faculty' || type === 'staff') {
-                const name = document.getElementById('name')?.value || '';
-                const position = document.getElementById('position')?.value || '';
+                const name = getName();
+                const position = getPosition();
+                
                 if (name) content += `<div class="name">${name}</div>`;
                 if (position) content += `<div class="position">${position}</div>`;
-            }
-
-            // Add room name for lab/general room/custodian closet
-            if (type === 'lab' || type === 'general-room' || type === 'custodian-closet') {
-                const roomName = document.getElementById('roomName')?.value || '';
-                if (roomName) content += `<div class="room-name">${roomName}</div>`;
-            }
-
-            // Add contact info for faculty/staff/student
-            if (type === 'faculty' || type === 'staff' || type === 'student') {
-                const email = document.getElementById('email')?.value || '';
-                const phone = document.getElementById('phone')?.value || '';
-                if (email || phone) {
+                
+                // Add contact info
+                const email = getEmail();
+                const phone = getPhone();
+                if ((email && showEmail?.checked) || (phone && showPhone?.checked)) {
                     content += '<div class="contact-info">';
-                    if (email) content += `<div>Email: ${email}</div>`;
-                    if (phone) content += `<div>Phone: ${phone}</div>`;
+                    if (email && showEmail?.checked) content += `<div>Email: ${email}</div>`;
+                    if (phone && showPhone?.checked) content += `<div>Phone: ${phone}</div>`;
+                    content += '</div>';
+                }
+                
+                // Add designations if enabled
+                if (designationsToggle?.classList.contains('active')) {
+                    const checkedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
+                        .map(checkbox => checkbox.value);
+                    const designationsToShow = checkedDesignations.length > 0 ? checkedDesignations : ['PhD'];
+                    content += `<div class="designations">${designationsToShow.join(', ')}</div>`;
+                }
+            } 
+            else if (type === 'student') {
+                const name = getName();
+                const email = getEmail();
+                
+                if (name) content += `<div class="name">${name}</div>`;
+                if (email) {
+                    content += '<div class="contact-info">';
+                    content += `<div>Email: ${email}</div>`;
                     content += '</div>';
                 }
             }
-
-            // Add designations
-            if (type === 'faculty' || type === 'staff') {
-                const checkedDesignations = Array.from(document.querySelectorAll('input[name="designations"]:checked'))
-                    .map(checkbox => checkbox.value);
-                if (checkedDesignations.length > 0) {
-                    content += `<div class="designations">${checkedDesignations.join(', ')}</div>`;
-                }
+            else if (type === 'lab' || type === 'general-room' || type === 'custodian-closet') {
+                const roomName = getRoomName();
+                if (roomName) content += `<div class="room-name">${roomName}</div>`;
             }
 
             // Update the content
@@ -1180,15 +1267,21 @@
 
             // Update alumni badge visibility
             if (alumniBadge) {
-                alumniBadge.style.display = (type === 'faculty' || type === 'staff') && 
-                    alumniToggle.classList.contains('active') ? 'block' : 'none';
+                const shouldShowAlumni = (type === 'faculty' || type === 'staff') && 
+                    alumniToggle?.classList.contains('active');
+                alumniBadge.style.display = shouldShowAlumni ? 'block' : 'none';
             }
 
             // Update SVG text with department info
-            const deptType = departmentType.value;
-            const mainDept = mainDepartment.value;
-            const subDept = subDepartment.value;
-            const subSubDept = subSubDepartment.value;
+            updateDepartmentDisplay();
+        }
+
+        // Separate function to handle department display
+        function updateDepartmentDisplay() {
+            const deptType = departmentType?.value;
+            const mainDept = mainDepartment?.value;
+            const subDept = subDepartment?.value;
+            const subSubDept = subSubDepartment?.value;
 
             // Use the most specific department level available for display
             let displayDept = '';
@@ -1200,9 +1293,28 @@
                 displayDept = mainDept;
             }
 
+            // Only update if we have department info
             if (deptType && displayDept) {
                 updateSVGText(displayDept);
+            } else {
+                // Clear the text if no department is selected
+                const textElement = document.querySelector('#svgDepartmentText');
+                if (textElement) {
+                    textElement.innerHTML = '';
+                }
             }
+        }
+
+        // Add event listeners for email and phone toggles
+        const showEmail = document.getElementById('showEmail');
+        const showPhone = document.getElementById('showPhone');
+
+        if (showEmail) {
+            showEmail.addEventListener('change', updateSign);
+        }
+
+        if (showPhone) {
+            showPhone.addEventListener('change', updateSign);
         }
     </script>
 </body>
