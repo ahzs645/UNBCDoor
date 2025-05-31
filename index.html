@@ -254,10 +254,9 @@
             margin-top: 20px;
             display: flex;
             justify-content: center;
-            background: white;
+            background: transparent;
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
         .door-sign {
@@ -268,6 +267,10 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow: hidden;
             position: relative;
+        }
+
+        .door-sign.card-holder-preview {
+            transform: none !important;
         }
 
         /* Remove conflicting style from media query if it exists and causes issues */
@@ -662,7 +665,7 @@
                 // Get the SVG element and set its size
                 const svg = logoContainer.querySelector('svg');
                 if (svg) {
-                    svg.style.width = '200px';
+                    svg.style.width = 'auto';
                     svg.style.height = 'auto';
                 }
                 
@@ -754,34 +757,223 @@
             }
         }
 
-        // Update door sign scaling based on card holder type
-        function updateDoorSignDimensions(type) {
-            const baseWidthPx = 500;
-            const baseHeightPx = 300;
+// Update door sign scaling based on card holder type
+function updateDoorSignDimensions(type) {
+    const doorSign = document.querySelector('.door-sign');
+    if (!doorSign) return;
 
-            if (doorSign) {
-                if (type && cardHolders[type]) {
-                    const spec = cardHolders[type];
-                    const viewableWidthIn = spec.viewableArea.width;
-                    const viewableHeightIn = spec.viewableArea.height;
+    // Reset to default state first
+    doorSign.style.transform = 'none';
+    doorSign.style.border = 'none';
+    doorSign.style.padding = '0';
+    doorSign.style.background = 'white';
+    doorSign.style.width = '500px';
+    doorSign.style.height = '300px';
+    doorSign.classList.remove('card-holder-preview');
 
-                    const targetWidthPx = viewableWidthIn * 96;
-                    const targetHeightPx = viewableHeightIn * 96;
+    // Reset all child elements to default
+    const signContent = doorSign.querySelector('.sign-content');
+    const signHeader = doorSign.querySelector('.sign-header');
 
-                    const scaleX = targetWidthPx / baseWidthPx;
-                    const scaleY = targetHeightPx / baseHeightPx;
-                    const scaleFactor = Math.min(scaleX, scaleY);
+    if (signContent) {
+        signContent.style.boxShadow = 'none';
+        signContent.style.borderRadius = '';
+        signContent.style.padding = '20px';
+        signContent.style.minHeight = '200px';
+        signContent.style.background = 'white';
+        signContent.style.display = 'flex';
+        signContent.style.alignItems = 'center';
+    }
 
-                    doorSign.style.transform = `scale(${scaleFactor})`;
-                    doorSign.style.transformOrigin = 'center';
+    if (signHeader) {
+        signHeader.style.boxShadow = 'none';
+        signHeader.style.height = '80px';
+        signHeader.style.padding = '15px 20px';
+        signHeader.style.background = '#035b42';
+        signHeader.style.borderRadius = '0';
+    }
 
-                } else {
-                    doorSign.style.transform = 'none';
-                    doorSign.style.transformOrigin = '';
-                }
+    // Reset font sizes
+    const nameElements = doorSign.querySelectorAll('.name, .room-name');
+    const positionElements = doorSign.querySelectorAll('.position');
+    const contactElements = doorSign.querySelectorAll('.contact-info');
+    const designationElements = doorSign.querySelectorAll('.designations');
+
+    nameElements.forEach(el => el.style.fontSize = '24px');
+    positionElements.forEach(el => el.style.fontSize = '18px');
+    contactElements.forEach(el => el.style.fontSize = '14px');
+    designationElements.forEach(el => el.style.fontSize = '14px');
+
+    // Remove any existing info element
+    const existingInfo = doorSign.querySelector('.card-holder-preview-info');
+    if (existingInfo) {
+        existingInfo.remove();
+    }
+    doorSign.style.position = '';
+
+    if (type && cardHolders && cardHolders[type]) {
+        doorSign.classList.add('card-holder-preview');
+        
+        const spec = cardHolders[type];
+        const viewableWidthIn = spec.viewableArea.width;
+        const viewableHeightIn = spec.viewableArea.height;
+        const borderWidthIn = spec.borderWidth;
+
+        // Calculate the aspect ratio of the viewable area
+        const viewableAspectRatio = viewableWidthIn / viewableHeightIn;
+        
+        // Keep preview at a reasonable size but maintain proportions
+        const maxPreviewWidth = 450;
+        const previewWidth = maxPreviewWidth;
+        const previewHeight = previewWidth / viewableAspectRatio;
+        
+        // Calculate scaling factor compared to original
+        const widthScale = previewWidth / 500; // 500 is original width
+        const heightScale = previewHeight / 300; // 300 is original height
+        const scale = Math.min(widthScale, heightScale);
+        
+        // Calculate border thickness based on ACTUAL border width relative to viewable area
+        const borderRatio = borderWidthIn / viewableWidthIn;
+        const borderThickness = borderRatio * previewWidth;
+        
+        // The door sign represents the total card holder (viewable + border)
+        const totalWidth = previewWidth + (borderThickness * 2);
+        const totalHeight = previewHeight + (borderThickness * 2);
+        
+        // Update door sign dimensions to represent the full card holder
+        doorSign.style.width = `${totalWidth}px`;
+        doorSign.style.height = `${totalHeight}px`;
+        doorSign.style.border = `${borderThickness}px solid #cbd5e0`;
+        doorSign.style.borderRadius = '12px';
+        doorSign.style.background = '#f7fafc'; // This represents the non-viewable border area
+        doorSign.style.position = 'relative';
+        doorSign.style.padding = '0'; // Remove any default padding
+        
+        // Style the content area to show it's the viewable area
+        if (signContent) {
+            signContent.style.background = 'white';
+            signContent.style.borderRadius = '0 0 8px 8px'; // Only bottom corners rounded
+            signContent.style.boxShadow = 'none'; // Remove shadow since it's part of the card
+            
+            // Scale padding proportionally to the viewable area
+            const scaledPadding = Math.max(8, 20 * scale);
+            signContent.style.padding = `${scaledPadding}px`;
+            
+            // Calculate available content height based on viewable area only
+            const headerHeight = signHeader ? (80 * scale) : 0;
+            const availableContentHeight = previewHeight - headerHeight;
+            
+            signContent.style.height = `${availableContentHeight}px`;
+            signContent.style.width = `${previewWidth}px`; // Fill the viewable area
+            signContent.style.boxSizing = 'border-box';
+            signContent.style.display = 'flex';
+            signContent.style.alignItems = 'center'; // Keep horizontal layout with alumni badge
+            signContent.style.margin = '0'; // Remove any margin
+            signContent.style.overflow = 'hidden'; // Prevent overflow
+            
+            // Add proper spacing between content elements
+            const mainContent = signContent.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.flex = '1'; // Take up remaining space
+                mainContent.style.display = 'flex';
+                mainContent.style.flexDirection = 'column';
+                mainContent.style.justifyContent = 'flex-start'; // Start from top instead of center
+                mainContent.style.gap = `${Math.max(1, 2 * scale)}px`; // Very minimal gap between elements
+                mainContent.style.overflow = 'hidden'; // Prevent overflow
             }
         }
 
+        // Style the header with proper scaling - this fills the viewable area
+        if (signHeader) {
+            signHeader.style.background = '#047857';
+            signHeader.style.borderRadius = '8px 8px 0 0';
+            signHeader.style.boxShadow = 'inset 0 0 0 1px #065f46';
+            
+            const scaledHeaderHeight = Math.max(60, 80 * scale);
+            const scaledHeaderPadding = Math.max(8, 15 * scale);
+            
+            signHeader.style.height = `${scaledHeaderHeight}px`;
+            signHeader.style.padding = `${scaledHeaderPadding}px ${scaledPadding}px`;
+            signHeader.style.width = `${previewWidth}px`; // Fill the viewable area
+            signHeader.style.boxSizing = 'border-box';
+            signHeader.style.margin = '0'; // Remove any margin
+            
+            // Scale logo in header - make it more responsive to card size
+            const logoContainer = signHeader.querySelector('.unbc-logo');
+            const logo = signHeader.querySelector('.unbc-logo img, .unbc-logo svg');
+            if (logo) {
+                // More aggressive scaling based on both width and height constraints
+                const widthScale = previewWidth / 500; // Original width reference
+                const heightScale = previewHeight / 300; // Original height reference
+                const headerHeightScale = scaledHeaderHeight / 80; // Header height reference
+                
+                // Use the most restrictive scale factor to ensure logo fits well
+                const logoScale = Math.min(widthScale, heightScale, headerHeightScale) * 0.7; // Reduced from 0.9 to 0.7 for more room
+                const minLogoScale = 0.25; // Reduced from 0.3 to 0.25 for smaller minimum size
+                const maxLogoScale = 1.0; // Reduced from 1.2 to 1.0 to prevent it from being too large
+                
+                const finalLogoScale = Math.max(minLogoScale, Math.min(maxLogoScale, logoScale));
+                
+                logo.style.width = `${200 * finalLogoScale}px`;
+                logo.style.height = 'auto';
+                
+                // Debug info (you can remove this later)
+                console.log(`Logo scaling - Width: ${widthScale.toFixed(2)}, Height: ${heightScale.toFixed(2)}, Header: ${headerHeightScale.toFixed(2)}, Final: ${finalLogoScale.toFixed(2)}`);
+            }
+            if (logoContainer) {
+                // Scale the container proportionally as well
+                const containerScale = Math.min(scale, 1.0); // Don't make container larger than original
+                logoContainer.style.transform = `scale(${Math.max(0.4, containerScale)})`;
+                logoContainer.style.transformOrigin = 'center';
+            }
+        }
+
+        // Scale fonts proportionally
+        const fontScale = Math.max(0.5, scale * 0.8); // Smaller fonts and lower minimum
+        
+        nameElements.forEach(el => {
+            el.style.fontSize = `${24 * fontScale}px`;
+            el.style.lineHeight = '1.1';
+            el.style.marginBottom = `${2 * fontScale}px`; // Even smaller margin
+        });
+        
+        positionElements.forEach(el => {
+            el.style.fontSize = `${16 * fontScale}px`; // Smaller base font size
+            el.style.lineHeight = '1.1';
+            el.style.marginBottom = `${2 * fontScale}px`; // Much smaller margin
+        });
+        
+        contactElements.forEach(el => {
+            el.style.fontSize = `${11 * fontScale}px`; // Even smaller base font size
+            el.style.lineHeight = '1.1';
+            el.style.marginTop = `${1 * fontScale}px`; // Minimal margin
+            
+            // Scale spacing within contact info - make it very tight
+            const contactDivs = el.querySelectorAll('div');
+            contactDivs.forEach(div => {
+                div.style.marginBottom = `${1 * fontScale}px`; // Very tight spacing
+            });
+        });
+        
+        designationElements.forEach(el => {
+            el.style.fontSize = `${11 * fontScale}px`; // Even smaller base font size
+            el.style.lineHeight = '1.1';
+            el.style.marginTop = `${1 * fontScale}px`; // Minimal margin
+        });
+
+        // Scale alumni badge if present - position it relative to the content area
+        const alumniBadge = doorSign.querySelector('.alumni-badge');
+        if (alumniBadge) {
+            const badgeScale = Math.max(0.3, scale * 0.5); // Much smaller scaling
+            alumniBadge.style.transform = `scale(${badgeScale})`;
+            alumniBadge.style.transformOrigin = 'center';
+            alumniBadge.style.marginLeft = `${5 * scale}px`; // Minimal margin
+            alumniBadge.style.flexShrink = '0'; // Prevent shrinking
+            alumniBadge.style.alignSelf = 'flex-end'; // Align to bottom of content area
+            alumniBadge.style.marginBottom = `${scaledPadding}px`; // Align with content padding
+        }
+    }
+}
         // Event listener for card holder type change
         if (cardHolderTypeSelect) {
             cardHolderTypeSelect.addEventListener('change', (e) => {

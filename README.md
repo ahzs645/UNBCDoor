@@ -27,6 +27,7 @@ A web-based tool for generating standardized door signs for the University of No
   - Visual feedback for valid/invalid inputs
   - Hover and focus states
   - Improved accessibility
+  - Simple show/hide toggles for contact information
 
 - **Department Management**
   - Hierarchical department structure
@@ -58,6 +59,7 @@ A web-based tool for generating standardized door signs for the University of No
 3. **Enter Information**
    - Fill in the required fields based on sign type
    - Add contact information where applicable
+   - Toggle visibility of email and phone using checkboxes
    - Phone numbers are automatically formatted as you type
    - Enter room name for lab/general room/custodian closet signs
 
