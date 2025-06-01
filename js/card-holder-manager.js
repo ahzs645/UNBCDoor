@@ -344,26 +344,18 @@ class CardHolderManager {
         }
     }
 
-     scaleFonts(scale) {
-        // More responsive font scaling - allow smaller fonts on mobile
-        const screenWidth = window.innerWidth;
+    scaleFonts(scale) {
+        // Consistent font scaling - same proportions on all devices, just smaller size
         const isCardHolderPreview = this.doorSign.classList.contains('card-holder-preview');
         let fontScale;
         
         if (isCardHolderPreview) {
-            // Card holder previews need more aggressive scaling
-            if (screenWidth <= 480) {
-                // Very small screens with card holder: very aggressive scaling
-                fontScale = Math.max(0.3, scale * 0.7);
-            } else if (screenWidth <= 768) {
-                // Mobile screens with card holder: aggressive scaling
-                fontScale = Math.max(0.4, scale * 0.75);
-            } else {
-                // Desktop screens with card holder: moderate scaling
-                fontScale = Math.max(0.6, scale * 0.85);
-            }
+            // Card holder previews: scale more aggressively to utilize space better
+            // Remove the minimum constraint and use a higher multiplier
+            fontScale = scale * 1.15; // Increased from 0.95 to 1.15 to better fill space
         } else {
-            // Regular door sign scaling (non card holder)
+            // Regular door sign scaling (keep existing mobile-responsive behavior)
+            const screenWidth = window.innerWidth;
             if (screenWidth <= 480) {
                 fontScale = Math.max(0.4, scale * 0.8);
             } else if (screenWidth <= 768) {
@@ -373,7 +365,7 @@ class CardHolderManager {
             }
         }
         
-        console.log(`Font scaling - Screen: ${screenWidth}px, Scale: ${scale}, Font scale: ${fontScale}, Card holder: ${isCardHolderPreview}`);
+        console.log(`Font scaling - Scale: ${scale}, Font scale: ${fontScale}, Card holder: ${isCardHolderPreview}`);
 
         const nameElements = this.doorSign.querySelectorAll('.name, .room-name');
         const positionElements = this.doorSign.querySelectorAll('.position');
