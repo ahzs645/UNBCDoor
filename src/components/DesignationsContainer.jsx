@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 const commonDesignations = [
   'PhD', 'MSc', 'MA', 'BSc', 'BA', 'MBA', 'MD', 'JD',
-  'P.Eng', 'CPA', 'RN', 'LPN', 'RPBio', 'QEP', 'MCIP'
+  'P.Eng', 'CPA', 'RN', 'LPN', 'RPBio', 'RPF', 'MCIP'
 ]
 
 export const DesignationsContainer = ({ selectedDesignations = [], onUpdate }) => {

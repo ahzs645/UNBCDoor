@@ -1,9 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react'
 import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+import { AlumniBadge } from './AlumniBadge'
 
 export const SignPreview = ({ signData, cardHolders }) => {
   const signRef = useRef(null)
   const [svgContent, setSvgContent] = useState('')
+  const [paperSize, setPaperSize] = useState('letter')
   
   // Helper function to get correct asset path
   const getAssetPath = (path) => {
@@ -11,23 +14,103 @@ export const SignPreview = ({ signData, cardHolders }) => {
     return `${basePath}${path}`
   }
 
-  const exportSign = async () => {
+  const exportSign = async (format = 'png') => {
     if (signRef.current) {
       try {
         const canvas = await html2canvas(signRef.current, {
           backgroundColor: '#ffffff',
-          scale: 2
+          scale: 3
         })
         
-        const link = document.createElement('a')
-        link.download = 'unbc-door-sign.png'
-        link.href = canvas.toDataURL()
-        link.click()
+        if (format === 'png') {
+          const link = document.createElement('a')
+          link.download = 'unbc-door-sign.png'
+          link.href = canvas.toDataURL()
+          link.click()
+        }
       } catch (error) {
         console.error('Error exporting sign:', error)
       }
     }
   }
+
+  const exportPDF = async () => {
+    if (signRef.current) {
+      try {
+        // Paper dimensions
+        const paperDimensions = {
+          letter: { width: 8.5, height: 11 },
+          a4: { width: 8.27, height: 11.69 }
+        }
+        
+        const paper = paperDimensions[paperSize]
+        const orientation = paper.width > paper.height ? 'landscape' : 'portrait'
+        
+        // Create PDF with selected paper size
+        const pdf = new jsPDF({
+          orientation: orientation,
+          unit: 'in',
+          format: paperSize
+        })
+        
+        // Capture the actual preview as shown
+        const canvas = await html2canvas(signRef.current, {
+          backgroundColor: '#ffffff',
+          scale: 4, // High resolution for print
+          useCORS: true
+        })
+        
+        const imgData = canvas.toDataURL('image/png')
+        
+        // Get actual dimensions of the captured element
+        const elementRect = signRef.current.getBoundingClientRect()
+        const actualWidth = elementRect.width / 96 // Convert pixels to inches (96 DPI)
+        const actualHeight = elementRect.height / 96
+        
+        // Calculate centering position
+        const xOffset = (paper.width - actualWidth) / 2
+        const yOffset = (paper.height - actualHeight) / 2
+        
+        // Add the sign image centered on paper
+        pdf.addImage(imgData, 'PNG', xOffset, yOffset, actualWidth, actualHeight)
+        
+        // Add cut lines around the actual card edges
+        pdf.setDrawColor(0, 0, 0)
+        pdf.setLineWidth(0.01)
+        
+        // Corner cut marks (0.25 inch long)
+        const markLength = 0.25
+        
+        // Top-left corner
+        pdf.line(xOffset - markLength, yOffset, xOffset, yOffset)
+        pdf.line(xOffset, yOffset - markLength, xOffset, yOffset)
+        
+        // Top-right corner
+        pdf.line(xOffset + actualWidth, yOffset, xOffset + actualWidth + markLength, yOffset)
+        pdf.line(xOffset + actualWidth, yOffset - markLength, xOffset + actualWidth, yOffset)
+        
+        // Bottom-left corner
+        pdf.line(xOffset - markLength, yOffset + actualHeight, xOffset, yOffset + actualHeight)
+        pdf.line(xOffset, yOffset + actualHeight, xOffset, yOffset + actualHeight + markLength)
+        
+        // Bottom-right corner
+        pdf.line(xOffset + actualWidth, yOffset + actualHeight, xOffset + actualWidth + markLength, yOffset + actualHeight)
+        pdf.line(xOffset + actualWidth, yOffset + actualHeight, xOffset + actualWidth, yOffset + actualHeight + markLength)
+        
+        // Add paper size info
+        pdf.setFontSize(8)
+        pdf.setTextColor(128, 128, 128)
+        pdf.text(`Paper: ${paperSize.toUpperCase()}`, paper.width / 2, paper.height - 0.3, { align: 'center' })
+        
+        // Save the PDF
+        const filename = `unbc-door-sign-${signData.signType || 'custom'}.pdf`
+        pdf.save(filename)
+      } catch (error) {
+        console.error('Error exporting PDF:', error)
+      }
+    }
+  }
+
 
   const getDefaultValues = (signType) => {
     switch(signType) {
@@ -283,7 +366,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
                 </div>
                 {shouldShowAlumni && (
                   <div className="alumni-badge" style={{ display: 'block' }}>
-                    <object data={getAssetPath('components/alumni-badge.svg')} type="image/svg+xml" width="80" height="92"></object>
+                    <AlumniBadge width={80} height={92} />
                   </div>
                 )}
               </div>
@@ -312,16 +395,48 @@ export const SignPreview = ({ signData, cardHolders }) => {
               </div>
               {shouldShowAlumni && (
                 <div className="alumni-badge" style={{ display: 'block' }}>
-                  <object data="/components/alumni-badge.svg" type="image/svg+xml" width="80" height="92"></object>
+                  <AlumniBadge width={80} height={92} />
                 </div>
               )}
             </div>
           </div>
         )}
       </div>
-      <button type="button" onClick={exportSign} className="export-btn">
-        Export Sign
-      </button>
+      <div className="export-section">
+        <div className="paper-size-selector">
+          <label>Paper Size:</label>
+          <div className="paper-size-options">
+            <label className={`paper-option ${paperSize === 'letter' ? 'active' : ''}`}>
+              <input 
+                type="radio" 
+                name="paperSize" 
+                value="letter" 
+                checked={paperSize === 'letter'}
+                onChange={(e) => setPaperSize(e.target.value)}
+              />
+              Letter (8.5" × 11")
+            </label>
+            <label className={`paper-option ${paperSize === 'a4' ? 'active' : ''}`}>
+              <input 
+                type="radio" 
+                name="paperSize" 
+                value="a4" 
+                checked={paperSize === 'a4'}
+                onChange={(e) => setPaperSize(e.target.value)}
+              />
+              A4 (210mm × 297mm)
+            </label>
+          </div>
+        </div>
+        <div className="export-buttons">
+          <button type="button" onClick={() => exportSign('png')} className="export-btn">
+            Export as PNG
+          </button>
+          <button type="button" onClick={exportPDF} className="export-btn pdf-export">
+            Export as PDF (Print-Ready)
+          </button>
+        </div>
+      </div>
     </>
   )
 }

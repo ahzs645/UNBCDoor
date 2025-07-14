@@ -241,7 +241,6 @@ input::placeholder {
     width: 500px;
     height: 300px;
     background: white;
-    border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     overflow: hidden;
     position: relative;
@@ -284,14 +283,13 @@ input::placeholder {
 }
 
 .alumni-badge {
-    display: none;
     flex-shrink: 0;
     height: fit-content;
     margin-left: 20px;
     align-self: center;
 }
 
-.alumni-badge object {
+.alumni-badge svg {
     width: 80px;
     height: auto;
     display: block;
@@ -571,6 +569,15 @@ input::placeholder {
     color: white;
 }
 
+.export-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
 .export-btn {
     background: linear-gradient(135deg, #035642 0%, #024d38 100%);
     color: white;
@@ -581,13 +588,21 @@ input::placeholder {
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s ease;
-    margin-top: 20px;
-    width: 100%;
+    flex: 1;
+    min-width: 200px;
 }
 
 .export-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(3, 86, 66, 0.3);
+}
+
+.export-btn.pdf-export {
+    background: linear-gradient(135deg, #8B0000 0%, #660000 100%);
+}
+
+.export-btn.pdf-export:hover {
+    box-shadow: 0 10px 25px rgba(139, 0, 0, 0.3);
 }
 
 .export-btn:disabled {
@@ -941,8 +956,76 @@ input:not(:placeholder-shown)::placeholder {
     box-sizing: border-box;
 }
 
-/* Make sure the export button is properly positioned */
-.export-btn {
-    margin-top: 20px;
-    align-self: stretch;
+/* Export section styling */
+.export-section {
+    margin-top: 30px;
+    width: 100%;
+}
+
+.paper-size-selector {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.paper-size-selector > label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #2d3748;
+}
+
+.paper-size-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.paper-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.paper-option:hover {
+    border-color: #035642;
+    background: #f7fafc;
+}
+
+.paper-option.active {
+    border-color: #035642;
+    background: #f0fdf4;
+    color: #035642;
+    font-weight: 600;
+}
+
+.paper-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #035642;
+}
+
+/* Make sure the export buttons are properly positioned */
+@media (max-width: 768px) {
+    .export-buttons {
+        flex-direction: column;
+    }
+    .export-btn {
+        width: 100%;
+    }
+    .paper-size-options {
+        flex-direction: column;
+        width: 100%;
+    }
+    .paper-option {
+        width: 100%;
+        justify-content: center;
+    }
 }
