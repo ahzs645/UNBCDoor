@@ -141,24 +141,6 @@ export const SignForm = ({ signData, onUpdate, departments, onSearchDepartments 
           onFocus={() => searchQuery && setShowSearchResults(true)}
         />
         
-        {/* Debug: Show current selection */}
-        {(signData.departmentType || signData.mainDepartment || signData.subDepartment || signData.subSubDepartment) && (
-          <div style={{ 
-            marginTop: '8px', 
-            padding: '8px', 
-            background: '#f0f9ff', 
-            border: '1px solid #0ea5e9', 
-            borderRadius: '4px',
-            fontSize: '0.9em'
-          }}>
-            <strong>Selected:</strong><br />
-            Type: {signData.departmentType}<br />
-            Main: {signData.mainDepartment}<br />
-            Sub: {signData.subDepartment}<br />
-            SubSub: {signData.subSubDepartment}
-          </div>
-        )}
-        
         {showSearchResults && searchResults.length > 0 && (
           <div className="search-results">
             {searchResults.map((result, index) => (
@@ -184,6 +166,37 @@ export const SignForm = ({ signData, onUpdate, departments, onSearchDepartments 
           </div>
         )}
       </div>
+
+      {(signData.departmentType || signData.mainDepartment || signData.subDepartment || signData.subSubDepartment) && (
+        <div className="department-selection-display">
+          <div className="department-header">
+            <div className="department-title">
+              <span className="department-icon">🏛️</span>
+              <strong>Selected Department</strong>
+            </div>
+            {signData.departmentType && (
+              <span className="department-type-badge">{signData.departmentType}</span>
+            )}
+          </div>
+          <div className="department-path">
+            {signData.mainDepartment && (
+              <span className="department-level main">{signData.mainDepartment}</span>
+            )}
+            {signData.subDepartment && (
+              <>
+                <span className="department-arrow">→</span>
+                <span className="department-level sub">{signData.subDepartment}</span>
+              </>
+            )}
+            {signData.subSubDepartment && (
+              <>
+                <span className="department-arrow">→</span>
+                <span className="department-level subsub">{signData.subSubDepartment}</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="form-group">
         <label htmlFor="name">Name</label>

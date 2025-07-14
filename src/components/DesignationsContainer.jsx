@@ -27,24 +27,27 @@ export const DesignationsContainer = ({ selectedDesignations = [], onUpdate }) =
   }
 
   return (
-    <div className="form-group">
+    <div id="designationsContainer">
+      <label className="section-label">Professional Designations</label>
+      
       <div className="designation-options">
         {commonDesignations.map(designation => (
-          <label key={designation} className="designation-checkbox">
+          <div key={designation} className="designation-option">
             <input
               type="checkbox"
+              id={`designation-${designation}`}
               checked={selectedDesignations.includes(designation)}
               onChange={() => handleDesignationToggle(designation)}
             />
-            {designation}
-          </label>
+            <label htmlFor={`designation-${designation}`}>{designation}</label>
+          </div>
         ))}
       </div>
       
       <div className="custom-designation">
         <input
           type="text"
-          placeholder="Enter custom designation"
+          placeholder="Add custom designation..."
           value={customDesignation}
           onChange={(e) => setCustomDesignation(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && addCustomDesignation()}
@@ -54,7 +57,7 @@ export const DesignationsContainer = ({ selectedDesignations = [], onUpdate }) =
       
       {selectedDesignations.length > 0 && (
         <div className="selected-designations">
-          <h4>Selected Designations:</h4>
+          <strong>Selected: </strong>
           {selectedDesignations.map(designation => (
             <span key={designation} className="designation-tag">
               {designation}
