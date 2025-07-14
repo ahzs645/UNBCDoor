@@ -4,6 +4,12 @@ import html2canvas from 'html2canvas'
 export const SignPreview = ({ signData, cardHolders }) => {
   const signRef = useRef(null)
   const [svgContent, setSvgContent] = useState('')
+  
+  // Helper function to get correct asset path
+  const getAssetPath = (path) => {
+    const basePath = import.meta.env.BASE_URL || '/'
+    return `${basePath}${path}`
+  }
 
   const exportSign = async () => {
     if (signRef.current) {
@@ -78,7 +84,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
   useEffect(() => {
     const loadSVG = async () => {
       try {
-        const response = await fetch('/components/unbc-logo.svg')
+        const response = await fetch(getAssetPath('components/unbc-logo.svg'))
         const svgText = await response.text()
         setSvgContent(svgText)
         console.log('SVG loaded successfully')
@@ -277,7 +283,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
                 </div>
                 {shouldShowAlumni && (
                   <div className="alumni-badge" style={{ display: 'block' }}>
-                    <object data="/components/alumni-badge.svg" type="image/svg+xml" width="80" height="92"></object>
+                    <object data={getAssetPath('components/alumni-badge.svg')} type="image/svg+xml" width="80" height="92"></object>
                   </div>
                 )}
               </div>
