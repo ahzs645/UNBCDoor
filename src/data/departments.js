@@ -1,5 +1,4 @@
-// Department data structure
-const departmentTypes = {
+export const departmentTypes = {
     academic: {
         name: "🎓 Academic Departments",
         departments: {
@@ -100,4 +99,4 @@ const departmentTypes = {
             }
         }
     }
-}; 
+}

@@ -1,0 +1,797 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.controls {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.card-holder-selector-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 20px 30px 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.preview {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+h1 {
+    color: #2d3748;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+select, input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    font-family: 'Inter', sans-serif;
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+input::placeholder {
+    color: #a0aec0;
+    font-style: italic;
+    opacity: 1;
+}
+
+.search-input {
+    position: relative;
+}
+
+.search-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.search-result-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #f8fafc;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item.no-results {
+    color: #64748b;
+    font-style: italic;
+    cursor: default;
+}
+
+.search-result-item.no-results:hover {
+    background-color: transparent;
+}
+
+.search-result-path {
+    font-size: 0.9rem;
+    color: #4a5568;
+    line-height: 1.4;
+}
+
+.contact-info-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.contact-info-group .form-group {
+    flex: 1;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-info-group .form-group label:first-child {
+    margin-bottom: 8px;
+}
+
+.contact-info-group .form-group input[type="email"],
+.contact-info-group .form-group input[type="tel"] {
+    margin-bottom: 0;
+}
+
+.card-holder-info {
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.card-holder-info p {
+    margin: 4px 0;
+}
+
+.card-holder-info strong {
+    color: #4a5568;
+}
+
+.toggle-buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+.toggle-button {
+    padding: 10px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.toggle-button.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.toggle-button:hover {
+    background: #f7fafc;
+}
+
+.toggle-button.active:hover {
+    background: #667eea;
+}
+
+.toggle-button i {
+    margin-right: 8px;
+}
+
+.door-sign {
+    width: 500px;
+    height: 300px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+}
+
+.door-sign.card-holder-preview {
+    transform: none !important;
+}
+
+.sign-header {
+    background: #035b42;
+    color: white;
+    padding: 15px 20px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.unbc-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+}
+
+.unbc-logo svg {
+    display: block;
+    width: 200px;
+    flex-shrink: 0;
+    margin-bottom: -10px;
+}
+
+.unbc-logo img {
+    display: block;
+    width: 200px;
+    flex-shrink: 0;
+    margin-bottom: -10px;
+}
+
+.alumni-badge {
+    display: none;
+    flex-shrink: 0;
+    height: fit-content;
+    margin-left: 20px;
+    align-self: center;
+}
+
+.alumni-badge object {
+    width: 80px;
+    height: auto;
+    display: block;
+}
+
+.sign-content {
+    padding: 25px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.main-content .name {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.main-content .position {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #666;
+}
+
+.main-content .room-name {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.main-content .department {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #666;
+}
+
+.main-content .contact-info {
+    font-size: 14px;
+    color: #666;
+    margin-top: 12px;
+}
+
+.main-content .designations {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    margin-top: 8px;
+}
+
+.name-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a202c;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    font-family: 'Helvetica Neue', sans-serif;
+}
+
+.position {
+    font-size: 18px;
+    color: #4a5568;
+    margin-bottom: 12px;
+    font-weight: 400;
+    display: block !important;
+    font-family: 'Helvetica Neue', sans-serif;
+}
+
+.contact-info {
+    font-size: 14px;
+    color: #2d3748;
+    line-height: 1.4;
+    display: block !important;
+    font-family: 'Helvetica Neue', sans-serif;
+}
+
+.contact-info div {
+    margin-bottom: 3px;
+}
+
+.email {
+    font-style: italic;
+}
+
+.phone {
+    font-style: italic;
+}
+
+.department {
+    font-size: 20px;
+    color: #4a5568;
+    margin-bottom: 15px;
+    font-weight: 500;
+    font-family: 'Helvetica Neue', sans-serif;
+}
+
+.designations {
+    font-size: 14px;
+    color: #2d3748;
+    margin-top: 8px;
+    font-weight: 500;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-style: italic;
+}
+
+#designationsContainer {
+    display: block;
+    margin-top: 15px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.designation-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.designation-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: white;
+    border: 1px solid #e2e8f0;
+}
+
+.designation-option:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+.designation-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+.designation-option label {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4a5568;
+    text-transform: none;
+    letter-spacing: normal;
+    margin: 0;
+}
+
+.designation-option input[type="checkbox"]:checked + label {
+    color: #2b6cb0;
+    font-weight: 600;
+}
+
+.designation-checkbox {
+    display: inline-block;
+    margin: 4px 8px 4px 0;
+    padding: 4px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.designation-checkbox input {
+    margin-right: 4px;
+}
+
+.custom-designation {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.custom-designation input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.custom-designation button {
+    padding: 8px 15px;
+    background-color: #035b42;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-designation button:hover {
+    background-color: #024d38;
+}
+
+.selected-designations {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.designation-tag {
+    display: inline-block;
+    background: #e2e8f0;
+    color: #2d3748;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+}
+
+.designation-tag button {
+    background: none;
+    border: none;
+    color: #718096;
+    margin-left: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.export-btn:hover {
+    transform: translateY(-2px);
+}
+
+.export-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.general-room {
+    text-align: center;
+}
+
+.general-room .main-title {
+    font-size: 48px;
+    margin-bottom: 0;
+}
+
+.custodian-closet {
+    text-align: left;
+}
+
+.custodian-closet .main-title {
+    font-size: 42px;
+    line-height: 1;
+    margin-bottom: 0;
+}
+
+.show-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.show-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.show-toggle label {
+    font-size: 0.9em;
+    color: #4a5568;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: normal;
+    margin: 0;
+}
+
+input:focus::placeholder {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+input:not(:placeholder-shown)::placeholder {
+    opacity: 0;
+}
+
+@media (max-width: 1024px) {
+    body {
+        padding: 15px;
+    }
+    
+    .container {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .controls, .card-holder-selector-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    
+    .card-holder-selector-container {
+        position: relative !important;
+        top: 0 !important;
+        order: 2;
+    }
+    
+    .controls {
+        order: 1;
+    }
+    
+    .toggle-buttons-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .toggle-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        gap: 15px;
+        padding: 0;
+    }
+    
+    .controls, .card-holder-selector-container {
+        padding: 20px;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .door-sign:not(.card-holder-preview) {
+        transform: scale(0.8);
+        transform-origin: center;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .preview {
+        padding: 15px;
+        max-height: 350px;
+    }
+    
+    .door-sign.card-holder-preview {
+        max-width: calc(100% - 30px) !important;
+        max-height: 300px !important;
+        margin: 5px auto !important;
+    }
+    
+    .toggle-buttons-container {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    .container {
+        padding: 0;
+    }
+    
+    .controls, .card-holder-selector-container {
+        padding: 15px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    
+    .door-sign:not(.card-holder-preview) {
+        transform: scale(0.7);
+        max-width: 350px;
+    }
+    
+    select, input {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    .preview {
+        padding: 10px;
+        max-height: 280px;
+    }
+    
+    .door-sign.card-holder-preview {
+        max-width: calc(100% - 20px) !important;
+        max-height: 250px !important;
+        margin: 5px auto !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+    }
+    
+    .toggle-buttons-container {
+        margin-top: 15px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .toggle-button {
+        width: 100%;
+        text-align: center;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+.preview {
+    width: 100%;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.door-sign.card-holder-preview {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* Responsive scaling for card holder containers */
+@media (max-width: 768px) {
+    .preview {
+        padding: 15px;
+    }
+    
+    .preview > div[style*="border: 2px dashed"] {
+        max-width: calc(100vw - 60px) !important;
+        transform: scale(0.8);
+        transform-origin: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .preview {
+        padding: 10px;
+    }
+    
+    .preview > div[style*="border: 2px dashed"] {
+        max-width: calc(100vw - 40px) !important;
+        transform: scale(0.65);
+        transform-origin: center;
+    }
+}
+
+/* Ensure the sign maintains its aspect ratio during scaling */
+.door-sign {
+    box-sizing: border-box;
+}
+
+/* Make sure the export button is properly positioned */
+.export-btn {
+    margin-top: 20px;
+    align-self: stretch;
+}
