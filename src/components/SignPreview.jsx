@@ -7,6 +7,15 @@ export const SignPreview = ({ signData, cardHolders }) => {
   const signRef = useRef(null)
   const [svgContent, setSvgContent] = useState('')
   const [paperSize, setPaperSize] = useState('letter')
+  const DEFAULT_INSERT_SIZE = { width: 8.5, height: 5.5 }
+
+  const formatInches = (value) => {
+    if (Number.isInteger(value)) {
+      return value.toString()
+    }
+
+    return value.toFixed(2).replace(/\.00$/, '').replace(/0$/, '')
+  }
   
   // Helper function to get correct asset path
   const getAssetPath = (path) => {
@@ -298,94 +307,56 @@ export const SignPreview = ({ signData, cardHolders }) => {
 
   const shouldShowAlumni = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
-  
-  // Calculate dimensions based on card holder or default
-  const getSignDimensions = () => {
-    if (selectedCardHolder) {
-      const { viewableArea, totalArea } = selectedCardHolder
-      // Use viewable area for the sign content, total area for the container
-      const aspectRatio = viewableArea.width / viewableArea.height
-      const maxWidth = 450 // Max width in pixels for the preview
-      const width = Math.min(maxWidth, maxWidth)
-      const height = width / aspectRatio
-      
-      return {
-        containerWidth: width * (totalArea.width / viewableArea.width),
-        containerHeight: height * (totalArea.height / viewableArea.height),
-        signWidth: width,
-        signHeight: height,
-        marginX: (width * (totalArea.width / viewableArea.width) - width) / 2,
-        marginY: (height * (totalArea.height / viewableArea.height) - height) / 2
-      }
-    }
-    
-    // Default dimensions (8.5" x 5.5" aspect ratio)
-    return {
-      containerWidth: 500,
-      containerHeight: 300,
-      signWidth: 500,
-      signHeight: 300,
-      marginX: 0,
-      marginY: 0
-    }
+
+  const insertSize = selectedCardHolder?.insertSize || DEFAULT_INSERT_SIZE
+  const viewableSize = selectedCardHolder?.viewableSize || insertSize
+
+  const horizontalDifference = Math.max(insertSize.width - viewableSize.width, 0)
+  const verticalDifference = Math.max(insertSize.height - viewableSize.height, 0)
+
+  const viewableOffset = selectedCardHolder?.viewableOffset || {
+    top: verticalDifference,
+    bottom: 0,
+    left: horizontalDifference / 2,
+    right: horizontalDifference / 2
   }
 
-  const dimensions = getSignDimensions()
-  const doorSignClass = `door-sign ${signData.signType || 'faculty'} ${selectedCardHolder ? 'card-holder-preview' : ''}`
+  const aspectRatio = insertSize.width / insertSize.height
 
-  const containerStyle = selectedCardHolder ? {
-    width: `${dimensions.containerWidth}px`,
-    height: `${dimensions.containerHeight}px`,
-    border: '2px dashed #ccc',
-    position: 'relative',
-    background: '#f9f9f9',
-    margin: '0 auto'
-  } : {}
-
-  const signStyle = {
-    width: `${dimensions.signWidth}px`,
-    height: `${dimensions.signHeight}px`,
-    position: selectedCardHolder ? 'absolute' : 'relative',
-    top: selectedCardHolder ? `${dimensions.marginY}px` : 'auto',
-    left: selectedCardHolder ? `${dimensions.marginX}px` : 'auto',
-    margin: selectedCardHolder ? '0' : '0 auto'
+  const previewFrameStyle = {
+    '--sign-aspect': aspectRatio,
+    '--holder-bar-top': `${(Math.max(viewableOffset.top, 0) / insertSize.height) * 100}%`,
+    '--holder-bar-bottom': `${(Math.max(viewableOffset.bottom, 0) / insertSize.height) * 100}%`,
+    '--holder-bar-left': `${(Math.max(viewableOffset.left, 0) / insertSize.width) * 100}%`,
+    '--holder-bar-right': `${(Math.max(viewableOffset.right, 0) / insertSize.width) * 100}%`
   }
+
+  const doorSignClass = `door-sign ${signData.signType || 'faculty'} ${selectedCardHolder ? 'with-holder' : ''}`
+
+  const measurementSummary = selectedCardHolder ? [
+    {
+      label: 'Insert',
+      value: `${formatInches(insertSize.width)}" × ${formatInches(insertSize.height)}"`
+    },
+    {
+      label: 'Viewable',
+      value: `${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}"`
+    }
+  ] : [
+    {
+      label: 'Default insert',
+      value: `${formatInches(DEFAULT_INSERT_SIZE.width)}" × ${formatInches(DEFAULT_INSERT_SIZE.height)}"`
+    }
+  ]
 
   return (
     <>
       <div className="preview">
-        {selectedCardHolder ? (
-          <div style={containerStyle}>
-            <div className={doorSignClass} ref={signRef} style={signStyle}>
-              <div className="sign-header">
-                <div className="unbc-logo" dangerouslySetInnerHTML={{ __html: svgContent }} />
-              </div>
-              <div className="sign-content">
-                <div className="main-content">
-                  {renderContent()}
-                </div>
-                {shouldShowAlumni && (
-                  <div className="alumni-badge" style={{ display: 'block' }}>
-                    <AlumniBadge width={80} height={92} />
-                  </div>
-                )}
-              </div>
-            </div>
-            <div style={{
-              position: 'absolute',
-              top: '5px',
-              left: '5px',
-              fontSize: '10px',
-              color: '#666',
-              background: 'rgba(255,255,255,0.8)',
-              padding: '2px 4px',
-              borderRadius: '2px'
-            }}>
-              Card Holder Preview ({(dimensions.containerWidth/50).toFixed(1)}" × {(dimensions.containerHeight/50).toFixed(1)}")
-            </div>
-          </div>
-        ) : (
-          <div className={doorSignClass} ref={signRef} style={signStyle}>
+        <div
+          className={`preview-frame ${selectedCardHolder ? 'with-holder' : 'without-holder'}`}
+          style={previewFrameStyle}
+        >
+          <div className={doorSignClass} ref={signRef}>
             <div className="sign-header">
               <div className="unbc-logo" dangerouslySetInnerHTML={{ __html: svgContent }} />
             </div>
@@ -400,7 +371,30 @@ export const SignPreview = ({ signData, cardHolders }) => {
               )}
             </div>
           </div>
-        )}
+
+          {selectedCardHolder && (
+            <div className="card-holder-overlay" aria-hidden="true">
+              <span className="card-holder-bar top" />
+              <span className="card-holder-bar bottom" />
+              <span className="card-holder-bar left" />
+              <span className="card-holder-bar right" />
+            </div>
+          )}
+        </div>
+
+        <div className="preview-measurements">
+          {selectedCardHolder && (
+            <div className="preview-measurements__title">{selectedCardHolder.name}</div>
+          )}
+          <div className="preview-measurements__list">
+            {measurementSummary.map(({ label, value }) => (
+              <div key={label} className="preview-measurements__item">
+                <span>{label}</span>
+                <strong>{value}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <div className="export-section">
         <div className="paper-size-selector">

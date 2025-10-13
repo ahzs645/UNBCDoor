@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { SignForm } from './components/SignForm'
 import { SignPreview } from './components/SignPreview'
 import { CardHolderSelector } from './components/CardHolderSelector'
@@ -11,6 +11,33 @@ import { departmentTypes } from './data/departments'
 function App() {
   const [signData, setSignData] = useSignState()
   const { cardHolders } = useCardHolders()
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const storedTheme = window.localStorage.getItem('theme')
+
+    if (storedTheme) {
+      setIsDarkMode(storedTheme === 'dark')
+      return
+    }
+
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    setIsDarkMode(prefersDark)
+  }, [])
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.classList.toggle('dark-mode', isDarkMode)
+    }
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
+    }
+  }, [isDarkMode])
 
   const updateSignData = (updates) => {
     setSignData(prev => ({ ...prev, ...updates }))
@@ -19,9 +46,22 @@ function App() {
   return (
     <div className="container">
       <div className="controls">
-        <h1>UNBC Door Sign Generator</h1>
-        <SignForm 
-          signData={signData} 
+        <div className="controls-header">
+          <h1>UNBC Door Sign Generator</h1>
+          <button
+            type="button"
+            className="theme-toggle-button"
+            onClick={() => setIsDarkMode(prev => !prev)}
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            <span aria-hidden="true" className="theme-toggle-icon">
+              {isDarkMode ? '🌞' : '🌙'}
+            </span>
+          </button>
+        </div>
+        <SignForm
+          signData={signData}
           onUpdate={updateSignData}
           departments={departmentTypes}
         />
