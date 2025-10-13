@@ -15,6 +15,11 @@ body {
     box-sizing: border-box;
 }
 
+body.dark-mode {
+    background: linear-gradient(135deg, #0f172a 0%, #1f2937 100%);
+    color: #e2e8f0;
+}
+
 .container {
     max-width: 1400px;
     margin: 0 auto;
@@ -36,6 +41,51 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.controls-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.controls-header h1 {
+    margin-bottom: 0;
+    text-align: left;
+    flex: 1;
+}
+
+.theme-toggle-button {
+    border: 2px solid #035642;
+    background: #ffffff;
+    color: #035642;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 12px 24px rgba(3, 86, 66, 0.15);
+}
+
+.theme-toggle-button:hover {
+    background: #035642;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 30px rgba(3, 86, 66, 0.25);
+}
+
+.theme-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
 .card-holder-selector-container {
     background: white;
     border-radius: 20px;
@@ -47,10 +97,284 @@ body {
     height: fit-content;
 }
 
+body.dark-mode .controls,
+body.dark-mode .card-holder-selector-container {
+    background: #111827;
+    box-shadow: 0 25px 50px rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    color: #e2e8f0;
+}
+
+body.dark-mode .controls {
+    backdrop-filter: none;
+}
+
+body.dark-mode .controls h1 {
+    color: #f8fafc;
+    text-shadow: 0 2px 6px rgba(15, 23, 42, 0.6);
+}
+
+body.dark-mode .controls-header h1 {
+    color: #f8fafc;
+}
+
+body.dark-mode .theme-toggle-button {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: #0b1120;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.5);
+}
+
+body.dark-mode .theme-toggle-button:hover {
+    background: #22c55e;
+    color: #0b1120;
+    box-shadow: 0 18px 30px rgba(34, 197, 94, 0.35);
+}
+
+body.dark-mode label {
+    color: #cbd5f5;
+}
+
+body.dark-mode select,
+body.dark-mode input {
+    background: #1f2937;
+    color: #f8fafc;
+    border-color: #374151;
+    box-shadow: none;
+}
+
+body.dark-mode select:focus,
+body.dark-mode input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+}
+
+body.dark-mode .search-results {
+    background: #111827;
+    border-color: #1f2937;
+}
+
+body.dark-mode .search-result-item {
+    border-bottom: 1px solid #1f2937;
+    color: #e2e8f0;
+}
+
+body.dark-mode .search-result-item:hover {
+    background-color: rgba(34, 197, 94, 0.15);
+    border-left-color: #22c55e;
+}
+
+body.dark-mode .search-result-item.no-results {
+    color: #94a3b8;
+}
+
+body.dark-mode .card-holder-info {
+    background: #1f2937;
+    border-color: #374151;
+    color: #e2e8f0;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.15);
+}
+
+body.dark-mode .card-holder-info__header strong {
+    color: #f8fafc;
+}
+
+body.dark-mode .card-holder-info__note,
+body.dark-mode .card-holder-info__notes {
+    color: #cbd5f5;
+}
+
+body.dark-mode .card-holder-info__measurement {
+    background: rgba(34, 197, 94, 0.08);
+}
+
+body.dark-mode .card-holder-info__measurement dt {
+    color: #94a3b8;
+}
+
+body.dark-mode .card-holder-info__measurement dd {
+    color: #f8fafc;
+}
+
+body.dark-mode .toggle-button {
+    background: #111827;
+    border-color: #374151;
+    color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.3);
+}
+
+body.dark-mode .toggle-button:hover {
+    background: #1f2937;
+}
+
+body.dark-mode .toggle-button.active {
+    background: #035642;
+    border-color: #035642;
+}
+
+body.dark-mode .preview-frame.with-holder {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.05) 100%);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+}
+
+body.dark-mode .preview-frame.with-holder::after {
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+body.dark-mode .card-holder-bar {
+    background: rgba(15, 23, 42, 0.65);
+}
+
+body.dark-mode .preview-measurements__title {
+    color: #e2e8f0;
+}
+
+body.dark-mode .preview-measurements__item {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+body.dark-mode .preview-measurements__item span {
+    color: #94a3b8;
+}
+
+body.dark-mode .preview-measurements__item strong {
+    color: #22c55e;
+}
+
+body.dark-mode .main-content .name,
+body.dark-mode .main-content .room-name {
+    color: #f8fafc;
+}
+
+body.dark-mode .main-content .position,
+body.dark-mode .main-content .department,
+body.dark-mode .main-content .contact-info,
+body.dark-mode .main-content .designations {
+    color: #cbd5f5;
+}
+
 .preview {
     margin-top: 20px;
+    width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.preview-frame {
+    width: min(100%, 560px);
+    aspect-ratio: var(--sign-aspect, 1.545);
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    box-sizing: border-box;
+}
+
+.preview-frame.with-holder {
+    padding: clamp(12px, 2.6vw, 20px);
+    background: linear-gradient(135deg, rgba(3, 86, 66, 0.12) 0%, rgba(3, 86, 66, 0.05) 100%);
+    border-radius: 22px;
+    box-shadow: 0 18px 38px rgba(3, 86, 66, 0.18);
+}
+
+.preview-frame.without-holder {
+    width: min(100%, 520px);
+}
+
+.preview-frame.with-holder::after {
+    content: '';
+    position: absolute;
+    inset: calc(var(--holder-bar-top, 0)) calc(var(--holder-bar-right, 0)) calc(var(--holder-bar-bottom, 0)) calc(var(--holder-bar-left, 0));
+    border: 1px dashed rgba(3, 86, 66, 0.45);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.card-holder-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.card-holder-bar {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.25);
+}
+
+.card-holder-bar.top {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--holder-bar-top, 0%);
+}
+
+.card-holder-bar.bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--holder-bar-bottom, 0%);
+}
+
+.card-holder-bar.left {
+    left: 0;
+    top: var(--holder-bar-top, 0);
+    bottom: var(--holder-bar-bottom, 0);
+    width: var(--holder-bar-left, 0%);
+}
+
+.card-holder-bar.right {
+    right: 0;
+    top: var(--holder-bar-top, 0);
+    bottom: var(--holder-bar-bottom, 0);
+    width: var(--holder-bar-right, 0%);
+}
+
+.preview-measurements {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.preview-measurements__title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.preview-measurements__list {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.preview-measurements__item {
+    background: rgba(3, 86, 66, 0.08);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+    text-align: center;
+}
+
+.preview-measurements__item span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #64748b;
+}
+
+.preview-measurements__item strong {
+    font-size: 1.1rem;
+    color: #035642;
 }
 
 h1 {
@@ -183,18 +507,64 @@ input::placeholder {
 }
 
 .card-holder-info {
+    margin-top: 12px;
     background: #f8fafc;
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 16px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
+    display: grid;
+    gap: 14px;
 }
 
-.card-holder-info p {
-    margin: 4px 0;
+.card-holder-info__header {
+    display: grid;
+    gap: 6px;
 }
 
-.card-holder-info strong {
-    color: #4a5568;
+.card-holder-info__header strong {
+    color: #1f2937;
+    font-size: 1.05rem;
+}
+
+.card-holder-info__note {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.4;
+}
+
+.card-holder-info__measurements {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.card-holder-info__measurement {
+    background: rgba(3, 86, 66, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    display: grid;
+    gap: 4px;
+}
+
+.card-holder-info__measurement dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #64748b;
+}
+
+.card-holder-info__measurement dd {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.card-holder-info__notes {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.5;
 }
 
 .toggle-buttons-container {
@@ -238,170 +608,113 @@ input::placeholder {
 }
 
 .door-sign {
-    width: 500px;
-    height: 300px;
+    width: 100%;
+    height: 100%;
     background: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 18px 35px rgba(0,0,0,0.18);
+    border-radius: clamp(14px, 3vw, 20px);
     overflow: hidden;
-    position: relative;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    font-size: clamp(12px, 1.6vw, 16px);
 }
 
-.door-sign.card-holder-preview {
-    transform: none !important;
+body.dark-mode .door-sign {
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
 }
 
 .sign-header {
     background: #035642;
     color: white;
-    padding: 15px 20px;
-    height: 80px;
+    padding: clamp(0.9rem, 2.3vw, 1.4rem) clamp(1.4rem, 3.4vw, 2rem);
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
 }
 
 .unbc-logo {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0px;
+    align-items: flex-start;
+    gap: 0;
 }
 
-.unbc-logo svg {
-    display: block;
-    width: 200px;
-    flex-shrink: 0;
-    margin-bottom: -10px;
-}
-
+.unbc-logo svg,
 .unbc-logo img {
     display: block;
-    width: 200px;
+    width: clamp(140px, 45%, 220px);
+    height: auto;
     flex-shrink: 0;
-    margin-bottom: -10px;
 }
 
 .alumni-badge {
     flex-shrink: 0;
     height: fit-content;
-    margin-left: 20px;
+    margin-left: clamp(1rem, 2.5vw, 2rem);
     align-self: center;
 }
 
 .alumni-badge svg {
-    width: 80px;
+    width: clamp(60px, 16vw, 90px);
     height: auto;
     display: block;
 }
 
 .sign-content {
-    padding: 25px;
-    height: 220px;
+    flex: 1;
+    padding: clamp(1.2rem, 3vw, 2rem);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative;
+    gap: clamp(1rem, 3.5vw, 2.5rem);
 }
 
 .main-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
 }
 
 .main-content .name {
-    font-size: 24px;
+    font-size: 1.8em;
     font-weight: 700;
-    margin-bottom: 8px;
-    color: #333;
+    color: #1f2937;
 }
 
 .main-content .position {
-    font-size: 18px;
+    font-size: 1.15em;
     font-weight: 500;
-    margin-bottom: 12px;
-    color: #666;
+    color: #475569;
 }
 
 .main-content .room-name {
-    font-size: 24px;
+    font-size: 1.7em;
     font-weight: 700;
-    margin-bottom: 12px;
-    color: #333;
+    color: #1f2937;
 }
 
 .main-content .department {
-    font-size: 16px;
+    font-size: 1.05em;
     font-weight: 500;
-    margin-bottom: 12px;
-    color: #666;
+    color: #475569;
 }
 
-.main-content .contact-info {
-    font-size: 14px;
-    color: #666;
-    margin-top: 12px;
+.main-content .contact-info,
+.main-content .designations {
+    font-size: 0.95em;
+    color: #475569;
+    line-height: 1.5;
 }
 
 .main-content .designations {
-    font-size: 14px;
+    font-style: italic;
     font-weight: 500;
-    color: #666;
-    margin-top: 8px;
-}
-
-.name-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a202c;
-    line-height: 1.1;
-    margin-bottom: 8px;
-    font-family: 'Helvetica Neue', sans-serif;
-}
-
-.position {
-    font-size: 18px;
-    color: #4a5568;
-    margin-bottom: 12px;
-    font-weight: 400;
-    display: block !important;
-    font-family: 'Helvetica Neue', sans-serif;
-}
-
-.contact-info {
-    font-size: 14px;
-    color: #2d3748;
-    line-height: 1.4;
-    display: block !important;
-    font-family: 'Helvetica Neue', sans-serif;
 }
 
 .contact-info div {
-    margin-bottom: 3px;
-}
-
-.email {
-    font-style: italic;
-}
-
-.phone {
-    font-style: italic;
-}
-
-.department {
-    font-size: 20px;
-    color: #4a5568;
-    margin-bottom: 15px;
-    font-weight: 500;
-    font-family: 'Helvetica Neue', sans-serif;
-}
-
-.designations {
-    font-size: 14px;
-    color: #2d3748;
-    margin-top: 8px;
-    font-weight: 500;
-    font-family: 'Helvetica Neue', sans-serif;
-    font-style: italic;
+    margin-bottom: 0.25em;
 }
 
 #designationsContainer {
@@ -809,12 +1122,12 @@ input:not(:placeholder-shown)::placeholder {
     body {
         padding: 10px;
     }
-    
+
     .container {
         gap: 15px;
         padding: 0;
     }
-    
+
     .controls, .card-holder-selector-container {
         padding: 20px;
         border-radius: 15px;
@@ -823,33 +1136,36 @@ input:not(:placeholder-shown)::placeholder {
         margin: 0;
         box-sizing: border-box;
     }
-    
+
     h1 {
         font-size: 1.5rem;
         margin-bottom: 20px;
     }
-    
-    .door-sign:not(.card-holder-preview) {
-        transform: scale(0.8);
-        transform-origin: center;
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
-    }
 
     .preview {
-        padding: 15px;
-        max-height: 350px;
+        padding: 0;
+        gap: 16px;
     }
-    
-    .door-sign.card-holder-preview {
-        max-width: calc(100% - 30px) !important;
-        max-height: 300px !important;
-        margin: 5px auto !important;
+
+    .preview-frame {
+        width: 100%;
     }
-    
-    .toggle-buttons-container {
-        margin-top: 20px;
+
+    .preview-frame.with-holder {
+        padding: 16px;
+        border-radius: 18px;
+    }
+
+    .door-sign {
+        font-size: clamp(11.5px, 2.6vw, 15px);
+    }
+
+    .preview-measurements__list {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .preview-measurements__item {
+        padding: 10px 12px;
     }
 }
 
@@ -857,11 +1173,11 @@ input:not(:placeholder-shown)::placeholder {
     body {
         padding: 5px;
     }
-    
+
     .container {
         padding: 0;
     }
-    
+
     .controls, .card-holder-selector-container {
         padding: 15px;
         border-radius: 12px;
@@ -870,84 +1186,35 @@ input:not(:placeholder-shown)::placeholder {
         margin: 0;
         box-sizing: border-box;
     }
-    
-    .door-sign:not(.card-holder-preview) {
-        transform: scale(0.7);
-        max-width: 350px;
-    }
-    
+
     select, input {
         padding: 12px;
         font-size: 0.9rem;
     }
-    
+
     h1 {
         font-size: 1.3rem;
     }
 
     .preview {
+        gap: 14px;
+    }
+
+    .preview-frame.with-holder {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .door-sign {
+        font-size: clamp(11px, 3.4vw, 14px);
+    }
+
+    .preview-measurements__list {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-measurements__item {
         padding: 10px;
-        max-height: 280px;
-    }
-    
-    .door-sign.card-holder-preview {
-        max-width: calc(100% - 20px) !important;
-        max-height: 250px !important;
-        margin: 5px auto !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
-    }
-    
-    .toggle-buttons-container {
-        margin-top: 15px;
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .toggle-button {
-        width: 100%;
-        text-align: center;
-        padding: 8px 15px;
-        font-size: 0.9rem;
-    }
-}
-
-.preview {
-    width: 100%;
-    overflow: visible;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    padding: 20px;
-    flex-direction: column;
-}
-
-.door-sign.card-holder-preview {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-}
-
-/* Responsive scaling for card holder containers */
-@media (max-width: 768px) {
-    .preview {
-        padding: 15px;
-    }
-    
-    .preview > div[style*="border: 2px dashed"] {
-        max-width: calc(100vw - 60px) !important;
-        transform: scale(0.8);
-        transform-origin: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .preview {
-        padding: 10px;
-    }
-    
-    .preview > div[style*="border: 2px dashed"] {
-        max-width: calc(100vw - 40px) !important;
-        transform: scale(0.65);
-        transform-origin: center;
     }
 }
 
