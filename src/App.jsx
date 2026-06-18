@@ -6,7 +6,7 @@ import { ToggleButtons } from './components/ToggleButtons'
 import { DesignationsContainer } from './components/DesignationsContainer'
 import { useCardHolders } from './hooks/useCardHolders'
 import { useSignState } from './hooks/useSignState'
-import { departmentTypes } from './data/departments'
+import { departmentTypes } from './unbc'
 
 function App() {
   const [signData, setSignData] = useSignState()

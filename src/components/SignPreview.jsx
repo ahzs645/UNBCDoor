@@ -1,13 +1,17 @@
 import React, { useRef, useState } from 'react'
-import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
-import { AlumniLogo } from '../brand/alumni/AlumniLogo'
-import { UNBCLogo } from '../brand/unbc/UNBCLogo'
-import { getDepartmentDisplayName } from '../organization/departmentHierarchy'
+import { svg2pdf } from 'svg2pdf.js'
+import { SignArtwork } from '../sign/SignArtwork'
+import { registerArtworkFonts, ARTWORK_ITALIC_FAMILY, ARTWORK_BLACK_FAMILY } from '../sign/pdfFonts'
+import { getDepartmentDisplayName } from '../unbc'
+
+const PT_PER_INCH = 72
 
 export const SignPreview = ({ signData, cardHolders }) => {
   const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
+  const [headlineWeight, setHeadlineWeight] = useState('bold')
+  const [roomNameStyle, setRoomNameStyle] = useState('standard')
   const DEFAULT_INSERT_SIZE = { width: 8.5, height: 5.5 }
 
   const formatInches = (value) => {
@@ -17,103 +21,6 @@ export const SignPreview = ({ signData, cardHolders }) => {
 
     return value.toFixed(2).replace(/\.00$/, '').replace(/0$/, '')
   }
-  const exportSign = async (format = 'png') => {
-    if (signRef.current) {
-      try {
-        const canvas = await html2canvas(signRef.current, {
-          backgroundColor: '#ffffff',
-          scale: 3
-        })
-        
-        if (format === 'png') {
-          const link = document.createElement('a')
-          link.download = 'unbc-door-sign.png'
-          link.href = canvas.toDataURL()
-          link.click()
-        }
-      } catch (error) {
-        console.error('Error exporting sign:', error)
-      }
-    }
-  }
-
-  const exportPDF = async () => {
-    if (signRef.current) {
-      try {
-        // Paper dimensions
-        const paperDimensions = {
-          letter: { width: 8.5, height: 11 },
-          a4: { width: 8.27, height: 11.69 }
-        }
-        
-        const paper = paperDimensions[paperSize]
-        const orientation = paper.width > paper.height ? 'landscape' : 'portrait'
-        
-        // Create PDF with selected paper size
-        const pdf = new jsPDF({
-          orientation: orientation,
-          unit: 'in',
-          format: paperSize
-        })
-        
-        // Capture the actual preview as shown
-        const canvas = await html2canvas(signRef.current, {
-          backgroundColor: '#ffffff',
-          scale: 4, // High resolution for print
-          useCORS: true
-        })
-        
-        const imgData = canvas.toDataURL('image/png')
-        
-        // Get actual dimensions of the captured element
-        const elementRect = signRef.current.getBoundingClientRect()
-        const actualWidth = elementRect.width / 96 // Convert pixels to inches (96 DPI)
-        const actualHeight = elementRect.height / 96
-        
-        // Calculate centering position
-        const xOffset = (paper.width - actualWidth) / 2
-        const yOffset = (paper.height - actualHeight) / 2
-        
-        // Add the sign image centered on paper
-        pdf.addImage(imgData, 'PNG', xOffset, yOffset, actualWidth, actualHeight)
-        
-        // Add cut lines around the actual card edges
-        pdf.setDrawColor(0, 0, 0)
-        pdf.setLineWidth(0.01)
-        
-        // Corner cut marks (0.25 inch long)
-        const markLength = 0.25
-        
-        // Top-left corner
-        pdf.line(xOffset - markLength, yOffset, xOffset, yOffset)
-        pdf.line(xOffset, yOffset - markLength, xOffset, yOffset)
-        
-        // Top-right corner
-        pdf.line(xOffset + actualWidth, yOffset, xOffset + actualWidth + markLength, yOffset)
-        pdf.line(xOffset + actualWidth, yOffset - markLength, xOffset + actualWidth, yOffset)
-        
-        // Bottom-left corner
-        pdf.line(xOffset - markLength, yOffset + actualHeight, xOffset, yOffset + actualHeight)
-        pdf.line(xOffset, yOffset + actualHeight, xOffset, yOffset + actualHeight + markLength)
-        
-        // Bottom-right corner
-        pdf.line(xOffset + actualWidth, yOffset + actualHeight, xOffset + actualWidth + markLength, yOffset + actualHeight)
-        pdf.line(xOffset + actualWidth, yOffset + actualHeight, xOffset + actualWidth, yOffset + actualHeight + markLength)
-        
-        // Add paper size info
-        pdf.setFontSize(8)
-        pdf.setTextColor(128, 128, 128)
-        pdf.text(`Paper: ${paperSize.toUpperCase()}`, paper.width / 2, paper.height - 0.3, { align: 'center' })
-        
-        // Save the PDF
-        const filename = `unbc-door-sign-${signData.signType || 'custom'}.pdf`
-        pdf.save(filename)
-      } catch (error) {
-        console.error('Error exporting PDF:', error)
-      }
-    }
-  }
-
 
   const getDefaultValues = (signType) => {
     switch(signType) {
@@ -154,55 +61,6 @@ export const SignPreview = ({ signData, cardHolders }) => {
   const getPhone = () => signData.phone || defaults.phone || ''
   const getRoomName = () => signData.roomName || defaults.roomName || ''
 
-  const renderContent = () => {
-    if (signData.signType === 'faculty' || signData.signType === 'staff') {
-      const name = getName()
-      const position = getPosition()
-      const email = getEmail()
-      const phone = getPhone()
-      
-      return (
-        <>
-          {name && <div className="name">{name}</div>}
-          {position && <div className="position">{position}</div>}
-          {((email && signData.showEmail) || (phone && signData.showPhone)) && (
-            <div className="contact-info">
-              {email && signData.showEmail && <div>Email: {email}</div>}
-              {phone && signData.showPhone && <div>Phone: {phone}</div>}
-            </div>
-          )}
-          {signData.showDesignations && signData.designations?.length > 0 && (
-            <div className="designations">{signData.designations.join(', ')}</div>
-          )}
-        </>
-      )
-    } else if (signData.signType === 'student') {
-      const name = getName()
-      const email = getEmail()
-      
-      return (
-        <>
-          {name && <div className="name">{name}</div>}
-          {email && (
-            <div className="contact-info">
-              <div>Email: {email}</div>
-            </div>
-          )}
-        </>
-      )
-    } else if (['lab', 'general-room', 'custodian-closet'].includes(signData.signType)) {
-      const roomName = getRoomName()
-      
-      return (
-        <>
-          {roomName && <div className="room-name">{roomName}</div>}
-        </>
-      )
-    }
-    
-    return null
-  }
-
   const shouldShowAlumni = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
 
@@ -229,7 +87,172 @@ export const SignPreview = ({ signData, cardHolders }) => {
     '--holder-bar-right': `${(Math.max(viewableOffset.right, 0) / insertSize.width) * 100}%`
   }
 
-  const doorSignClass = `door-sign ${signData.signType || 'faculty'} ${selectedCardHolder ? 'with-holder' : ''}`
+  const isRoomType = ['lab', 'general-room', 'custodian-closet'].includes(signData.signType)
+
+  const doorSignClass = [
+    'door-sign',
+    signData.signType || 'faculty',
+    selectedCardHolder ? 'with-holder' : ''
+  ].filter(Boolean).join(' ')
+
+  // Single source of truth for the artwork — used by the preview and both exporters.
+  const signContent = {
+    signType: signData.signType || 'faculty',
+    departmentText: getDepartmentDisplayName(signData),
+    name: getName(),
+    credentials: (signData.showDesignations && signData.designations?.length > 0)
+      ? signData.designations.join(', ')
+      : '',
+    position: getPosition(),
+    email: getEmail(),
+    phone: getPhone(),
+    showEmail: signData.showEmail,
+    showPhone: signData.showPhone,
+    roomName: getRoomName(),
+    showAlumni: shouldShowAlumni,
+    headlineWeight,
+    roomNameStyle,
+    insert: insertSize
+  }
+
+  const cloneArtworkForExport = (availableFonts = {}) => {
+    const source = signRef.current
+    if (!source) return null
+    const clone = source.cloneNode(true)
+
+    const italicFamily = availableFonts[ARTWORK_ITALIC_FAMILY]
+    const blackFamily = availableFonts[ARTWORK_BLACK_FAMILY]
+
+    const useFamily = (node, family) => {
+      // The embedded face already carries its weight/slant, so reference it as normal/normal.
+      node.setAttribute('font-family', family)
+      node.setAttribute('font-style', 'normal')
+      node.setAttribute('font-weight', 'normal')
+      node.style.fontFamily = family
+      node.style.fontStyle = 'normal'
+      node.style.fontWeight = 'normal'
+    }
+
+    // Upright regular/bold ride jsPDF's standard Helvetica (crisp, selectable, no embedding).
+    // Italic and Black route to the embedded brand faces — svg2pdf can't drive standard-Helvetica
+    // italic under jsPDF v3, and standard Helvetica has no Black weight at all.
+    clone.setAttribute('font-family', 'helvetica')
+    clone.querySelectorAll('text').forEach((node) => {
+      const weight = parseInt(node.getAttribute('font-weight'), 10) || 400
+      const isItalic = node.getAttribute('font-style') === 'italic'
+
+      if (isItalic && italicFamily) return useFamily(node, italicFamily)
+      if (weight >= 800 && blackFamily) return useFamily(node, blackFamily)
+
+      // Standard Helvetica only has normal/bold — collapse other weights so svg2pdf matches
+      // the face instead of silently falling back to Times.
+      const fontWeight = weight >= 600 ? 'bold' : 'normal'
+      node.setAttribute('font-family', 'helvetica')
+      node.setAttribute('font-weight', fontWeight)
+      node.setAttribute('font-style', 'normal')
+      node.style.fontFamily = 'helvetica'
+      node.style.fontWeight = fontWeight
+      node.style.fontStyle = 'normal'
+    })
+    return clone
+  }
+
+  const exportPNG = () => {
+    const source = signRef.current
+    if (!source) return
+
+    const [, , viewW, viewH] = (source.getAttribute('viewBox') || '0 0 612 396')
+      .split(/\s+/)
+      .map(Number)
+
+    // Rasterize the artwork as-authored (keeps font-style italic for the browser to render).
+    const clone = source.cloneNode(true)
+    clone.setAttribute('width', viewW)
+    clone.setAttribute('height', viewH)
+
+    const xml = new XMLSerializer().serializeToString(clone)
+    const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(xml)}`
+    const scale = 4
+
+    const image = new Image()
+    image.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = viewW * scale
+      canvas.height = viewH * scale
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.setTransform(scale, 0, 0, scale, 0, 0)
+      ctx.drawImage(image, 0, 0)
+
+      const link = document.createElement('a')
+      link.download = 'unbc-door-sign.png'
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    }
+    image.onerror = (error) => console.error('Error exporting PNG:', error)
+    image.src = svgUrl
+  }
+
+  const exportPDF = async () => {
+    const source = signRef.current
+    if (!source) return
+
+    try {
+      const paperDimensions = {
+        letter: { width: 8.5, height: 11 },
+        a4: { width: 8.27, height: 11.69 }
+      }
+      const paper = paperDimensions[paperSize]
+
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: paperSize })
+      const availableFonts = await registerArtworkFonts(doc)
+
+      const artWidth = insertSize.width * PT_PER_INCH
+      const artHeight = insertSize.height * PT_PER_INCH
+      const pageWidth = paper.width * PT_PER_INCH
+      const pageHeight = paper.height * PT_PER_INCH
+      const xOffset = (pageWidth - artWidth) / 2
+      const yOffset = (pageHeight - artHeight) / 2
+
+      // svg2pdf needs the node laid out in the document to resolve geometry/styles.
+      const clone = cloneArtworkForExport(availableFonts)
+      clone.setAttribute('width', artWidth)
+      clone.setAttribute('height', artHeight)
+
+      const holder = document.createElement('div')
+      holder.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0;pointer-events:none;'
+      holder.appendChild(clone)
+      document.body.appendChild(holder)
+
+      try {
+        await svg2pdf(clone, doc, { x: xOffset, y: yOffset, width: artWidth, height: artHeight })
+      } finally {
+        holder.remove()
+      }
+
+      // Vector crop marks at the artwork corners (0.25" arms).
+      const mark = 0.25 * PT_PER_INCH
+      doc.setDrawColor(0, 0, 0)
+      doc.setLineWidth(0.75)
+
+      doc.line(xOffset - mark, yOffset, xOffset, yOffset)
+      doc.line(xOffset, yOffset - mark, xOffset, yOffset)
+
+      doc.line(xOffset + artWidth, yOffset, xOffset + artWidth + mark, yOffset)
+      doc.line(xOffset + artWidth, yOffset - mark, xOffset + artWidth, yOffset)
+
+      doc.line(xOffset - mark, yOffset + artHeight, xOffset, yOffset + artHeight)
+      doc.line(xOffset, yOffset + artHeight, xOffset, yOffset + artHeight + mark)
+
+      doc.line(xOffset + artWidth, yOffset + artHeight, xOffset + artWidth + mark, yOffset + artHeight)
+      doc.line(xOffset + artWidth, yOffset + artHeight, xOffset + artWidth, yOffset + artHeight + mark)
+
+      doc.save(`unbc-door-sign-${signData.signType || 'custom'}.pdf`)
+    } catch (error) {
+      console.error('Error exporting PDF:', error)
+    }
+  }
 
   const measurementSummary = selectedCardHolder ? [
     {
@@ -254,20 +277,8 @@ export const SignPreview = ({ signData, cardHolders }) => {
           className={`preview-frame ${selectedCardHolder ? 'with-holder' : 'without-holder'}`}
           style={previewFrameStyle}
         >
-          <div className={doorSignClass} ref={signRef}>
-            <div className="sign-header">
-              <UNBCLogo departmentText={getDepartmentDisplayName(signData)} />
-            </div>
-            <div className="sign-content">
-              <div className="main-content">
-                {renderContent()}
-              </div>
-              {shouldShowAlumni && (
-                <div className="alumni-badge" style={{ display: 'block' }}>
-                  <AlumniLogo width={80} height={92} />
-                </div>
-              )}
-            </div>
+          <div className={doorSignClass}>
+            <SignArtwork ref={signRef} content={signContent} />
           </div>
 
           {selectedCardHolder && (
@@ -294,25 +305,81 @@ export const SignPreview = ({ signData, cardHolders }) => {
           </div>
         </div>
       </div>
+      <div className="sign-style-section">
+        <div className="style-control">
+          <span className="style-control__label">Headline Weight</span>
+          <div className="style-options">
+            <label className={`style-option ${headlineWeight === 'bold' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="headlineWeight"
+                value="bold"
+                checked={headlineWeight === 'bold'}
+                onChange={(e) => setHeadlineWeight(e.target.value)}
+              />
+              Bold
+            </label>
+            <label className={`style-option ${headlineWeight === 'black' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="headlineWeight"
+                value="black"
+                checked={headlineWeight === 'black'}
+                onChange={(e) => setHeadlineWeight(e.target.value)}
+              />
+              Black
+            </label>
+          </div>
+        </div>
+
+        {isRoomType && (
+          <div className="style-control">
+            <span className="style-control__label">Room Name Style</span>
+            <div className="style-options">
+              <label className={`style-option ${roomNameStyle === 'standard' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="roomNameStyle"
+                  value="standard"
+                  checked={roomNameStyle === 'standard'}
+                  onChange={(e) => setRoomNameStyle(e.target.value)}
+                />
+                Bold
+              </label>
+              <label className={`style-option ${roomNameStyle === 'italic' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="roomNameStyle"
+                  value="italic"
+                  checked={roomNameStyle === 'italic'}
+                  onChange={(e) => setRoomNameStyle(e.target.value)}
+                />
+                Italic
+              </label>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="export-section">
         <div className="paper-size-selector">
           <label>Paper Size:</label>
           <div className="paper-size-options">
             <label className={`paper-option ${paperSize === 'letter' ? 'active' : ''}`}>
-              <input 
-                type="radio" 
-                name="paperSize" 
-                value="letter" 
+              <input
+                type="radio"
+                name="paperSize"
+                value="letter"
                 checked={paperSize === 'letter'}
                 onChange={(e) => setPaperSize(e.target.value)}
               />
               Letter (8.5" × 11")
             </label>
             <label className={`paper-option ${paperSize === 'a4' ? 'active' : ''}`}>
-              <input 
-                type="radio" 
-                name="paperSize" 
-                value="a4" 
+              <input
+                type="radio"
+                name="paperSize"
+                value="a4"
                 checked={paperSize === 'a4'}
                 onChange={(e) => setPaperSize(e.target.value)}
               />
@@ -321,7 +388,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
           </div>
         </div>
         <div className="export-buttons">
-          <button type="button" onClick={() => exportSign('png')} className="export-btn">
+          <button type="button" onClick={exportPNG} className="export-btn">
             Export as PNG
           </button>
           <button type="button" onClick={exportPDF} className="export-btn pdf-export">

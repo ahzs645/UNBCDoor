@@ -1,5 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
 
+/* UNBC brand typeface for the sign artwork (matches the print templates) */
+@font-face {
+    font-family: 'HelveticaNeueUNBC';
+    src: url('../Fonts/HelveticaNeueRoman.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'HelveticaNeueUNBC';
+    src: url('../Fonts/HelveticaNeueBlack.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'HelveticaNeueUNBC';
+    src: url('../Fonts/HelveticaNeueItalic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Brand palette — override these per organization (e.g. NUGSS blue, NBCGSS teal)
+   to re-theme both the UI and the SVG sign artwork at runtime. */
+:root {
+    --brand-green: #035642;
+    --brand-green-dark: #024d38;
+    --brand-header: var(--brand-green);
+    --brand-on-header: #ffffff;
+    --sign-name-color: #1f2937;
+    --sign-secondary-color: #475569;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -147,25 +183,6 @@ body.dark-mode select:focus,
 body.dark-mode input:focus {
     border-color: #22c55e;
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
-}
-
-body.dark-mode .search-results {
-    background: #111827;
-    border-color: #1f2937;
-}
-
-body.dark-mode .search-result-item {
-    border-bottom: 1px solid #1f2937;
-    color: #e2e8f0;
-}
-
-body.dark-mode .search-result-item:hover {
-    background-color: rgba(34, 197, 94, 0.15);
-    border-left-color: #22c55e;
-}
-
-body.dark-mode .search-result-item.no-results {
-    color: #94a3b8;
 }
 
 body.dark-mode .card-holder-info {
@@ -427,63 +444,6 @@ input::placeholder {
     opacity: 1;
 }
 
-.search-input {
-    position: relative;
-}
-
-.search-input:focus {
-    border-color: #035642;
-    box-shadow: 0 0 0 3px rgba(3, 86, 66, 0.1);
-}
-
-.search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-top: none;
-    border-radius: 0 0 12px 12px;
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 9999;
-    box-shadow: 0 8px 25px rgba(3, 86, 66, 0.2);
-}
-
-.search-result-item {
-    padding: 12px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f5f9;
-    transition: all 0.2s ease;
-}
-
-.search-result-item:hover {
-    background-color: #f0fdf4;
-    border-left: 3px solid #035642;
-    padding-left: 12px;
-}
-
-.search-result-item:last-child {
-    border-bottom: none;
-}
-
-.search-result-item.no-results {
-    color: #64748b;
-    font-style: italic;
-    cursor: default;
-}
-
-.search-result-item.no-results:hover {
-    background-color: transparent;
-}
-
-.search-result-path {
-    font-size: 0.9rem;
-    color: #4a5568;
-    line-height: 1.4;
-}
-
 .contact-info-group {
     display: flex;
     gap: 15px;
@@ -617,6 +577,7 @@ input::placeholder {
     display: flex;
     flex-direction: column;
     font-size: clamp(12px, 1.6vw, 16px);
+    font-family: 'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 body.dark-mode .door-sign {
@@ -690,9 +651,28 @@ body.dark-mode .door-sign {
 }
 
 .main-content .room-name {
-    font-size: 1.7em;
+    font-size: 3em;
     font-weight: 700;
+    line-height: 1.04;
     color: #1f2937;
+}
+
+/* Headline weight choice (Bold vs Final Black) — mirrors the manual template variants */
+.door-sign.weight-bold .main-content .name,
+.door-sign.weight-bold .main-content .room-name {
+    font-weight: 700;
+}
+
+.door-sign.weight-black .main-content .name,
+.door-sign.weight-black .main-content .room-name {
+    font-weight: 900;
+}
+
+/* Italic room-name treatment (e.g. WIDC "Spark Lab") */
+.door-sign.room-italic .main-content .room-name {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.3em;
 }
 
 .main-content .department {
@@ -701,16 +681,11 @@ body.dark-mode .door-sign {
     color: #475569;
 }
 
-.main-content .contact-info,
-.main-content .designations {
+.main-content .contact-info {
     font-size: 0.95em;
     color: #475569;
     line-height: 1.5;
-}
-
-.main-content .designations {
     font-style: italic;
-    font-weight: 500;
 }
 
 .contact-info div {
@@ -976,107 +951,6 @@ input:not(:placeholder-shown)::placeholder {
     opacity: 0;
 }
 
-/* Department Selection Display */
-.department-selection-display {
-    margin: 20px 0;
-    padding: 16px;
-    background: linear-gradient(135deg, #035642 0%, #024d38 100%);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 12px rgba(3, 86, 66, 0.2);
-}
-
-.department-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    color: white;
-}
-
-.department-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.department-icon {
-    font-size: 1.2em;
-}
-
-.department-title strong {
-    color: white;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.department-type-badge {
-    background: rgba(255, 255, 255, 0.25);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: capitalize;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    letter-spacing: 0.5px;
-}
-
-.department-path {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    line-height: 1.4;
-}
-
-.department-level {
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    width: 100%;
-    word-wrap: break-word;
-    white-space: normal;
-    transition: all 0.2s ease;
-    text-align: center;
-}
-
-.department-level.type {
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    text-transform: capitalize;
-}
-
-.department-level.main {
-    background: rgba(255, 255, 255, 0.15);
-    color: #f0f9ff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.department-level.sub {
-    background: rgba(255, 255, 255, 0.1);
-    color: #e0f2fe;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.department-level.subsub {
-    background: rgba(255, 255, 255, 0.05);
-    color: #cffafe;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.department-arrow {
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: bold;
-    font-size: 1.2rem;
-    align-self: center;
-    transform: rotate(90deg);
-    margin: -4px 0;
-}
-
 @media (max-width: 1024px) {
     body {
         padding: 15px;
@@ -1279,10 +1153,91 @@ input:not(:placeholder-shown)::placeholder {
     accent-color: #035642;
 }
 
+/* Sign appearance controls (headline weight / room-name style) */
+.sign-style-section {
+    margin-top: 30px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+}
+
+.style-control {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.style-control__label {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.9rem;
+}
+
+.style-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.style-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.style-option:hover {
+    border-color: #035642;
+    background: #f7fafc;
+}
+
+.style-option.active {
+    border-color: #035642;
+    background: #f0fdf4;
+    color: #035642;
+    font-weight: 600;
+}
+
+.style-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #035642;
+}
+
+body.dark-mode .style-control__label {
+    color: #cbd5f5;
+}
+
+body.dark-mode .style-option {
+    background: #1f2937;
+    border-color: #374151;
+    color: #e2e8f0;
+}
+
+body.dark-mode .style-option.active {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
 /* Make sure the export buttons are properly positioned */
 @media (max-width: 768px) {
     .export-buttons {
         flex-direction: column;
+    }
+    .sign-style-section {
+        flex-direction: column;
+        gap: 18px;
     }
     .export-btn {
         width: 100%;

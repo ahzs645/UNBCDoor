@@ -1,5 +1,5 @@
 import React from 'react'
-import { hasDepartmentSelection } from '../../organization/departmentHierarchy'
+import { hasDepartmentSelection } from './hierarchy'
 
 export const DepartmentSelectionDisplay = ({ selection }) => {
   if (!hasDepartmentSelection(selection)) {

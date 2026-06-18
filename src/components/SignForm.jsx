@@ -1,5 +1,5 @@
 import React from 'react'
-import { DepartmentSearch } from './departments/DepartmentSearch'
+import { DepartmentSelector } from '../unbc'
 
 export const SignForm = ({ signData, onUpdate, departments }) => {
   const handleInputChange = (e) => {
@@ -38,10 +38,10 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
         </select>
       </div>
 
-      <DepartmentSearch
+      <DepartmentSelector
         departments={departments}
-        selection={signData}
-        onSelect={onUpdate}
+        value={signData}
+        onChange={onUpdate}
       />
 
       <div className="form-group">

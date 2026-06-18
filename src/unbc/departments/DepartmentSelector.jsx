@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import {
   searchDepartmentHierarchy,
   toDepartmentSelection
-} from '../../organization/departmentHierarchy'
+} from './hierarchy'
 import { DepartmentSelectionDisplay } from './DepartmentSelectionDisplay'
+import './departments.css'
 
-export const DepartmentSearch = ({ departments, selection, onSelect }) => {
+export const DepartmentSelector = ({ departments, value, onChange }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [searchResults, setSearchResults] = useState([])
@@ -21,7 +22,7 @@ export const DepartmentSearch = ({ departments, selection, onSelect }) => {
   }
 
   const selectDepartment = (result) => {
-    onSelect(toDepartmentSelection(result))
+    onChange(toDepartmentSelection(result))
     setSearchQuery('')
     setShowSearchResults(false)
     setSearchResults([])
@@ -83,7 +84,7 @@ export const DepartmentSearch = ({ departments, selection, onSelect }) => {
         )}
       </div>
 
-      <DepartmentSelectionDisplay selection={selection} />
+      <DepartmentSelectionDisplay selection={value} />
     </>
   )
 }
