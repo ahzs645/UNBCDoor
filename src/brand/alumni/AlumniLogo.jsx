@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const AlumniBadge = ({ width = 80, height = 92 }) => {
+export const AlumniLogo = ({ width = 80, height = 92 }) => {
   return (
     <svg 
       width={width} 

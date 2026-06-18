@@ -1,11 +1,12 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
-import { AlumniBadge } from './AlumniBadge'
+import { AlumniLogo } from '../brand/alumni/AlumniLogo'
+import { UNBCLogo } from '../brand/unbc/UNBCLogo'
+import { getDepartmentDisplayName } from '../organization/departmentHierarchy'
 
 export const SignPreview = ({ signData, cardHolders }) => {
   const signRef = useRef(null)
-  const [svgContent, setSvgContent] = useState('')
   const [paperSize, setPaperSize] = useState('letter')
   const DEFAULT_INSERT_SIZE = { width: 8.5, height: 5.5 }
 
@@ -16,13 +17,6 @@ export const SignPreview = ({ signData, cardHolders }) => {
 
     return value.toFixed(2).replace(/\.00$/, '').replace(/0$/, '')
   }
-  
-  // Helper function to get correct asset path
-  const getAssetPath = (path) => {
-    const basePath = import.meta.env.BASE_URL || '/'
-    return `${basePath}${path}`
-  }
-
   const exportSign = async (format = 'png') => {
     if (signRef.current) {
       try {
@@ -160,103 +154,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
   const getPhone = () => signData.phone || defaults.phone || ''
   const getRoomName = () => signData.roomName || defaults.roomName || ''
 
-  const getDepartmentDisplay = () => {
-    // Use the most specific department level available for display
-    if (signData.subSubDepartment) {
-      return signData.subSubDepartment
-    } else if (signData.subDepartment) {
-      return signData.subDepartment
-    } else if (signData.mainDepartment) {
-      return signData.mainDepartment
-    }
-    return ''
-  }
-
-  // Load SVG content on component mount
-  useEffect(() => {
-    const loadSVG = async () => {
-      try {
-        const response = await fetch(getAssetPath('components/unbc-logo.svg'))
-        const svgText = await response.text()
-        setSvgContent(svgText)
-        console.log('SVG loaded successfully')
-      } catch (error) {
-        console.error('Error loading SVG:', error)
-      }
-    }
-    
-    loadSVG()
-  }, [])
-
-  const updateSVGText = (departmentText) => {
-    // Wait a bit for the SVG to be rendered in the DOM
-    setTimeout(() => {
-      const textElement = signRef.current?.querySelector('#svgDepartmentText')
-      if (!textElement) {
-        console.log('SVG text element not found in sign preview')
-        return
-      }
-
-      console.log('Updating SVG text with:', departmentText)
-
-      // Clear existing tspans
-      textElement.innerHTML = ''
-
-      if (departmentText) {
-        // Split text into words and create lines to fit within the SVG space
-        const words = departmentText.split(' ')
-        let currentLine = ''
-        const lines = []
-        const maxCharsPerLine = 24 // Max chars per line for the SVG
-
-        words.forEach(word => {
-          if ((currentLine + word).length <= maxCharsPerLine) {
-            currentLine += (currentLine ? ' ' : '') + word
-          } else {
-            if (currentLine) lines.push(currentLine)
-            currentLine = word
-          }
-        })
-        if (currentLine) lines.push(currentLine)
-
-        // Create tspan elements for each line
-        lines.forEach((line, index) => {
-          const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
-          tspan.setAttribute('x', '0')
-          tspan.setAttribute('y', index * 10) // 10 units between lines
-          tspan.textContent = line
-          textElement.appendChild(tspan)
-        })
-        
-        // If 3+ lines, move the entire logo group up
-        const logoGroup = signRef.current?.querySelector('#logoAndTextGroup')
-        if (logoGroup) {
-          if (lines.length >= 3) {
-            // Move up by 10 units (approximately 1 line height)
-            logoGroup.setAttribute('transform', 'translate(0, 5)')
-            console.log(`Moving logo up for ${lines.length} lines of text`)
-          } else {
-            // Reset to original position
-            logoGroup.setAttribute('transform', 'translate(0, 15)')
-          }
-        }
-        
-        console.log('SVG text updated successfully')
-      }
-    }, 100)
-  }
-
-  // Update SVG text whenever department data changes or SVG content loads
-  useEffect(() => {
-    if (svgContent) {
-      const departmentText = getDepartmentDisplay()
-      updateSVGText(departmentText)
-    }
-  }, [signData.departmentType, signData.mainDepartment, signData.subDepartment, signData.subSubDepartment, svgContent])
-
   const renderContent = () => {
-    const departmentText = getDepartmentDisplay()
-    
     if (signData.signType === 'faculty' || signData.signType === 'staff') {
       const name = getName()
       const position = getPosition()
@@ -358,7 +256,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
         >
           <div className={doorSignClass} ref={signRef}>
             <div className="sign-header">
-              <div className="unbc-logo" dangerouslySetInnerHTML={{ __html: svgContent }} />
+              <UNBCLogo departmentText={getDepartmentDisplayName(signData)} />
             </div>
             <div className="sign-content">
               <div className="main-content">
@@ -366,7 +264,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
               </div>
               {shouldShowAlumni && (
                 <div className="alumni-badge" style={{ display: 'block' }}>
-                  <AlumniBadge width={80} height={92} />
+                  <AlumniLogo width={80} height={92} />
                 </div>
               )}
             </div>
