@@ -1,6 +1,6 @@
 export const departmentTypes = {
     academic: {
-        name: "🎓 Academic Departments",
+        name: "Academic Departments",
         departments: {
             "Provost and Vice-President, Academic": {
                 "Faculty of Human and Health Sciences": {
@@ -60,7 +60,7 @@ export const departmentTypes = {
         }
     },
     administrative: {
-        name: "🌐 Administrative Departments",
+        name: "Administrative Departments",
         departments: {
             "President": {
                 "Athletics": ["Athletics"],
