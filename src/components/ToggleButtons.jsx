@@ -12,7 +12,6 @@ export const ToggleButtons = ({ signType, showAlumni, showDesignations, onToggle
         className={`toggle-button ${showAlumni ? 'active' : ''}`}
         onClick={onToggleAlumni}
       >
-        <i>🎓</i>
         {showAlumni ? 'Hide Alumni Badge' : 'Show Alumni Badge'}
       </button>
       
@@ -21,7 +20,6 @@ export const ToggleButtons = ({ signType, showAlumni, showDesignations, onToggle
         className={`toggle-button ${showDesignations ? 'active' : ''}`}
         onClick={onToggleDesignations}
       >
-        <i>📜</i>
         {showDesignations ? 'Disable Designations' : 'Enable Designations'}
       </button>
     </div>

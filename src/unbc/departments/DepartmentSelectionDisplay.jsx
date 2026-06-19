@@ -10,7 +10,6 @@ export const DepartmentSelectionDisplay = ({ selection }) => {
     <div className="department-selection-display">
       <div className="department-header">
         <div className="department-title">
-          <span className="department-icon">🏛️</span>
           <strong>Selected Department</strong>
         </div>
         {selection.departmentType && (
