@@ -50,7 +50,12 @@ export const DesignationsContainer = ({ selectedDesignations = [], onUpdate }) =
           placeholder="Add custom designation..."
           value={customDesignation}
           onChange={(e) => setCustomDesignation(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && addCustomDesignation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              addCustomDesignation()
+            }
+          }}
         />
         <button type="button" onClick={addCustomDesignation}>Add</button>
       </div>
