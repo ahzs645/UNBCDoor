@@ -118,6 +118,14 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   const W = insert.width * PT_PER_INCH
   const H = insert.height * PT_PER_INCH
 
+  // Bleed (in points) extends the background fills past the trim line so cutting leaves
+  // no white slivers. The trim-sized layout below is unchanged — everything is translated
+  // inward by BLEED and the canvas (viewBox) grows by BLEED on every edge.
+  const bleedInches = Number.isFinite(content.bleed) ? content.bleed : 0
+  const BLEED = bleedInches * PT_PER_INCH
+  const CW = W + BLEED * 2
+  const CH = H + BLEED * 2
+
   const headerColor = readBrandVar('--brand-header', '#035642')
   const nameColor = readBrandVar('--sign-name-color', '#1f2937')
   const secondaryColor = readBrandVar('--sign-secondary-color', '#475569')
@@ -173,40 +181,47 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     <svg
       ref={ref}
       xmlns="http://www.w3.org/2000/svg"
-      viewBox={`0 0 ${W} ${H}`}
+      viewBox={`0 0 ${CW} ${CH}`}
       width="100%"
       height="100%"
       preserveAspectRatio="xMidYMid meet"
       fontFamily={fontFamily}
+      data-bleed={BLEED}
+      data-trim-width={W}
+      data-trim-height={H}
       style={{ display: 'block' }}
     >
-      <rect x="0" y="0" width={W} height={H} fill="#ffffff" />
-      <rect x="0" y="0" width={W} height={HEADER_H} fill={headerColor} />
+      {/* Background fills span the full bleed canvas; the green header also bleeds off
+          the top and side edges (height = top bleed + the trim-height header). */}
+      <rect x="0" y="0" width={CW} height={CH} fill="#ffffff" />
+      <rect x="0" y="0" width={CW} height={BLEED + HEADER_H} fill={headerColor} />
 
-      <UnbcLogoMark
-        transform={`translate(${PAD_X}, ${logoY}) scale(${logoScale})`}
-        departmentText={content.departmentText}
-        fontFamily={fontFamily}
-      />
-
-      {texts.map((text, index) => (
-        <text
-          key={index}
-          x={PAD_X}
-          y={text.baseline}
+      <g transform={`translate(${BLEED}, ${BLEED})`}>
+        <UnbcLogoMark
+          transform={`translate(${PAD_X}, ${logoY}) scale(${logoScale})`}
+          departmentText={content.departmentText}
           fontFamily={fontFamily}
-          fontSize={text.size}
-          fontWeight={text.weight}
-          fontStyle={text.style}
-          fill={text.fill}
-        >
-          {text.text}
-        </text>
-      ))}
+        />
 
-      {hasAlumni && (
-        <AlumniCrest transform={`translate(${badgeX}, ${badgeY}) scale(${badgeScale})`} />
-      )}
+        {texts.map((text, index) => (
+          <text
+            key={index}
+            x={PAD_X}
+            y={text.baseline}
+            fontFamily={fontFamily}
+            fontSize={text.size}
+            fontWeight={text.weight}
+            fontStyle={text.style}
+            fill={text.fill}
+          >
+            {text.text}
+          </text>
+        ))}
+
+        {hasAlumni && (
+          <AlumniCrest transform={`translate(${badgeX}, ${badgeY}) scale(${badgeScale})`} />
+        )}
+      </g>
     </svg>
   )
 })

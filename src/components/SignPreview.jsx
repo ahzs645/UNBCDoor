@@ -7,11 +7,17 @@ import { getDepartmentDisplayName } from '../unbc'
 
 const PT_PER_INCH = 72
 
+// Print production constants (inches). Bleed is the industry-standard 1/8"; the safe area
+// keeps critical content clear of the cut. Both are used by the preview guides and the PDF.
+const BLEED_INCHES = 0.125
+const SAFE_INCHES = 0.125
+
 export const SignPreview = ({ signData, cardHolders }) => {
   const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
   const [headlineWeight, setHeadlineWeight] = useState('bold')
   const [roomNameStyle, setRoomNameStyle] = useState('standard')
+  const [showGuides, setShowGuides] = useState(true)
   const DEFAULT_INSERT_SIZE = { width: 8.5, height: 5.5 }
 
   const formatInches = (value) => {
@@ -77,10 +83,24 @@ export const SignPreview = ({ signData, cardHolders }) => {
     right: horizontalDifference / 2
   }
 
-  const aspectRatio = insertSize.width / insertSize.height
+  // Canvas = trim insert + bleed on every edge. The preview frame matches this canvas, and
+  // the trim / safe / holder guides are inset back in as a fraction of the canvas.
+  const canvasWidth = insertSize.width + BLEED_INCHES * 2
+  const canvasHeight = insertSize.height + BLEED_INCHES * 2
+  const aspectRatio = canvasWidth / canvasHeight
+
+  const bleedFracX = (BLEED_INCHES / canvasWidth) * 100
+  const bleedFracY = (BLEED_INCHES / canvasHeight) * 100
+  const safeFracX = (SAFE_INCHES / canvasWidth) * 100
+  const safeFracY = (SAFE_INCHES / canvasHeight) * 100
 
   const previewFrameStyle = {
     '--sign-aspect': aspectRatio,
+    '--bleed-x': `${bleedFracX}%`,
+    '--bleed-y': `${bleedFracY}%`,
+    '--safe-x': `${safeFracX}%`,
+    '--safe-y': `${safeFracY}%`,
+    // Holder bars are measured against the trim insert, so they live inside the trim box.
     '--holder-bar-top': `${(Math.max(viewableOffset.top, 0) / insertSize.height) * 100}%`,
     '--holder-bar-bottom': `${(Math.max(viewableOffset.bottom, 0) / insertSize.height) * 100}%`,
     '--holder-bar-left': `${(Math.max(viewableOffset.left, 0) / insertSize.width) * 100}%`,
@@ -112,7 +132,8 @@ export const SignPreview = ({ signData, cardHolders }) => {
     showAlumni: shouldShowAlumni,
     headlineWeight,
     roomNameStyle,
-    insert: insertSize
+    insert: insertSize,
+    bleed: BLEED_INCHES
   }
 
   const cloneArtworkForExport = (availableFonts = {}) => {
@@ -165,6 +186,10 @@ export const SignPreview = ({ signData, cardHolders }) => {
       .split(/\s+/)
       .map(Number)
 
+    const bleedPt = BLEED_INCHES * PT_PER_INCH
+    const trimW = insertSize.width * PT_PER_INCH
+    const trimH = insertSize.height * PT_PER_INCH
+
     // Rasterize the artwork as-authored (keeps font-style italic for the browser to render).
     const clone = source.cloneNode(true)
     clone.setAttribute('width', viewW)
@@ -176,14 +201,19 @@ export const SignPreview = ({ signData, cardHolders }) => {
 
     const image = new Image()
     image.onload = () => {
+      // The PNG is the finished, trimmed insert — crop the bleed margin back off so it
+      // matches what you get after cutting (the PDF keeps the bleed for the printer).
       const canvas = document.createElement('canvas')
-      canvas.width = viewW * scale
-      canvas.height = viewH * scale
+      canvas.width = trimW * scale
+      canvas.height = trimH * scale
       const ctx = canvas.getContext('2d')
       ctx.fillStyle = '#ffffff'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
-      ctx.setTransform(scale, 0, 0, scale, 0, 0)
-      ctx.drawImage(image, 0, 0)
+      ctx.drawImage(
+        image,
+        bleedPt, bleedPt, trimW, trimH,
+        0, 0, canvas.width, canvas.height
+      )
 
       const link = document.createElement('a')
       link.download = 'unbc-door-sign.png'
@@ -208,12 +238,19 @@ export const SignPreview = ({ signData, cardHolders }) => {
       const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: paperSize })
       const availableFonts = await registerArtworkFonts(doc)
 
-      const artWidth = insertSize.width * PT_PER_INCH
-      const artHeight = insertSize.height * PT_PER_INCH
+      // The artwork carries bleed on every edge; crop marks below pin the trim (cut) line.
+      const bleedPt = BLEED_INCHES * PT_PER_INCH
+      const trimW = insertSize.width * PT_PER_INCH
+      const trimH = insertSize.height * PT_PER_INCH
+      const artWidth = trimW + bleedPt * 2
+      const artHeight = trimH + bleedPt * 2
       const pageWidth = paper.width * PT_PER_INCH
       const pageHeight = paper.height * PT_PER_INCH
-      const xOffset = (pageWidth - artWidth) / 2
-      const yOffset = (pageHeight - artHeight) / 2
+      // Center the TRIM box on the page; bleed extends outward from there. When the insert
+      // is as wide as the sheet (e.g. 8.5" insert on Letter) the side bleed falls off the
+      // page — expected, since the trim edge is then the paper edge.
+      const xOffset = (pageWidth - trimW) / 2 - bleedPt
+      const yOffset = (pageHeight - trimH) / 2 - bleedPt
 
       // svg2pdf needs the node laid out in the document to resolve geometry/styles.
       const clone = cloneArtworkForExport(availableFonts)
@@ -231,22 +268,32 @@ export const SignPreview = ({ signData, cardHolders }) => {
         holder.remove()
       }
 
-      // Vector crop marks at the artwork corners (0.25" arms).
+      // Vector crop marks aligned to the trim (cut) line, sitting in the margin just
+      // outside the bleed so they never print on the live artwork (0.25" arms).
       const mark = 0.25 * PT_PER_INCH
+      const ax0 = xOffset                 // artwork (bleed) edges
+      const ay0 = yOffset
+      const ax1 = xOffset + artWidth
+      const ay1 = yOffset + artHeight
+      const tx0 = xOffset + bleedPt        // trim (cut) lines
+      const ty0 = yOffset + bleedPt
+      const tx1 = ax1 - bleedPt
+      const ty1 = ay1 - bleedPt
+
       doc.setDrawColor(0, 0, 0)
       doc.setLineWidth(0.75)
 
-      doc.line(xOffset - mark, yOffset, xOffset, yOffset)
-      doc.line(xOffset, yOffset - mark, xOffset, yOffset)
+      // Horizontal arms in the left/right margins, aligned to the trim top & bottom.
+      doc.line(ax0 - mark, ty0, ax0, ty0)
+      doc.line(ax1, ty0, ax1 + mark, ty0)
+      doc.line(ax0 - mark, ty1, ax0, ty1)
+      doc.line(ax1, ty1, ax1 + mark, ty1)
 
-      doc.line(xOffset + artWidth, yOffset, xOffset + artWidth + mark, yOffset)
-      doc.line(xOffset + artWidth, yOffset - mark, xOffset + artWidth, yOffset)
-
-      doc.line(xOffset - mark, yOffset + artHeight, xOffset, yOffset + artHeight)
-      doc.line(xOffset, yOffset + artHeight, xOffset, yOffset + artHeight + mark)
-
-      doc.line(xOffset + artWidth, yOffset + artHeight, xOffset + artWidth + mark, yOffset + artHeight)
-      doc.line(xOffset + artWidth, yOffset + artHeight, xOffset + artWidth, yOffset + artHeight + mark)
+      // Vertical arms in the top/bottom margins, aligned to the trim left & right.
+      doc.line(tx0, ay0 - mark, tx0, ay0)
+      doc.line(tx1, ay0 - mark, tx1, ay0)
+      doc.line(tx0, ay1, tx0, ay1 + mark)
+      doc.line(tx1, ay1, tx1, ay1 + mark)
 
       doc.save(`unbc-door-sign-${signData.signType || 'custom'}.pdf`)
     } catch (error) {
@@ -254,42 +301,74 @@ export const SignPreview = ({ signData, cardHolders }) => {
     }
   }
 
-  const measurementSummary = selectedCardHolder ? [
+  const measurementSummary = [
     {
-      label: 'Insert',
-      value: `${formatInches(insertSize.width)}" × ${formatInches(insertSize.height)}"`
+      label: 'Print (with bleed)',
+      value: `${formatInches(canvasWidth)}" × ${formatInches(canvasHeight)}"`
     },
     {
+      label: 'Trim / insert',
+      value: `${formatInches(insertSize.width)}" × ${formatInches(insertSize.height)}"`
+    },
+    ...(selectedCardHolder ? [{
       label: 'Viewable',
       value: `${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}"`
-    }
-  ] : [
-    {
-      label: 'Default insert',
-      value: `${formatInches(DEFAULT_INSERT_SIZE.width)}" × ${formatInches(DEFAULT_INSERT_SIZE.height)}"`
-    }
+    }] : [])
   ]
 
   return (
     <>
       <div className="preview">
+        <div className="preview-toolbar">
+          <span className="preview-toolbar__title">Preview</span>
+          <label className="switch preview-guide-toggle">
+            <input
+              type="checkbox"
+              checked={showGuides}
+              onChange={(e) => setShowGuides(e.target.checked)}
+            />
+            <span className="switch__track" aria-hidden="true" />
+            <span className="switch__text">Print guides</span>
+          </label>
+        </div>
+
         <div
-          className={`preview-frame ${selectedCardHolder ? 'with-holder' : 'without-holder'}`}
+          className={`preview-frame ${selectedCardHolder ? 'with-holder' : 'without-holder'} ${showGuides ? 'show-guides' : ''}`}
           style={previewFrameStyle}
         >
           <div className={doorSignClass}>
             <SignArtwork ref={signRef} content={signContent} />
           </div>
 
+          {showGuides && (
+            <>
+              <span className="print-guide print-trim" aria-hidden="true" />
+              <span className="print-guide print-safe" aria-hidden="true" />
+            </>
+          )}
+
           {selectedCardHolder && (
-            <div className="card-holder-overlay" aria-hidden="true">
-              <span className="card-holder-bar top" />
-              <span className="card-holder-bar bottom" />
-              <span className="card-holder-bar left" />
-              <span className="card-holder-bar right" />
+            <div className="card-holder-frame" aria-hidden="true">
+              <div className="card-holder-overlay">
+                <span className="card-holder-bar top" />
+                <span className="card-holder-bar bottom" />
+                <span className="card-holder-bar left" />
+                <span className="card-holder-bar right" />
+              </div>
             </div>
           )}
         </div>
+
+        {showGuides && (
+          <div className="preview-legend" aria-hidden="true">
+            <span className="preview-legend__item preview-legend__item--bleed">Bleed</span>
+            <span className="preview-legend__item preview-legend__item--trim">Trim / cut line</span>
+            <span className="preview-legend__item preview-legend__item--safe">Safe area</span>
+            {selectedCardHolder && (
+              <span className="preview-legend__item preview-legend__item--holder">Holder window</span>
+            )}
+          </div>
+        )}
 
         <div className="preview-measurements">
           {selectedCardHolder && (

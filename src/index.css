@@ -244,17 +244,41 @@ body.dark-mode .toggle-button.active {
     border-color: #035642;
 }
 
-body.dark-mode .preview-frame.with-holder {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.05) 100%);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+body.dark-mode .preview-toolbar__title {
+    color: #f8fafc;
 }
 
-body.dark-mode .preview-frame.with-holder::after {
-    border-color: rgba(34, 197, 94, 0.45);
+body.dark-mode .print-trim {
+    border-color: rgba(226, 232, 240, 0.7);
+}
+
+body.dark-mode .print-safe {
+    border-color: rgba(34, 197, 94, 0.7);
+}
+
+body.dark-mode .card-holder-frame::after {
+    border-color: rgba(226, 232, 240, 0.85);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
 }
 
 body.dark-mode .card-holder-bar {
-    background: rgba(15, 23, 42, 0.65);
+    background: rgba(2, 6, 23, 0.6);
+}
+
+body.dark-mode .preview-legend__item {
+    color: #94a3b8;
+}
+
+body.dark-mode .preview-legend__item--trim {
+    color: #cbd5f5;
+}
+
+body.dark-mode .preview-legend__item--safe {
+    color: #22c55e;
+}
+
+body.dark-mode .preview-legend__item--holder {
+    color: #cbd5f5;
 }
 
 body.dark-mode .preview-measurements__title {
@@ -294,8 +318,28 @@ body.dark-mode .main-content .designations {
     gap: 18px;
 }
 
+.preview-toolbar {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.preview-toolbar__title {
+    font-weight: 700;
+    color: var(--ui-text);
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+}
+
+.preview-guide-toggle {
+    margin-top: 0;
+}
+
 .preview-frame {
-    width: min(100%, 560px);
+    width: min(100%, 600px);
     aspect-ratio: var(--sign-aspect, 1.545);
     position: relative;
     display: flex;
@@ -304,37 +348,54 @@ body.dark-mode .main-content .designations {
     box-sizing: border-box;
 }
 
-.preview-frame.with-holder {
-    padding: clamp(12px, 2.6vw, 20px);
-    background: var(--ui-surface-muted);
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius);
-    box-shadow: var(--ui-shadow-md);
-}
-
 .preview-frame.without-holder {
-    width: min(100%, 520px);
+    width: min(100%, 560px);
 }
 
-.preview-frame.with-holder::after {
+/* Print guides: square-cornered overlays pinned to the trim and safe-area boxes.
+   The sign artwork already fills the frame to the bleed edge, so these just mark
+   where the piece is cut (trim) and where content must stay clear (safe). */
+.print-guide {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.print-trim {
+    inset: var(--bleed-y, 0) var(--bleed-x, 0);
+    border: 1px dashed rgba(15, 23, 42, 0.6);
+}
+
+.print-safe {
+    inset: calc(var(--bleed-y, 0) + var(--safe-y, 0)) calc(var(--bleed-x, 0) + var(--safe-x, 0));
+    border: 1px dashed rgba(3, 86, 66, 0.55);
+}
+
+/* Holder window: the acrylic frame covers part of the trimmed insert, so it lives inside
+   the trim box (inset by the bleed). Bars are measured against the trim insert. */
+.card-holder-frame {
+    position: absolute;
+    inset: var(--bleed-y, 0) var(--bleed-x, 0);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.card-holder-frame::after {
     content: '';
     position: absolute;
-    inset: calc(var(--holder-bar-top, 0)) calc(var(--holder-bar-right, 0)) calc(var(--holder-bar-bottom, 0)) calc(var(--holder-bar-left, 0));
-    border: 1px dashed rgba(3, 86, 66, 0.45);
-    border-radius: 12px;
-    pointer-events: none;
+    inset: var(--holder-bar-top, 0) var(--holder-bar-right, 0) var(--holder-bar-bottom, 0) var(--holder-bar-left, 0);
+    border: 1px dashed rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.3);
 }
 
 .card-holder-overlay {
     position: absolute;
     inset: 0;
-    pointer-events: none;
-    border-radius: inherit;
 }
 
 .card-holder-bar {
     position: absolute;
-    background: rgba(15, 23, 42, 0.25);
+    background: rgba(15, 23, 42, 0.32);
 }
 
 .card-holder-bar.top {
@@ -365,9 +426,55 @@ body.dark-mode .main-content .designations {
     width: var(--holder-bar-right, 0%);
 }
 
+.preview-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.preview-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.78rem;
+    color: var(--ui-text-muted);
+    font-weight: 500;
+}
+
+.preview-legend__item::before {
+    content: '';
+    width: 16px;
+    height: 0;
+    border-top: 2px dashed currentColor;
+    flex-shrink: 0;
+}
+
+.preview-legend__item--trim { color: #334155; }
+.preview-legend__item--safe { color: #035642; }
+
+.preview-legend__item--bleed { color: #94a3b8; }
+.preview-legend__item--bleed::before {
+    border-top: none;
+    height: 11px;
+    background: #035642;
+    border-radius: 2px;
+    opacity: 0.5;
+}
+
+.preview-legend__item--holder { color: #334155; }
+.preview-legend__item--holder::before {
+    border-top: none;
+    height: 11px;
+    background: rgba(15, 23, 42, 0.32);
+    border-radius: 2px;
+}
+
 .preview-measurements {
     width: 100%;
-    max-width: 560px;
+    max-width: 600px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -582,7 +689,8 @@ input::placeholder {
     height: 100%;
     background: white;
     box-shadow: 0 18px 35px rgba(0,0,0,0.18);
-    border-radius: clamp(14px, 3vw, 20px);
+    /* Square corners — a printed insert is cut to a sharp rectangle, not rounded. */
+    border-radius: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1081,11 +1189,6 @@ input:not(:placeholder-shown)::placeholder {
         width: 100%;
     }
 
-    .preview-frame.with-holder {
-        padding: 16px;
-        border-radius: 18px;
-    }
-
     .door-sign {
         font-size: clamp(11.5px, 2.6vw, 15px);
     }
@@ -1130,11 +1233,6 @@ input:not(:placeholder-shown)::placeholder {
         gap: 14px;
     }
 
-    .preview-frame.with-holder {
-        padding: 14px;
-        border-radius: 16px;
-    }
-
     .door-sign {
         font-size: clamp(11px, 3.4vw, 14px);
     }
@@ -1145,6 +1243,21 @@ input:not(:placeholder-shown)::placeholder {
 
     .preview-measurements__item {
         padding: 10px;
+    }
+
+    .preview-toolbar,
+    .preview-legend,
+    .preview-measurements {
+        max-width: 100%;
+    }
+
+    .preview-toolbar__title {
+        font-size: 1rem;
+    }
+
+    .preview-legend {
+        gap: 8px 14px;
+        font-size: 0.74rem;
     }
 }
 
