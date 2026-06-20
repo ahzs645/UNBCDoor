@@ -1,0 +1,136 @@
+/* Custom (non-native) dropdown. The trigger mirrors the .form-group input/select
+   field styling from form.css; the panel is our own listbox so the open menu is
+   branded and consistent across browsers, OSes and dark mode. */
+
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select__trigger {
+    width: 100%;
+    text-align: left;
+    padding: 12px 42px 12px 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--ui-surface);
+    color: var(--ui-text);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+}
+
+.custom-select__trigger:hover {
+    border-color: var(--ui-border-strong);
+}
+
+.custom-select__trigger:focus-visible {
+    outline: none;
+    border-color: var(--brand-green);
+    box-shadow: var(--ui-focus-ring);
+}
+
+.custom-select--open .custom-select__trigger {
+    border-color: var(--brand-green);
+    box-shadow: var(--ui-focus-ring);
+}
+
+/* Rotate the chevron when the menu is open. */
+.custom-select--open .custom-select__trigger {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23035642' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 15l-6-6-6 6'/%3E%3C/svg%3E");
+}
+
+.custom-select__value {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.custom-select__value--placeholder {
+    color: #9ca3af;
+}
+
+.custom-select__panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+    -webkit-overflow-scrolling: touch;
+}
+
+.custom-select__option {
+    padding: 11px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--ui-text);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.custom-select__option--active {
+    background-color: #f0fdf4;
+}
+
+.custom-select__option--selected {
+    color: var(--brand-green);
+    font-weight: 600;
+}
+
+.custom-select__option--selected.custom-select__option--active {
+    background-color: #dcfce7;
+}
+
+/* Dark mode */
+body.dark-mode .custom-select__trigger {
+    background-color: #1f2937;
+    color: #f8fafc;
+    border-color: #374151;
+}
+
+body.dark-mode .custom-select__trigger:focus-visible,
+body.dark-mode .custom-select--open .custom-select__trigger {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+}
+
+body.dark-mode .custom-select--open .custom-select__trigger {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 15l-6-6-6 6'/%3E%3C/svg%3E");
+}
+
+body.dark-mode .custom-select__panel {
+    background: #111827;
+    border-color: #1f2937;
+    box-shadow: 0 18px 35px rgba(15, 23, 42, 0.55);
+}
+
+body.dark-mode .custom-select__option {
+    color: #e2e8f0;
+}
+
+body.dark-mode .custom-select__option--active {
+    background-color: rgba(34, 197, 94, 0.15);
+}
+
+body.dark-mode .custom-select__option--selected {
+    color: #22c55e;
+}
+
+body.dark-mode .custom-select__option--selected.custom-select__option--active {
+    background-color: rgba(34, 197, 94, 0.25);
+}
