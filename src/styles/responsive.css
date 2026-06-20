@@ -89,12 +89,41 @@
     }
 
     .controls, .card-holder-selector-container {
-        padding: 20px;
+        padding: 18px;
         border-radius: 15px;
         width: 100%;
         max-width: 100%;
         margin: 0;
         box-sizing: border-box;
+    }
+
+    /* Tighter vertical rhythm so more of the form fits on a phone screen. */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    label {
+        margin-bottom: 6px;
+    }
+
+    .contact-info-group {
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .toggle-buttons-container {
+        margin-top: 18px;
+        margin-bottom: 16px;
+    }
+
+    .card-holder-info {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    /* 16px keeps iOS Safari from zooming the viewport when a field is focused. */
+    input, .custom-select__trigger {
+        font-size: 16px;
     }
 
     .mobile-tab-panel {
@@ -156,7 +185,7 @@
     }
 
     .controls, .card-holder-selector-container {
-        padding: 15px;
+        padding: 14px;
         border-radius: 12px;
         width: 100%;
         max-width: 100%;
@@ -164,13 +193,22 @@
         box-sizing: border-box;
     }
 
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    /* Keep font-size at 16px to avoid the iOS focus zoom; trim padding for compactness. */
     input, .custom-select__trigger {
-        padding: 12px;
-        font-size: 0.9rem;
+        padding: 10px 12px;
+        font-size: 16px;
     }
 
     .custom-select__trigger {
         padding-right: 42px;
+    }
+
+    .controls-header {
+        margin-bottom: 20px;
     }
 
     h1 {
