@@ -133,10 +133,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
           </div>
         )}
 
-        <PreviewMeasurements
-          selectedCardHolder={selectedCardHolder}
-          measurementSummary={measurementSummary}
-        />
+        <PreviewMeasurements measurementSummary={measurementSummary} />
       </div>
 
       <SignStyleControls
