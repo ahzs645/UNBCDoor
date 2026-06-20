@@ -57,6 +57,12 @@
     line-height: 1.4;
 }
 
+.search-result-detail {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 2px;
+}
+
 /* Department Selection Display */
 .department-selection-display {
     margin: 20px 0;
@@ -169,5 +175,13 @@ body.dark-mode .search-result-item:hover {
 }
 
 body.dark-mode .search-result-item.no-results {
+    color: #94a3b8;
+}
+
+body.dark-mode .search-result-path {
+    color: #e2e8f0;
+}
+
+body.dark-mode .search-result-detail {
     color: #94a3b8;
 }

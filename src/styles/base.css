@@ -1,0 +1,303 @@
+/* Brand palette — override these per organization (e.g. NUGSS blue, NBCGSS teal)
+   to re-theme both the UI and the SVG sign artwork at runtime. */
+:root {
+    --brand-green: #035642;
+    --brand-green-dark: #024d38;
+    --brand-header: var(--brand-green);
+    --brand-on-header: #ffffff;
+    --sign-name-color: #1f2937;
+    --sign-secondary-color: #475569;
+
+    /* Interface chrome tokens — these style the app UI only, never the sign artwork. */
+    --ui-surface: #ffffff;
+    --ui-surface-muted: #f8fafc;
+    --ui-border: #e5e7eb;
+    --ui-border-strong: #cbd5e1;
+    --ui-text: #0f172a;
+    --ui-text-muted: #64748b;
+    --ui-radius: 16px;
+    --ui-radius-sm: 10px;
+    --ui-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --ui-shadow-md: 0 12px 32px rgba(3, 86, 66, 0.10);
+    --ui-focus-ring: 0 0 0 3px rgba(3, 86, 66, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #035642 0%, #2d5a3d 100%);
+    min-height: 100vh;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #0f172a 0%, #1f2937 100%);
+    color: #e2e8f0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.controls {
+    background: var(--ui-surface);
+    border-radius: var(--ui-radius);
+    padding: 32px;
+    box-shadow: var(--ui-shadow-md);
+    border: 1px solid var(--ui-border);
+}
+
+.controls-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.controls-header h1 {
+    margin-bottom: 0;
+    text-align: left;
+    flex: 1;
+}
+
+.theme-toggle-button {
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface);
+    color: var(--brand-green);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--ui-shadow-sm);
+}
+
+.theme-toggle-button:hover {
+    background: var(--brand-green);
+    color: white;
+    border-color: var(--brand-green);
+}
+
+.theme-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.theme-toggle-icon svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.card-holder-selector-container {
+    background: var(--ui-surface);
+    border-radius: var(--ui-radius);
+    padding: 24px 24px 32px 24px;
+    box-shadow: var(--ui-shadow-md);
+    border: 1px solid var(--ui-border);
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.mobile-editor-tabs {
+    display: none;
+}
+
+body.dark-mode .controls,
+body.dark-mode .card-holder-selector-container {
+    background: #111827;
+    box-shadow: 0 25px 50px rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    color: #e2e8f0;
+}
+
+body.dark-mode .controls {
+    backdrop-filter: none;
+}
+
+body.dark-mode .controls h1 {
+    color: #f8fafc;
+    text-shadow: 0 2px 6px rgba(15, 23, 42, 0.6);
+}
+
+body.dark-mode .controls-header h1 {
+    color: #f8fafc;
+}
+
+body.dark-mode .theme-toggle-button {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: #0b1120;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.5);
+}
+
+body.dark-mode .theme-toggle-button:hover {
+    background: #22c55e;
+    color: #0b1120;
+    box-shadow: 0 18px 30px rgba(34, 197, 94, 0.35);
+}
+
+body.dark-mode .mobile-editor-tabs {
+    background: #111827;
+    border-color: rgba(148, 163, 184, 0.15);
+    box-shadow: 0 18px 35px rgba(15, 23, 42, 0.45);
+}
+
+body.dark-mode .mobile-editor-tab {
+    color: #cbd5f5;
+}
+
+body.dark-mode .mobile-editor-tab.active {
+    background: #22c55e;
+    color: #0b1120;
+}
+
+body.dark-mode label {
+    color: #cbd5f5;
+}
+
+body.dark-mode select,
+body.dark-mode input {
+    background: #1f2937;
+    color: #f8fafc;
+    border-color: #374151;
+    box-shadow: none;
+}
+
+body.dark-mode select:focus,
+body.dark-mode input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+}
+
+body.dark-mode .card-holder-info {
+    background: #1f2937;
+    border-color: #374151;
+    color: #e2e8f0;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.15);
+}
+
+body.dark-mode .card-holder-info__header strong {
+    color: #f8fafc;
+}
+
+body.dark-mode .card-holder-info__note,
+body.dark-mode .card-holder-info__notes {
+    color: #cbd5f5;
+}
+
+body.dark-mode .card-holder-info__measurement {
+    background: rgba(34, 197, 94, 0.08);
+}
+
+body.dark-mode .card-holder-info__measurement dt {
+    color: #94a3b8;
+}
+
+body.dark-mode .card-holder-info__measurement dd {
+    color: #f8fafc;
+}
+
+body.dark-mode .toggle-button {
+    background: #111827;
+    border-color: #374151;
+    color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.3);
+}
+
+body.dark-mode .toggle-button:hover {
+    background: #1f2937;
+}
+
+body.dark-mode .toggle-button.active {
+    background: #035642;
+    border-color: #035642;
+}
+
+body.dark-mode .preview-toolbar__title {
+    color: #f8fafc;
+}
+
+body.dark-mode .print-trim {
+    border-color: rgba(226, 232, 240, 0.7);
+}
+
+body.dark-mode .print-safe {
+    border-color: rgba(34, 197, 94, 0.7);
+}
+
+body.dark-mode .card-holder-frame::after {
+    border-color: rgba(226, 232, 240, 0.85);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode .card-holder-bar {
+    background: rgba(2, 6, 23, 0.6);
+}
+
+body.dark-mode .preview-legend__item {
+    color: #94a3b8;
+}
+
+body.dark-mode .preview-legend__item--trim {
+    color: #cbd5f5;
+}
+
+body.dark-mode .preview-legend__item--safe {
+    color: #22c55e;
+}
+
+body.dark-mode .preview-legend__item--holder {
+    color: #cbd5f5;
+}
+
+body.dark-mode .preview-measurements__title {
+    color: #e2e8f0;
+}
+
+body.dark-mode .preview-measurements__item {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+body.dark-mode .preview-measurements__item span {
+    color: #94a3b8;
+}
+
+body.dark-mode .preview-measurements__item strong {
+    color: #22c55e;
+}
+
+body.dark-mode .main-content .name,
+body.dark-mode .main-content .room-name {
+    color: #f8fafc;
+}
+
+body.dark-mode .main-content .position,
+body.dark-mode .main-content .department,
+body.dark-mode .main-content .contact-info,
+body.dark-mode .main-content .designations {
+    color: #cbd5f5;
+}
+

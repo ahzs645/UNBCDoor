@@ -1,0 +1,344 @@
+.door-sign {
+    width: 100%;
+    height: 100%;
+    background: white;
+    box-shadow: 0 18px 35px rgba(0,0,0,0.18);
+    /* Square corners — a printed insert is cut to a sharp rectangle, not rounded. */
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-size: clamp(12px, 1.6vw, 16px);
+    font-family: 'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body.dark-mode .door-sign {
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+}
+
+.sign-header {
+    background: #035642;
+    color: white;
+    padding: clamp(0.9rem, 2.3vw, 1.4rem) clamp(1.4rem, 3.4vw, 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.unbc-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.unbc-logo svg,
+.unbc-logo img {
+    display: block;
+    width: clamp(140px, 45%, 220px);
+    height: auto;
+    flex-shrink: 0;
+}
+
+.alumni-badge {
+    flex-shrink: 0;
+    height: fit-content;
+    margin-left: clamp(1rem, 2.5vw, 2rem);
+    align-self: center;
+}
+
+.alumni-badge svg {
+    width: clamp(60px, 16vw, 90px);
+    height: auto;
+    display: block;
+}
+
+.sign-content {
+    flex: 1;
+    padding: clamp(1.2rem, 3vw, 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(1rem, 3.5vw, 2.5rem);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+}
+
+.main-content .name {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.main-content .position {
+    font-size: 1.15em;
+    font-weight: 500;
+    color: #475569;
+}
+
+.main-content .room-name {
+    font-size: 3em;
+    font-weight: 700;
+    line-height: 1.04;
+    color: #1f2937;
+}
+
+/* Headline weight choice (Bold vs Final Black) — mirrors the manual template variants */
+.door-sign.weight-bold .main-content .name,
+.door-sign.weight-bold .main-content .room-name {
+    font-weight: 700;
+}
+
+.door-sign.weight-black .main-content .name,
+.door-sign.weight-black .main-content .room-name {
+    font-weight: 900;
+}
+
+/* Italic room-name treatment (e.g. WIDC "Spark Lab") */
+.door-sign.room-italic .main-content .room-name {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.3em;
+}
+
+.main-content .department {
+    font-size: 1.05em;
+    font-weight: 500;
+    color: #475569;
+}
+
+.main-content .contact-info {
+    font-size: 0.95em;
+    color: #475569;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.contact-info div {
+    margin-bottom: 0.25em;
+}
+
+#designationsContainer {
+    display: block;
+    margin-top: 15px;
+    padding: 20px;
+    background: var(--ui-surface-muted);
+    border-radius: var(--ui-radius-sm);
+    border: 1px solid var(--ui-border);
+}
+
+.section-label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: var(--ui-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.designation-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.designation-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+}
+
+.designation-option:hover {
+    background-color: var(--ui-surface-muted);
+    border-color: var(--brand-green);
+}
+
+.designation-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #035642;
+}
+
+.designation-option label {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4a5568;
+    margin: 0;
+}
+
+.designation-option input[type="checkbox"]:checked + label {
+    color: #035642;
+    font-weight: 600;
+}
+
+.designation-checkbox {
+    display: inline-block;
+    margin: 4px 8px 4px 0;
+    padding: 4px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.designation-checkbox input {
+    margin-right: 4px;
+}
+
+.custom-designation {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.custom-designation input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--ui-surface);
+}
+
+.custom-designation input:focus {
+    outline: none;
+    border-color: var(--brand-green);
+    box-shadow: var(--ui-focus-ring);
+}
+
+.custom-designation button {
+    padding: 10px 20px;
+    background: var(--brand-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.custom-designation button:hover {
+    background: var(--brand-green-dark);
+}
+
+.selected-designations {
+    margin-top: 15px;
+    padding: 12px;
+    background: var(--brand-green);
+    border-radius: 8px;
+    font-size: 0.9em;
+    color: white;
+}
+
+.selected-designations strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+.designation-tag {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 4px 8px;
+    margin: 2px 4px 2px 0;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+.designation-tag button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    margin-left: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 2px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.designation-tag button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.export-btn {
+    background: var(--brand-green);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--ui-radius-sm);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    flex: 1;
+    min-width: 200px;
+}
+
+.export-btn:hover {
+    background: var(--brand-green-dark);
+}
+
+.export-btn.pdf-export {
+    background: #8b0000;
+}
+
+.export-btn.pdf-export:hover {
+    background: #660000;
+}
+
+.export-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.general-room {
+    text-align: center;
+}
+
+.general-room .main-title {
+    font-size: 48px;
+    margin-bottom: 0;
+}
+
+.custodian-closet {
+    text-align: left;
+}
+
+.custodian-closet .main-title {
+    font-size: 42px;
+    line-height: 1;
+    margin-bottom: 0;
+}
+

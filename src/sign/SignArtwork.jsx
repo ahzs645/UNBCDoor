@@ -1,9 +1,8 @@
 import React, { forwardRef } from 'react'
 import { UnbcLogoMark, AlumniCrest } from '../unbc'
+import { PT_PER_INCH, DEFAULT_INSERT_SIZE } from './signConstants'
 
 export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
-
-const PT_PER_INCH = 72
 
 const readBrandVar = (name, fallback) => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -114,7 +113,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
 }
 
 export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, ref) => {
-  const insert = content.insert || { width: 8.5, height: 5.5 }
+  const insert = content.insert || DEFAULT_INSERT_SIZE
   const W = insert.width * PT_PER_INCH
   const H = insert.height * PT_PER_INCH
 

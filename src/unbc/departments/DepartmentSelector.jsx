@@ -67,7 +67,7 @@ export const DepartmentSelector = ({ departments, value, onChange }) => {
                 onClick={() => selectDepartment(result)}
               >
                 <div className="search-result-path">{result.path}</div>
-                <div style={{ fontSize: '0.8em', color: '#666', marginTop: '2px' }}>
+                <div className="search-result-detail">
                   {result.type} → {result.main} → {result.sub} {result.subSub ? `→ ${result.subSub}` : ''}
                 </div>
               </div>

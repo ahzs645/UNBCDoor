@@ -1,0 +1,167 @@
+h1 {
+    color: var(--brand-green);
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--ui-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    transition: color 0.2s ease;
+}
+
+select, input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-family: 'Inter', sans-serif;
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: var(--brand-green);
+    box-shadow: var(--ui-focus-ring);
+}
+
+input::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+
+.contact-info-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.contact-info-group .form-group {
+    flex: 1;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-info-group .form-group label:first-child {
+    margin-bottom: 8px;
+}
+
+.contact-info-group .form-group input[type="email"],
+.contact-info-group .form-group input[type="tel"] {
+    margin-bottom: 0;
+}
+
+.card-holder-info {
+    margin-top: 12px;
+    background: var(--ui-surface-muted);
+    padding: 16px;
+    border-radius: var(--ui-radius-sm);
+    border: 1px solid var(--ui-border);
+    display: grid;
+    gap: 14px;
+}
+
+.card-holder-info__header {
+    display: grid;
+    gap: 6px;
+}
+
+.card-holder-info__header strong {
+    color: #1f2937;
+    font-size: 1.05rem;
+}
+
+.card-holder-info__note {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.4;
+}
+
+.card-holder-info__measurements {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.card-holder-info__measurement {
+    background: rgba(3, 86, 66, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    display: grid;
+    gap: 4px;
+}
+
+.card-holder-info__measurement dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #64748b;
+}
+
+.card-holder-info__measurement dd {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.card-holder-info__notes {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.toggle-buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+.toggle-button {
+    padding: 11px 22px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.toggle-button.active {
+    background: var(--brand-green);
+    color: white;
+    border-color: var(--brand-green);
+}
+
+.toggle-button:hover {
+    background: var(--ui-surface-muted);
+    border-color: var(--ui-border-strong);
+}
+
+.toggle-button.active:hover {
+    background: var(--brand-green-dark);
+    border-color: var(--brand-green-dark);
+}
+

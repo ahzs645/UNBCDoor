@@ -1,0 +1,51 @@
+/* Make sure the export buttons are properly positioned */
+@media (max-width: 768px) {
+    .export-buttons {
+        flex-direction: column;
+    }
+    .sign-style-section {
+        flex-direction: column;
+        gap: 18px;
+    }
+    .export-btn {
+        width: 100%;
+    }
+    .paper-size-options {
+        flex-direction: column;
+        width: 100%;
+    }
+    .paper-option {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Accessibility: keyboard focus rings for interactive controls.
+   Mouse clicks won't trigger these (focus-visible), so the visuals stay clean. */
+.theme-toggle-button:focus-visible,
+.toggle-button:focus-visible,
+.export-btn:focus-visible,
+.custom-designation button:focus-visible,
+.designation-tag button:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-ring);
+}
+
+.paper-option:focus-within,
+.style-option:focus-within,
+.designation-option:focus-within {
+    border-color: var(--brand-green);
+    box-shadow: var(--ui-focus-ring);
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
