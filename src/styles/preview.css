@@ -60,6 +60,12 @@
     border: 1px dashed rgba(3, 86, 66, 0.55);
 }
 
+/* With a holder selected, the viewable-window outline is the real safe area, so the generic
+   uniform safe guide would just be a misleading second rectangle — hide it. */
+.preview-frame.with-holder .print-safe {
+    display: none;
+}
+
 /* Holder window: the acrylic frame covers part of the trimmed insert, so it lives inside
    the trim box (inset by the bleed). Bars are measured against the trim insert. */
 .card-holder-frame {

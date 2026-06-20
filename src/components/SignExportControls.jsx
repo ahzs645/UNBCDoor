@@ -1,38 +1,38 @@
 import React from 'react'
+import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 
-// Paper size selection plus the PNG / print-ready PDF export buttons.
+// Paper size selection, an optional print-fit warning, and the PNG / print-ready PDF buttons.
+// Paper options are derived from PAPER_DIMENSIONS so adding a sheet there surfaces it here.
 export const SignExportControls = ({
   paperSize,
   onPaperSizeChange,
   onExportPNG,
-  onExportPDF
+  onExportPDF,
+  fitWarning
 }) => (
   <div className="export-section">
     <div className="paper-size-selector">
       <label>Paper Size:</label>
       <div className="paper-size-options">
-        <label className={`paper-option ${paperSize === 'letter' ? 'active' : ''}`}>
-          <input
-            type="radio"
-            name="paperSize"
-            value="letter"
-            checked={paperSize === 'letter'}
-            onChange={(e) => onPaperSizeChange(e.target.value)}
-          />
-          Letter (8.5" × 11")
-        </label>
-        <label className={`paper-option ${paperSize === 'a4' ? 'active' : ''}`}>
-          <input
-            type="radio"
-            name="paperSize"
-            value="a4"
-            checked={paperSize === 'a4'}
-            onChange={(e) => onPaperSizeChange(e.target.value)}
-          />
-          A4 (210mm × 297mm)
-        </label>
+        {PAPER_ORDER.map((key) => (
+          <label key={key} className={`paper-option ${paperSize === key ? 'active' : ''}`}>
+            <input
+              type="radio"
+              name="paperSize"
+              value={key}
+              checked={paperSize === key}
+              onChange={(e) => onPaperSizeChange(e.target.value)}
+            />
+            {PAPER_DIMENSIONS[key].label}
+          </label>
+        ))}
       </div>
     </div>
+
+    {fitWarning && (
+      <p className="print-fit-warning" role="alert">{fitWarning}</p>
+    )}
+
     <div className="export-buttons">
       <button type="button" onClick={onExportPNG} className="export-btn">
         Export as PNG

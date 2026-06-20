@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { SignArtwork } from '../sign/SignArtwork'
 import { BLEED_INCHES } from '../sign/signConstants'
 import { resolveSignValues } from '../sign/signDefaults'
-import { resolveCardHolderGeometry } from '../sign/signGeometry'
+import { resolveCardHolderGeometry, getPrintLayout } from '../sign/signGeometry'
 import { exportSignPNG, exportSignPDF } from '../sign/signExport'
 import { getDepartmentDisplayName } from '../unbc'
 import { SignStyleControls } from './SignStyleControls'
@@ -10,6 +10,21 @@ import { SignExportControls } from './SignExportControls'
 import { PreviewMeasurements } from './PreviewMeasurements'
 
 const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']
+
+// Turns the print-fit result into a one-line caution shown above the export buttons. Returns
+// null when the insert + bleed + crop marks all fit the chosen sheet at the required 1:1 scale.
+const buildFitWarning = (layout) => {
+  if (layout.fitsMarks) return null
+  const target = layout.recommendedPaperLabel
+  if (!layout.fitsBleed) {
+    return target
+      ? `This insert is larger than the selected sheet and will be clipped. Switch to ${target} to print it full-size with crop marks.`
+      : 'This insert is too large for the available sheets — print it at a commercial printer.'
+  }
+  return target
+    ? `The artwork fits, but there's no room for crop marks on this sheet. Switch to ${target} for crop marks, or cut to the insert size by hand.`
+    : "There's no room for crop marks on this sheet; cut to the insert size by hand."
+}
 
 export const SignPreview = ({ signData, cardHolders }) => {
   const signRef = useRef(null)
@@ -19,7 +34,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
   const [showGuides, setShowGuides] = useState(true)
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
-  const { insertSize, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
+  const { insertSize, viewableOffset, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
 
   const values = resolveSignValues(signData)
   const shouldShowAlumni = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni
@@ -49,8 +64,12 @@ export const SignPreview = ({ signData, cardHolders }) => {
     headlineWeight,
     roomNameStyle,
     insert: insertSize,
+    viewable: viewableOffset,
     bleed: BLEED_INCHES
   }
+
+  const printLayout = getPrintLayout({ insertSize, paperSize })
+  const fitWarning = buildFitWarning(printLayout)
 
   const handleExportPNG = () => exportSignPNG(signRef.current, { insertSize })
   const handleExportPDF = () => exportSignPDF(signRef.current, {
@@ -106,9 +125,10 @@ export const SignPreview = ({ signData, cardHolders }) => {
           <div className="preview-legend" aria-hidden="true">
             <span className="preview-legend__item preview-legend__item--bleed">Bleed</span>
             <span className="preview-legend__item preview-legend__item--trim">Trim / cut line</span>
-            <span className="preview-legend__item preview-legend__item--safe">Safe area</span>
-            {selectedCardHolder && (
-              <span className="preview-legend__item preview-legend__item--holder">Holder window</span>
+            {selectedCardHolder ? (
+              <span className="preview-legend__item preview-legend__item--holder">Holder window (safe area)</span>
+            ) : (
+              <span className="preview-legend__item preview-legend__item--safe">Safe area</span>
             )}
           </div>
         )}
@@ -132,6 +152,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
         onPaperSizeChange={setPaperSize}
         onExportPNG={handleExportPNG}
         onExportPDF={handleExportPDF}
+        fitWarning={fitWarning}
       />
     </>
   )

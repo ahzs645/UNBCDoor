@@ -180,7 +180,9 @@ body.dark-mode label {
 
 body.dark-mode select,
 body.dark-mode input {
-    background: #1f2937;
+    /* background-color (not the `background` shorthand) so the custom select chevron
+       image set in form.css survives in dark mode instead of being reset to none. */
+    background-color: #1f2937;
     color: #f8fafc;
     border-color: #374151;
     box-shadow: none;

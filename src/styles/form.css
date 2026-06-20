@@ -29,16 +29,45 @@ select, input {
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius-sm);
     font-size: 0.95rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    background: var(--ui-surface);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    background-color: var(--ui-surface);
     color: var(--ui-text);
     font-family: 'Inter', sans-serif;
+}
+
+/* Custom dropdown: strip the native OS chevron (appearance: none) and paint our own so
+   the two <select> fields match the rest of the branded form. The neutral slate chevron
+   reads on both the light surface and the dark #1f2937 surface, so no separate dark-mode
+   image is needed — only the dark-mode rule's `background-color` (see base.css) keeps it. */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 42px;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+}
+
+/* Hover affordance for the text-like fields and selects (not radios/checkboxes). */
+select:hover,
+input:not([type="radio"]):not([type="checkbox"]):hover {
+    border-color: var(--ui-border-strong);
 }
 
 select:focus, input:focus {
     outline: none;
     border-color: var(--brand-green);
     box-shadow: var(--ui-focus-ring);
+}
+
+/* The native option list renders white-on-white in dark mode on Windows/Linux; tint it.
+   macOS draws the popup natively and ignores these declarations, which is fine. */
+body.dark-mode select option {
+    background-color: #1f2937;
+    color: #f8fafc;
 }
 
 input::placeholder {

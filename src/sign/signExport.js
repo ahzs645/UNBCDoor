@@ -5,7 +5,8 @@ import {
   ARTWORK_ITALIC_FAMILY,
   ARTWORK_BLACK_FAMILY
 } from './pdfFonts'
-import { PT_PER_INCH, BLEED_INCHES, PAPER_DIMENSIONS } from './signConstants'
+import { PT_PER_INCH, BLEED_INCHES } from './signConstants'
+import { getPrintLayout } from './signGeometry'
 
 // Pure, non-React export helpers. Each takes the live artwork <svg> node plus the geometry
 // it needs and triggers a browser download. Kept out of the React tree so the heavy
@@ -104,9 +105,12 @@ export const exportSignPDF = async (source, { insertSize, paperSize, signType })
   if (!source) return
 
   try {
-    const paper = PAPER_DIMENSIONS[paperSize]
+    // Orient the sheet to the insert so a landscape insert prints on the rotated page —
+    // otherwise wide inserts (e.g. the 8.5"×5.5" standard holder) overrun a portrait sheet
+    // and lose their side bleed and crop marks off the page edge.
+    const { orientation } = getPrintLayout({ insertSize, paperSize })
 
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: paperSize })
+    const doc = new jsPDF({ orientation, unit: 'pt', format: paperSize })
     const availableFonts = await registerArtworkFonts(doc)
 
     // The artwork carries bleed on every edge; crop marks below pin the trim (cut) line.
@@ -115,8 +119,10 @@ export const exportSignPDF = async (source, { insertSize, paperSize, signType })
     const trimH = insertSize.height * PT_PER_INCH
     const artWidth = trimW + bleedPt * 2
     const artHeight = trimH + bleedPt * 2
-    const pageWidth = paper.width * PT_PER_INCH
-    const pageHeight = paper.height * PT_PER_INCH
+    // Read the page size back from the oriented document so centering math matches the
+    // sheet jsPDF actually produced (its A4/Legal/Tabloid sizes are authoritative).
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
     // Center the TRIM box on the page; bleed extends outward from there. When the insert
     // is as wide as the sheet (e.g. 8.5" insert on Letter) the side bleed falls off the
     // page — expected, since the trim edge is then the paper edge.

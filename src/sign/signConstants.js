@@ -12,8 +12,19 @@ export const SAFE_INCHES = 0.125
 // Fallback insert size when no card holder is selected (inches).
 export const DEFAULT_INSERT_SIZE = { width: 8.5, height: 5.5 }
 
-// Printable sheet sizes offered by the PDF exporter (inches).
+// Crop-mark arm length (inches). Marks sit just outside the bleed, in the page margin, so
+// the sheet must be at least insert + 2*bleed + 2*mark in each direction to print them.
+export const MARK_INCHES = 0.25
+
+// Printable sheet sizes offered by the PDF exporter (inches), stored in portrait. The
+// exporter orients the page to the insert, so a landscape insert uses the rotated sheet.
+// Ordered smallest-to-largest so the fit helper can recommend the smallest sheet that fits.
 export const PAPER_DIMENSIONS = {
-  letter: { width: 8.5, height: 11 },
-  a4: { width: 8.27, height: 11.69 }
+  letter: { width: 8.5, height: 11, label: 'Letter (8.5" × 11")' },
+  a4: { width: 8.27, height: 11.69, label: 'A4 (210mm × 297mm)' },
+  legal: { width: 8.5, height: 14, label: 'Legal (8.5" × 14")' },
+  tabloid: { width: 11, height: 17, label: 'Tabloid (11" × 17")' }
 }
+
+// Recommendation order — smallest usable sheet first.
+export const PAPER_ORDER = ['letter', 'a4', 'legal', 'tabloid']

@@ -1,4 +1,12 @@
-import { BLEED_INCHES, SAFE_INCHES, DEFAULT_INSERT_SIZE } from './signConstants'
+import {
+  BLEED_INCHES,
+  SAFE_INCHES,
+  DEFAULT_INSERT_SIZE,
+  MARK_INCHES,
+  PT_PER_INCH,
+  PAPER_DIMENSIONS,
+  PAPER_ORDER
+} from './signConstants'
 
 // Trims trailing zeros so 8.50 -> "8.5" and 11.00 -> "11" in the measurement readout.
 const formatInches = (value) => {
@@ -64,5 +72,49 @@ export const resolveCardHolderGeometry = (selectedCardHolder) => {
     }] : [])
   ]
 
-  return { insertSize, viewableSize, previewFrameStyle, measurementSummary }
+  return { insertSize, viewableSize, viewableOffset, previewFrameStyle, measurementSummary }
+}
+
+// Oriented sheet dimensions (inches) for an insert: a landscape insert (wider than tall)
+// prints on the rotated sheet so the long edge runs horizontally.
+const orientedPaper = (paper, orientation) =>
+  orientation === 'landscape'
+    ? { width: paper.height, height: paper.width }
+    : { width: paper.width, height: paper.height }
+
+// True when insert + bleed + crop-mark arms all fit on the (oriented) sheet at 1:1.
+const marksFitOn = (paper, insertSize, orientation) => {
+  const page = orientedPaper(paper, orientation)
+  const needW = insertSize.width + (BLEED_INCHES + MARK_INCHES) * 2
+  const needH = insertSize.height + (BLEED_INCHES + MARK_INCHES) * 2
+  return needW <= page.width && needH <= page.height
+}
+
+// Resolves how an insert lays out on the chosen sheet: orientation (matched to the insert),
+// page size in points (for the exporter), whether bleed / crop marks fit at the required 1:1
+// scale, and — when they don't — the smallest stock sheet that would. Pure: no DOM, so both
+// the export and the warning UI share one source of truth.
+export const getPrintLayout = ({ insertSize, paperSize }) => {
+  const orientation = insertSize.width >= insertSize.height ? 'landscape' : 'portrait'
+  const paper = PAPER_DIMENSIONS[paperSize] || PAPER_DIMENSIONS.letter
+  const page = orientedPaper(paper, orientation)
+
+  const artW = insertSize.width + BLEED_INCHES * 2
+  const artH = insertSize.height + BLEED_INCHES * 2
+  const fitsBleed = artW <= page.width && artH <= page.height
+  const fitsMarks = marksFitOn(paper, insertSize, orientation)
+
+  const recommendedPaper = fitsMarks
+    ? null
+    : (PAPER_ORDER.find((key) => marksFitOn(PAPER_DIMENSIONS[key], insertSize, orientation)) || null)
+
+  return {
+    orientation,
+    pageWidth: page.width * PT_PER_INCH,
+    pageHeight: page.height * PT_PER_INCH,
+    fitsBleed,
+    fitsMarks,
+    recommendedPaper,
+    recommendedPaperLabel: recommendedPaper ? PAPER_DIMENSIONS[recommendedPaper].label : null
+  }
 }

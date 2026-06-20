@@ -118,35 +118,50 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   const H = insert.height * PT_PER_INCH
 
   // Bleed (in points) extends the background fills past the trim line so cutting leaves
-  // no white slivers. The trim-sized layout below is unchanged — everything is translated
-  // inward by BLEED and the canvas (viewBox) grows by BLEED on every edge.
+  // no white slivers. The canvas (viewBox) grows by BLEED on every edge.
   const bleedInches = Number.isFinite(content.bleed) ? content.bleed : 0
   const BLEED = bleedInches * PT_PER_INCH
   const CW = W + BLEED * 2
   const CH = H + BLEED * 2
 
+  // Viewable window: the acrylic frame covers these insets (inches) of the trimmed insert,
+  // so all live content is laid out INSIDE this window and never hides behind the frame.
+  // With no holder selected the offsets are 0 and the window equals the full trim (unchanged).
+  const view = content.viewable || {}
+  const VL = Math.max(view.left || 0, 0) * PT_PER_INCH
+  const VR = Math.max(view.right || 0, 0) * PT_PER_INCH
+  const VT = Math.max(view.top || 0, 0) * PT_PER_INCH
+  const VB = Math.max(view.bottom || 0, 0) * PT_PER_INCH
+  const VW = W - VL - VR   // viewable width  (the design space below works in these dims)
+  const VH = H - VT - VB   // viewable height
+
   const headerColor = readBrandVar('--brand-header', '#035642')
   const nameColor = readBrandVar('--sign-name-color', '#1f2937')
   const secondaryColor = readBrandVar('--sign-secondary-color', '#475569')
 
-  const PAD_X = W * 0.085
-  const HEADER_H = H * 0.235
+  // Everything below is in DESIGN space — coordinates relative to the viewable window's
+  // top-left corner. The content <g> is translated out by BLEED + the viewable inset.
+  const PAD_X = VW * 0.085
+  const HEADER_H = VH * 0.235
 
-  const logoWidth = W * 0.3
+  const logoWidth = VW * 0.3
   const logoScale = logoWidth / 178
   const logoHeight = 80 * logoScale
-  const logoY = (HEADER_H - logoHeight) / 2
+  // Centre the logo in the header band, but never above the viewable top — for a wide-but-short
+  // window (e.g. Residence Compact) the band is shorter than the logo, which would otherwise
+  // push it up under the frame.
+  const logoY = Math.max((HEADER_H - logoHeight) / 2, 0)
 
   const hasAlumni = Boolean(content.showAlumni)
-  const badgeHeight = (H - HEADER_H) * 0.46
+  const badgeHeight = (VH - HEADER_H) * 0.46
   const badgeScale = badgeHeight / 67.82
   const badgeWidth = 59.27 * badgeScale
-  const badgeX = W - PAD_X - badgeWidth
-  const badgeY = HEADER_H + ((H - HEADER_H) - badgeHeight) / 2
+  const badgeX = VW - PAD_X - badgeWidth
+  const badgeY = HEADER_H + ((VH - HEADER_H) - badgeHeight) / 2
 
-  const textMaxWidth = (W - 2 * PAD_X) - (hasAlumni ? badgeWidth + W * 0.025 : 0)
+  const textMaxWidth = (VW - 2 * PAD_X) - (hasAlumni ? badgeWidth + VW * 0.025 : 0)
 
-  const blocks = buildBlocks(content, { H, nameColor, secondaryColor })
+  const blocks = buildBlocks(content, { H: VH, nameColor, secondaryColor })
 
   const items = []
   blocks.forEach((block) => {
@@ -167,7 +182,7 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   })
 
   const totalHeight = items.reduce((sum, item) => sum + item.marginTop + item.lineHeight, 0)
-  let cursorY = HEADER_H + Math.max(((H - HEADER_H) - totalHeight) / 2, H * 0.02)
+  let cursorY = HEADER_H + Math.max(((VH - HEADER_H) - totalHeight) / 2, VH * 0.02)
 
   const texts = items.map((item) => {
     cursorY += item.marginTop
@@ -175,6 +190,13 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     cursorY += item.lineHeight
     return { ...item, baseline }
   })
+
+  // Canvas-space top-left of the viewable window (bleed + frame inset).
+  const originX = BLEED + VL
+  const originY = BLEED + VT
+  // The green header bleeds off the top and side canvas edges and runs down to the bottom of
+  // the header band inside the viewable window, so the frame-covered margin reads as green.
+  const headerBottom = originY + HEADER_H
 
   return (
     <svg
@@ -190,12 +212,12 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
       data-trim-height={H}
       style={{ display: 'block' }}
     >
-      {/* Background fills span the full bleed canvas; the green header also bleeds off
-          the top and side edges (height = top bleed + the trim-height header). */}
+      {/* White spans the full bleed canvas; the green header bleeds off the top and side
+          edges and stops at the header band inside the viewable window. */}
       <rect x="0" y="0" width={CW} height={CH} fill="#ffffff" />
-      <rect x="0" y="0" width={CW} height={BLEED + HEADER_H} fill={headerColor} />
+      <rect x="0" y="0" width={CW} height={headerBottom} fill={headerColor} />
 
-      <g transform={`translate(${BLEED}, ${BLEED})`}>
+      <g transform={`translate(${originX}, ${originY})`}>
         <UnbcLogoMark
           transform={`translate(${PAD_X}, ${logoY}) scale(${logoScale})`}
           departmentText={content.departmentText}
