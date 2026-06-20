@@ -1,7 +1,17 @@
 import React from 'react'
 import { DepartmentSelector } from '../unbc'
+import { CustomSelect } from './CustomSelect'
 
 const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']
+
+const SIGN_TYPE_OPTIONS = [
+  { value: 'faculty', label: 'Faculty' },
+  { value: 'staff', label: 'Staff' },
+  { value: 'student', label: 'Student' },
+  { value: 'lab', label: 'Lab' },
+  { value: 'general-room', label: 'General Room' },
+  { value: 'custodian-closet', label: 'Custodian Closet' }
+]
 
 export const SignForm = ({ signData, onUpdate, departments }) => {
   const handleInputChange = (e) => {
@@ -28,19 +38,13 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
     <form id="signForm">
       <div className="form-group">
         <label htmlFor="signType">Sign Type</label>
-        <select
+        <CustomSelect
           id="signType"
           name="signType"
+          options={SIGN_TYPE_OPTIONS}
           value={signData.signType}
-          onChange={handleInputChange}
-        >
-          <option value="faculty">Faculty</option>
-          <option value="staff">Staff</option>
-          <option value="student">Student</option>
-          <option value="lab">Lab</option>
-          <option value="general-room">General Room</option>
-          <option value="custodian-closet">Custodian Closet</option>
-        </select>
+          onChange={(value) => onUpdate({ signType: value })}
+        />
       </div>
 
       <DepartmentSelector

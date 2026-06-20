@@ -105,6 +105,20 @@
         display: block;
     }
 
+    /* Roomier touch targets for the custom dropdown on phones/tablets. */
+    .custom-select__trigger {
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .custom-select__option {
+        padding: 14px 12px;
+    }
+
+    .custom-select__panel {
+        max-height: 50vh;
+    }
+
     h1 {
         font-size: 1.5rem;
         margin-bottom: 20px;
@@ -150,9 +164,13 @@
         box-sizing: border-box;
     }
 
-    select, input {
+    input, .custom-select__trigger {
         padding: 12px;
         font-size: 0.9rem;
+    }
+
+    .custom-select__trigger {
+        padding-right: 42px;
     }
 
     h1 {

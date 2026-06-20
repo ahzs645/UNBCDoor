@@ -1,9 +1,11 @@
 import React from 'react'
+import { CustomSelect } from './CustomSelect'
 
 export const CardHolderSelector = ({ cardHolders, selectedType, onUpdate }) => {
-  const handleChange = (e) => {
-    onUpdate(e.target.value)
-  }
+  const options = Object.entries(cardHolders).map(([key, holder]) => ({
+    value: key,
+    label: `${key} - ${holder.name}`
+  }))
 
   const formatInches = (value) => {
     if (Number.isInteger(value)) {
@@ -18,19 +20,14 @@ export const CardHolderSelector = ({ cardHolders, selectedType, onUpdate }) => {
   return (
     <div className="form-group">
       <label htmlFor="cardHolderType">Card Holder Type</label>
-      <select
+      <CustomSelect
         id="cardHolderType"
         name="cardHolderType"
+        options={options}
         value={selectedType}
-        onChange={handleChange}
-      >
-        <option value="">Select Card Holder Type</option>
-        {Object.entries(cardHolders).map(([key, holder]) => (
-          <option key={key} value={key}>
-            {key} - {holder.name}
-          </option>
-        ))}
-      </select>
+        placeholder="Select Card Holder Type"
+        onChange={onUpdate}
+      />
 
       {selectedHolder && (
         <div className="card-holder-info">

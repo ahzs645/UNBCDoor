@@ -7,6 +7,7 @@
 @import './styles/base.css';             /* design tokens, reset, app shell, dark-mode shell */
 @import './styles/preview.css';          /* preview frame, print guides, holder window, measurements */
 @import './styles/form.css';             /* headings, form fields, card-holder info, toggle buttons */
+@import './styles/select.css';           /* custom (non-native) dropdown trigger + listbox */
 @import './styles/sign.css';             /* rendered door-sign artwork, designations, export buttons */
 @import './styles/switch.css';           /* email/phone show-on-sign toggle switch */
 @import './styles/responsive.css';       /* 1024 / 768 / 480 breakpoints */
