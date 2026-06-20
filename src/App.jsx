@@ -12,6 +12,7 @@ function App() {
   const [signData, setSignData] = useSignState()
   const { cardHolders } = useCardHolders()
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [activeMobileTab, setActiveMobileTab] = useState('editor')
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -45,7 +46,34 @@ function App() {
 
   return (
     <div className="container">
-      <div className="controls">
+      <div className="mobile-editor-tabs" role="tablist" aria-label="Editor and preview">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeMobileTab === 'editor'}
+          aria-controls="editor-panel"
+          className={`mobile-editor-tab ${activeMobileTab === 'editor' ? 'active' : ''}`}
+          onClick={() => setActiveMobileTab('editor')}
+        >
+          Editor
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeMobileTab === 'preview'}
+          aria-controls="preview-panel"
+          className={`mobile-editor-tab ${activeMobileTab === 'preview' ? 'active' : ''}`}
+          onClick={() => setActiveMobileTab('preview')}
+        >
+          Preview
+        </button>
+      </div>
+
+      <div
+        id="editor-panel"
+        role="tabpanel"
+        className={`controls mobile-tab-panel ${activeMobileTab === 'editor' ? 'active' : ''}`}
+      >
         <div className="controls-header">
           <h1>UNBC Door Sign Generator</h1>
           <button
@@ -76,7 +104,11 @@ function App() {
         />
       </div>
 
-      <div className="card-holder-selector-container">
+      <div
+        id="preview-panel"
+        role="tabpanel"
+        className={`card-holder-selector-container mobile-tab-panel ${activeMobileTab === 'preview' ? 'active' : ''}`}
+      >
         <CardHolderSelector 
           cardHolders={cardHolders}
           selectedType={signData.cardHolderType}
