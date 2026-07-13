@@ -43,8 +43,10 @@ export const resolveSignValues = (signData) => {
     contactName: signData.contactName || '',
     name2: signData.name2 || '',
     position2: signData.position2 || '',
+    tagline2: signData.tagline2 || '',
     email2: signData.email2 || '',
     phone2: signData.phone2 || '',
+    cellPhone2: signData.cellPhone2 || '',
     roomName2: signData.roomName2 || '',
     contactName2: signData.contactName2 || ''
   }

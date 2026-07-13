@@ -5,6 +5,7 @@ import { CardHolderSelector } from './components/CardHolderSelector'
 import { ToggleButtons } from './components/ToggleButtons'
 import { DesignationsContainer } from './components/DesignationsContainer'
 import { ThemeToggle } from './components/ThemeToggle'
+import { SignArchiveControls } from './components/SignArchiveControls'
 import { useCardHolders } from './hooks/useCardHolders'
 import { useSignState } from './hooks/useSignState'
 import { useTheme } from './hooks/useTheme'
@@ -54,6 +55,10 @@ function App() {
           <h1>UNBC Door Sign Generator</h1>
           <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
         </div>
+        <SignArchiveControls
+          signData={signData}
+          onLoadSign={(loadedSign) => setSignData(loadedSign)}
+        />
         <SignForm
           signData={signData}
           onUpdate={updateSignData}

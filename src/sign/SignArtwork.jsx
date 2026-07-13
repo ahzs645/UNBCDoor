@@ -166,8 +166,8 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
       pushRoomGroup({
         roomName: content.roomName2,
         contactName: content.contactName2,
-        email: content.email2,
-        phone: content.phone2
+        email: content.showEmail2 ? content.email2 : '',
+        phone: content.showPhone2 ? content.phone2 : ''
       }, blocks.length ? groupGap : 0)
     }
     return blocks
@@ -186,8 +186,10 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     pushPersonGroup({
       name: content.name2,
       position: content.position2,
-      email: content.email2,
-      phone: content.phone2
+      tagline: content.tagline2,
+      email: content.showEmail2 ? content.email2 : '',
+      phone: content.showPhone2 ? content.phone2 : '',
+      cellPhone: content.showCellPhone2 ? content.cellPhone2 : ''
     }, blocks.length ? groupGap : 0)
   }
 

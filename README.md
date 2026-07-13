@@ -19,6 +19,12 @@ A web-based tool for generating standardized door signs for the University of No
   - Room name display
   - Professional designations
   - Alumni badge option
+  - Optional second occupant or second room/lab, with independent contact visibility
+
+- **Saved Sign Archives**
+  - Import a single sign or a multi-sign JSON archive
+  - Switch between imported signs and continue editing them
+  - Export the current sign as versioned, re-importable JSON
 
 - **Enhanced Form Features**
   - Smart input validation
@@ -62,6 +68,7 @@ A web-based tool for generating standardized door signs for the University of No
    - Toggle visibility of email and phone using checkboxes
    - Phone numbers are automatically formatted as you type
    - Enter room name for lab/general room/custodian closet signs
+   - Turn on the clearly labelled second occupant section when a holder is shared
 
 4. **Customize Display**
    - Toggle alumni badge for faculty/staff
@@ -74,7 +81,14 @@ A web-based tool for generating standardized door signs for the University of No
    - Preview will automatically scale to match
 
 6. **Export**
-   - Use the export button to save the generated sign
+   - Export the artwork as PNG or print-ready PDF
+   - Use **Export current** in Saved signs to save editable JSON
+
+7. **Import an Archive**
+   - Choose **Load production archive** to use the included 89-sign collection immediately
+   - Choose **Import JSON** under Saved signs
+   - For a multi-sign archive, choose any imported entry from the new selector
+   - A transcribed 89-sign production archive is included at `data/door-sign-archive.json`
 
 ## Technical Details
 
@@ -89,11 +103,10 @@ A web-based tool for generating standardized door signs for the University of No
 ## File Structure
 
 - `index.html` - Main application file
-- `css/styles.css` - Styling and form enhancements
-- `js/script.js` - Core functionality and form handling
-- `js/departments.js` - Department data and structure
-- `js/cardHolders.js` - Card holder specifications
-- `js/door-sign.js` - Door sign rendering logic
+- `src/components` - Form, preview, archive, and export controls
+- `src/sign` - Sign defaults, geometry, artwork, archive, and export logic
+- `src/unbc` - Department hierarchy and UNBC artwork assets
+- `data/door-sign-archive.json` - Re-importable production-sign archive
 
 ## Dependencies
 
@@ -111,9 +124,7 @@ A web-based tool for generating standardized door signs for the University of No
 
 - Additional sign templates
 - More customization options
-- Batch processing
 - Direct printing support
-- Save/load functionality
 - User authentication
 - Department management interface
 - Additional form validation rules
@@ -125,4 +136,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.

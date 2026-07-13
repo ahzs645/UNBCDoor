@@ -193,24 +193,33 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
         )}
       </div>
 
-      <div className="form-group">
-        <label className="switch">
+      <fieldset className="occupant-section">
+        <legend>{isRoom ? 'Second room or lab' : 'Second occupant'}</legend>
+        <div className="form-group occupant-section__toggle">
+          <label className="switch">
           <input
             type="checkbox"
             id="showSecondOccupant"
             name="showSecondOccupant"
             checked={signData.showSecondOccupant}
             onChange={handleInputChange}
+            aria-controls="second-occupant-fields"
+            aria-expanded={signData.showSecondOccupant}
           />
           <span className="switch__track" aria-hidden="true" />
           <span className="switch__text">
             {isRoom ? 'Add a second room / lab to this sign' : 'Add a second occupant to this sign'}
           </span>
-        </label>
-      </div>
+          </label>
+          {!signData.showSecondOccupant && (
+            <p className="occupant-section__hint">
+              Turn this on to reveal the second {isRoom ? 'room or lab' : 'person'} fields.
+            </p>
+          )}
+        </div>
 
       {signData.showSecondOccupant && (
-        <>
+        <div id="second-occupant-fields" className="occupant-section__fields">
           {isPerson && (
             <>
               <div className="form-group">
@@ -233,6 +242,18 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
                   name="position2"
                   placeholder="Enter Position"
                   value={signData.position2}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="tagline2">Second Occupant Extra Line (optional)</label>
+                <input
+                  type="text"
+                  id="tagline2"
+                  name="tagline2"
+                  placeholder="e.g. Supporting the Spark Lab"
+                  value={signData.tagline2}
                   onChange={handleInputChange}
                 />
               </div>
@@ -278,6 +299,17 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
                 value={signData.email2}
                 onChange={handleInputChange}
               />
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  id="showEmail2"
+                  name="showEmail2"
+                  checked={signData.showEmail2}
+                  onChange={handleInputChange}
+                />
+                <span className="switch__track" aria-hidden="true" />
+                <span className="switch__text">Show on sign</span>
+              </label>
             </div>
 
             <div className="form-group">
@@ -290,10 +322,47 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
                 value={signData.phone2}
                 onChange={handlePhoneChange}
               />
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  id="showPhone2"
+                  name="showPhone2"
+                  checked={signData.showPhone2}
+                  onChange={handleInputChange}
+                />
+                <span className="switch__track" aria-hidden="true" />
+                <span className="switch__text">Show on sign</span>
+              </label>
             </div>
+
+            {isPerson && (
+              <div className="form-group">
+                <label htmlFor="cellPhone2">Cell (optional)</label>
+                <input
+                  type="tel"
+                  id="cellPhone2"
+                  name="cellPhone2"
+                  placeholder="778-XXX-XXXX"
+                  value={signData.cellPhone2}
+                  onChange={handlePhoneChange}
+                />
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    id="showCellPhone2"
+                    name="showCellPhone2"
+                    checked={signData.showCellPhone2}
+                    onChange={handleInputChange}
+                  />
+                  <span className="switch__track" aria-hidden="true" />
+                  <span className="switch__text">Show on sign</span>
+                </label>
+              </div>
+            )}
           </div>
-        </>
+        </div>
       )}
+      </fieldset>
     </form>
   )
 }
