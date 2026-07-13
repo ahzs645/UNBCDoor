@@ -3,10 +3,12 @@
 :root {
     --brand-green: #035642;
     --brand-green-dark: #024d38;
-    --brand-header: var(--brand-green);
+    /* Sign artwork colors sampled from the production print files: the header green is the
+       rendered PMS build (#2a634d), and body text is neutral charcoal — not blue-tinted. */
+    --brand-header: #2a634d;
     --brand-on-header: #ffffff;
-    --sign-name-color: #1f2937;
-    --sign-secondary-color: #475569;
+    --sign-name-color: #373535;
+    --sign-secondary-color: #454343;
 
     /* Interface chrome tokens — these style the app UI only, never the sign artwork. */
     --ui-surface: #ffffff;
