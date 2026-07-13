@@ -28,6 +28,8 @@ export const getDefaultValues = (signType) => {
 }
 
 // Resolves the text fields shown on the sign, falling back to the per-type placeholders.
+// Optional fields (tagline, contact line, cell, second occupant) have no placeholders —
+// they only appear on the sign when filled in.
 export const resolveSignValues = (signData) => {
   const defaults = getDefaultValues(signData.signType)
   return {
@@ -35,6 +37,15 @@ export const resolveSignValues = (signData) => {
     position: signData.position || defaults.position || '',
     email: signData.email || defaults.email || '',
     phone: signData.phone || defaults.phone || '',
-    roomName: signData.roomName || defaults.roomName || ''
+    roomName: signData.roomName || defaults.roomName || '',
+    tagline: signData.tagline || '',
+    cellPhone: signData.cellPhone || '',
+    contactName: signData.contactName || '',
+    name2: signData.name2 || '',
+    position2: signData.position2 || '',
+    email2: signData.email2 || '',
+    phone2: signData.phone2 || '',
+    roomName2: signData.roomName2 || '',
+    contactName2: signData.contactName2 || ''
   }
 }

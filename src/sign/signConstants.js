@@ -9,8 +9,9 @@ export const PT_PER_INCH = 72
 export const BLEED_INCHES = 0.125
 export const SAFE_INCHES = 0.125
 
-// Fallback insert size when no card holder is selected (inches).
-export const DEFAULT_INSERT_SIZE = { width: 8.5, height: 5.5 }
+// Fallback insert size when no card holder is selected (inches). Matches the Building 10
+// production artboards (177mm × 106mm), the most common size in the print archive.
+export const DEFAULT_INSERT_SIZE = { width: 6.97, height: 4.17 }
 
 // Crop-mark arm length (inches). Marks sit just outside the bleed, in the page margin, so
 // the sheet must be at least insert + 2*bleed + 2*mark in each direction to print them.

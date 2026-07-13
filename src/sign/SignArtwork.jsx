@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react'
 import { UnbcLogoMark, AlumniCrest } from '../unbc'
+import { splitDepartmentText } from '../unbc/logo/logoText'
 import { PT_PER_INCH, DEFAULT_INSERT_SIZE } from './signConstants'
 
 export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
@@ -51,63 +52,144 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
   return lines
 }
 
+// Block sizes are fractions of the viewable height, matched against the production
+// Illustrator files: names ≈ 10% H, positions ≈ 5% H, contact lines ≈ 4.6% H.
 const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   const blocks = []
+  const isRoom = content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet'
+  const headlineWeight = content.headlineWeight === 'black' ? 900 : 700
 
-  if (content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet') {
+  const pushContactLines = (lines, gapBefore) => {
+    lines.filter(Boolean).forEach((line, index) => {
+      blocks.push({
+        text: line,
+        size: H * 0.046,
+        weight: 400,
+        style: 'italic',
+        fill: secondaryColor,
+        lineHeightRatio: 1.32,
+        gapBefore: index === 0 ? gapBefore : 0
+      })
+    })
+  }
+
+  // Room signs: big room name, optionally followed by a contact line ("Contact: …" or a
+  // PI's name, rendered as typed) and Email / Phone lines — the dominant lab pattern in
+  // the production archive. The headline drops a step when a contact block shares the card.
+  const pushRoomGroup = (group, gapBefore) => {
+    if (!group.roomName) return
     const italic = content.roomNameStyle === 'italic'
+    const hasDetails = Boolean(group.contactName || group.email || group.phone)
     blocks.push({
-      text: content.roomName,
-      size: italic ? H * 0.1 : H * 0.135,
-      weight: italic ? 400 : (content.headlineWeight === 'black' ? 900 : 700),
+      text: group.roomName,
+      size: italic ? H * 0.1 : (hasDetails ? H * 0.105 : H * 0.135),
+      weight: italic ? 400 : headlineWeight,
       style: italic ? 'italic' : 'normal',
       fill: nameColor,
       lineHeightRatio: 1.05,
-      gapBefore: 0,
+      gapBefore,
       wrap: true
     })
+    if (group.contactName) {
+      blocks.push({
+        text: group.contactName,
+        size: H * 0.05,
+        weight: 500,
+        style: 'normal',
+        fill: secondaryColor,
+        lineHeightRatio: 1.3,
+        gapBefore: H * 0.045,
+        wrap: true
+      })
+    }
+    pushContactLines([
+      group.email ? `Email: ${group.email}` : '',
+      group.phone ? `Phone: ${group.phone}` : ''
+    ], H * 0.035)
+  }
+
+  // Person (faculty / staff / student) group: name + credentials, wrapped position,
+  // optional italic tagline, then Email / Phone / Cell lines.
+  const pushPersonGroup = (group, gapBefore) => {
+    if (!group.name) return
+    blocks.push({
+      text: group.name + (group.credentials ? `, (${group.credentials})` : ''),
+      size: H * 0.1,
+      weight: headlineWeight,
+      style: 'normal',
+      fill: nameColor,
+      lineHeightRatio: 1.12,
+      gapBefore,
+      wrap: true
+    })
+    if (group.position) {
+      blocks.push({
+        text: group.position,
+        size: H * 0.05,
+        weight: 500,
+        style: 'normal',
+        fill: secondaryColor,
+        lineHeightRatio: 1.3,
+        gapBefore: H * 0.03,
+        wrap: true
+      })
+    }
+    if (group.tagline) {
+      blocks.push({
+        text: group.tagline,
+        size: H * 0.046,
+        weight: 400,
+        style: 'italic',
+        fill: secondaryColor,
+        lineHeightRatio: 1.32,
+        gapBefore: H * 0.03,
+        wrap: true
+      })
+    }
+    pushContactLines([
+      group.email ? `Email: ${group.email}` : '',
+      group.phone ? `Phone: ${group.phone}` : '',
+      group.cellPhone ? `Cell: ${group.cellPhone}` : ''
+    ], H * 0.035)
+  }
+
+  const groupGap = H * 0.07
+
+  if (isRoom) {
+    pushRoomGroup({
+      roomName: content.roomName,
+      contactName: content.contactName,
+      email: content.showEmail ? content.email : '',
+      phone: content.showPhone ? content.phone : ''
+    }, 0)
+    if (content.showSecondOccupant) {
+      pushRoomGroup({
+        roomName: content.roomName2,
+        contactName: content.contactName2,
+        email: content.email2,
+        phone: content.phone2
+      }, blocks.length ? groupGap : 0)
+    }
     return blocks
   }
 
-  // Person (faculty / staff) and student share the name + contact layout.
-  const nameText = content.name + (content.credentials ? `, (${content.credentials})` : '')
-  blocks.push({
-    text: nameText,
-    size: H * 0.085,
-    weight: content.headlineWeight === 'black' ? 900 : 700,
-    style: 'normal',
-    fill: nameColor,
-    lineHeightRatio: 1.12,
-    gapBefore: 0,
-    wrap: true
-  })
-
-  if (content.position) {
-    blocks.push({
-      text: content.position,
-      size: H * 0.043,
-      weight: 500,
-      style: 'normal',
-      fill: secondaryColor,
-      lineHeightRatio: 1.3,
-      gapBefore: H * 0.03
-    })
+  pushPersonGroup({
+    name: content.name,
+    credentials: content.credentials,
+    position: content.position,
+    tagline: content.tagline,
+    email: content.showEmail ? content.email : '',
+    phone: content.showPhone ? content.phone : '',
+    cellPhone: content.showCellPhone ? content.cellPhone : ''
+  }, 0)
+  if (content.showSecondOccupant) {
+    pushPersonGroup({
+      name: content.name2,
+      position: content.position2,
+      email: content.email2,
+      phone: content.phone2
+    }, blocks.length ? groupGap : 0)
   }
-
-  const contactLines = []
-  if (content.email && content.showEmail) contactLines.push(`Email: ${content.email}`)
-  if (content.phone && content.showPhone) contactLines.push(`Phone: ${content.phone}`)
-  contactLines.forEach((line, index) => {
-    blocks.push({
-      text: line,
-      size: H * 0.036,
-      weight: 400,
-      style: 'italic',
-      fill: secondaryColor,
-      lineHeightRatio: 1.32,
-      gapBefore: index === 0 ? H * 0.035 : 0
-    })
-  })
 
   return blocks
 }
@@ -135,16 +217,19 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   const VW = W - VL - VR   // viewable width  (the design space below works in these dims)
   const VH = H - VT - VB   // viewable height
 
-  const headerColor = readBrandVar('--brand-header', '#035642')
-  const nameColor = readBrandVar('--sign-name-color', '#1f2937')
-  const secondaryColor = readBrandVar('--sign-secondary-color', '#475569')
+  const headerColor = readBrandVar('--brand-header', '#2a634d')
+  const nameColor = readBrandVar('--sign-name-color', '#373535')
+  const secondaryColor = readBrandVar('--sign-secondary-color', '#454343')
 
   // Everything below is in DESIGN space — coordinates relative to the viewable window's
   // top-left corner. The content <g> is translated out by BLEED + the viewable inset.
-  const PAD_X = VW * 0.085
-  const HEADER_H = VH * 0.235
+  // Production files measure ~12% left margin, a ~20.5% header band that grows ~3.3% per
+  // department line, and a logo lockup spanning ~35.5% of the card width.
+  const PAD_X = VW * 0.12
+  const departmentLineCount = splitDepartmentText(content.departmentText || '').length
+  const HEADER_H = VH * (0.205 + 0.033 * departmentLineCount)
 
-  const logoWidth = VW * 0.3
+  const logoWidth = VW * 0.355
   const logoScale = logoWidth / 178
   const logoHeight = 80 * logoScale
   // Centre the logo in the header band, but never above the viewable top — for a wide-but-short
@@ -181,7 +266,20 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     })
   })
 
-  const totalHeight = items.reduce((sum, item) => sum + item.marginTop + item.lineHeight, 0)
+  // Auto-shrink: long content (wrapped room names, two occupants) scales down uniformly
+  // instead of running off the bottom of the card.
+  const rawHeight = items.reduce((sum, item) => sum + item.marginTop + item.lineHeight, 0)
+  const availableHeight = (VH - HEADER_H) * 0.96
+  const shrink = rawHeight > availableHeight ? availableHeight / rawHeight : 1
+  if (shrink < 1) {
+    items.forEach((item) => {
+      item.size *= shrink
+      item.lineHeight *= shrink
+      item.marginTop *= shrink
+    })
+  }
+
+  const totalHeight = rawHeight * shrink
   let cursorY = HEADER_H + Math.max(((VH - HEADER_H) - totalHeight) / 2, VH * 0.02)
 
   const texts = items.map((item) => {
