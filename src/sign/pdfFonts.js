@@ -1,16 +1,26 @@
+import romanFontUrl from '../../Fonts/HelveticaNeueRoman.otf'
 import italicFontUrl from '../../Fonts/HelveticaNeueItalic.ttf'
+import boldFontUrl from '../../Fonts/HelveticaNeueBold.ttf'
 import blackFontUrl from '../../Fonts/HelveticaNeueBlack.ttf'
 
-// svg2pdf can't reliably drive jsPDF's standard-Helvetica italic, and standard Helvetica has
-// no Black weight at all — so we embed the real brand faces and reference them by family name,
-// which sidesteps svg2pdf's style logic and gives true brand fidelity (and selectable text).
-// Upright regular/bold stay on built-in Helvetica to keep the PDF light.
+// svg2pdf can't reliably select all Helvetica Neue faces through jsPDF's standard Helvetica.
+// Embed the true italic, bold, and black brand faces and address each by its own family name,
+// which keeps preview, PNG, and PDF typography consistent and selectable.
 export const ARTWORK_ITALIC_FAMILY = 'hnitalic'
+export const ARTWORK_BOLD_FAMILY = 'hnbold'
 export const ARTWORK_BLACK_FAMILY = 'hnblack'
 
 const EMBEDDED_FONTS = [
   { url: italicFontUrl, vfs: 'HelveticaNeueItalic.ttf', family: ARTWORK_ITALIC_FAMILY },
+  { url: boldFontUrl, vfs: 'HelveticaNeueBold.ttf', family: ARTWORK_BOLD_FAMILY },
   { url: blackFontUrl, vfs: 'HelveticaNeueBlack.ttf', family: ARTWORK_BLACK_FAMILY }
+]
+
+const SVG_FONTS = [
+  { url: romanFontUrl, format: 'opentype', weight: 400, style: 'normal' },
+  { url: italicFontUrl, format: 'truetype', weight: 400, style: 'italic' },
+  { url: boldFontUrl, format: 'truetype', weight: 700, style: 'normal' },
+  { url: blackFontUrl, format: 'truetype', weight: 900, style: 'normal' }
 ]
 
 const base64Cache = new Map()
@@ -47,4 +57,14 @@ export const registerArtworkFonts = async (doc) => {
     }
   }
   return available
+}
+
+// A standalone SVG loaded through an <img> cannot see the page's @font-face rules. Embed the
+// same files directly in PNG exports so browser preview and raster output use identical faces.
+export const getEmbeddedArtworkFontCss = async () => {
+  const faces = await Promise.all(SVG_FONTS.map(async (font) => {
+    const base64 = await loadBase64(font.url)
+    return `@font-face{font-family:'HelveticaNeueUNBC';src:url(data:font/${font.format};base64,${base64}) format('${font.format}');font-weight:${font.weight};font-style:${font.style};}`
+  }))
+  return faces.join('\n')
 }

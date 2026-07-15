@@ -26,11 +26,9 @@ const buildFitWarning = (layout) => {
     : "There's no room for crop marks on this sheet; cut to the insert size by hand."
 }
 
-export const SignPreview = ({ signData, cardHolders }) => {
+export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
   const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
-  const [headlineWeight, setHeadlineWeight] = useState('bold')
-  const [roomNameStyle, setRoomNameStyle] = useState('standard')
   const [showGuides, setShowGuides] = useState(true)
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
@@ -38,6 +36,7 @@ export const SignPreview = ({ signData, cardHolders }) => {
 
   const values = resolveSignValues(signData)
   const shouldShowAlumni = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni
+  const shouldShowAlumni2 = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni2
   const isRoomType = ROOM_TYPES.includes(signData.signType)
 
   const doorSignClass = [
@@ -57,14 +56,18 @@ export const SignPreview = ({ signData, cardHolders }) => {
     position: values.position,
     tagline: values.tagline,
     email: values.email,
+    emailLabel: signData.emailLabel,
     phone: values.phone,
+    phoneLabel: signData.phoneLabel,
     cellPhone: values.cellPhone,
+    cellPhoneLabel: signData.cellPhoneLabel,
     showEmail: signData.showEmail,
     showPhone: signData.showPhone,
     showCellPhone: signData.showCellPhone,
     roomName: values.roomName,
     contactName: values.contactName,
     showSecondOccupant: signData.showSecondOccupant,
+    secondaryEntryType: signData.secondaryEntryType,
     name2: values.name2,
     position2: values.position2,
     tagline2: values.tagline2,
@@ -77,8 +80,21 @@ export const SignPreview = ({ signData, cardHolders }) => {
     roomName2: values.roomName2,
     contactName2: values.contactName2,
     showAlumni: shouldShowAlumni,
-    headlineWeight,
-    roomNameStyle,
+    showAlumni2: shouldShowAlumni2,
+    headlineWeight: signData.headlineWeight,
+    roomNameStyle: signData.roomNameStyle,
+    positionLayout: signData.positionLayout,
+    positionSize: signData.positionSize,
+    designationLayout: signData.designationLayout,
+    twoPersonSpacing: signData.twoPersonSpacing,
+    contentSize: signData.contentSize,
+    contentSpacing: signData.contentSpacing,
+    contentWidth: signData.contentWidth,
+    textAlignment: signData.textAlignment,
+    contactLayout: signData.contactLayout,
+    contactSize: signData.contactSize,
+    roomContactGrouping: signData.roomContactGrouping,
+    organizationLogo: signData.organizationLogo,
     insert: insertSize,
     viewable: viewableOffset,
     bleed: BLEED_INCHES
@@ -153,10 +169,36 @@ export const SignPreview = ({ signData, cardHolders }) => {
       </div>
 
       <SignStyleControls
-        headlineWeight={headlineWeight}
-        onHeadlineWeightChange={setHeadlineWeight}
-        roomNameStyle={roomNameStyle}
-        onRoomNameStyleChange={setRoomNameStyle}
+        headlineWeight={signData.headlineWeight}
+        onHeadlineWeightChange={(headlineWeight) => onUpdate({ headlineWeight })}
+        roomNameStyle={signData.roomNameStyle}
+        onRoomNameStyleChange={(roomNameStyle) => onUpdate({ roomNameStyle })}
+        positionLayout={signData.positionLayout}
+        onPositionLayoutChange={(positionLayout) => onUpdate({ positionLayout })}
+        twoPersonSpacing={signData.twoPersonSpacing}
+        onTwoPersonSpacingChange={(twoPersonSpacing) => onUpdate({ twoPersonSpacing })}
+        contentSize={signData.contentSize}
+        onContentSizeChange={(contentSize) => onUpdate({ contentSize })}
+        contentSpacing={signData.contentSpacing}
+        onContentSpacingChange={(contentSpacing) => onUpdate({ contentSpacing })}
+        contentWidth={signData.contentWidth}
+        onContentWidthChange={(contentWidth) => onUpdate({ contentWidth })}
+        textAlignment={signData.textAlignment}
+        onTextAlignmentChange={(textAlignment) => onUpdate({ textAlignment })}
+        contactLayout={signData.contactLayout}
+        onContactLayoutChange={(contactLayout) => onUpdate({ contactLayout })}
+        contactSize={signData.contactSize}
+        onContactSizeChange={(contactSize) => onUpdate({ contactSize })}
+        roomContactGrouping={signData.roomContactGrouping}
+        onRoomContactGroupingChange={(roomContactGrouping) => onUpdate({ roomContactGrouping })}
+        positionSize={signData.positionSize}
+        onPositionSizeChange={(positionSize) => onUpdate({ positionSize })}
+        designationLayout={signData.designationLayout}
+        onDesignationLayoutChange={(designationLayout) => onUpdate({ designationLayout })}
+        organizationLogo={signData.organizationLogo}
+        onOrganizationLogoChange={(organizationLogo) => onUpdate({ organizationLogo })}
+        hasSecondOccupant={signData.showSecondOccupant}
+        hasDesignations={signData.showDesignations && signData.designations?.length > 0}
         isRoomType={isRoomType}
       />
 

@@ -23,11 +23,53 @@ export const normalizeSignData = (value = {}) => {
     }
   })
 
-  normalized.designations = Array.isArray(normalized.designations)
-    ? normalized.designations.filter(item => typeof item === 'string')
+  normalized.designations = Array.isArray(value.designations)
+    ? value.designations.filter(item => typeof item === 'string')
     : []
 
   if (!SIGN_TYPES.has(normalized.signType)) normalized.signType = INITIAL_SIGN_DATA.signType
+  if (!['regular', 'bold', 'black'].includes(normalized.headlineWeight)) {
+    normalized.headlineWeight = INITIAL_SIGN_DATA.headlineWeight
+  }
+  if (!['standard', 'italic'].includes(normalized.roomNameStyle)) {
+    normalized.roomNameStyle = INITIAL_SIGN_DATA.roomNameStyle
+  }
+  if (!['stacked', 'inline'].includes(normalized.positionLayout)) {
+    normalized.positionLayout = INITIAL_SIGN_DATA.positionLayout
+  }
+  if (!['compact', 'relaxed'].includes(normalized.twoPersonSpacing)) {
+    normalized.twoPersonSpacing = INITIAL_SIGN_DATA.twoPersonSpacing
+  }
+  if (!['standard', 'large', 'largest'].includes(normalized.contentSize)) {
+    normalized.contentSize = INITIAL_SIGN_DATA.contentSize
+  }
+  if (!['standard', 'compact'].includes(normalized.contentSpacing)) {
+    normalized.contentSpacing = INITIAL_SIGN_DATA.contentSpacing
+  }
+  if (!['standard', 'wide'].includes(normalized.contentWidth)) {
+    normalized.contentWidth = INITIAL_SIGN_DATA.contentWidth
+  }
+  if (!['left', 'center'].includes(normalized.textAlignment)) {
+    normalized.textAlignment = INITIAL_SIGN_DATA.textAlignment
+  }
+  if (!['stacked', 'inline'].includes(normalized.contactLayout)) {
+    normalized.contactLayout = INITIAL_SIGN_DATA.contactLayout
+  }
+  if (!['standard', 'large'].includes(normalized.contactSize)) {
+    normalized.contactSize = INITIAL_SIGN_DATA.contactSize
+  }
+  if (!['by-person', 'by-field'].includes(normalized.roomContactGrouping)) {
+    normalized.roomContactGrouping = INITIAL_SIGN_DATA.roomContactGrouping
+  }
+  if (!['standard', 'large'].includes(normalized.positionSize)) {
+    normalized.positionSize = INITIAL_SIGN_DATA.positionSize
+  }
+  if (!['inline', 'below'].includes(normalized.designationLayout)) {
+    normalized.designationLayout = INITIAL_SIGN_DATA.designationLayout
+  }
+  if (!['none', 'ctaan'].includes(normalized.organizationLogo)) {
+    normalized.organizationLogo = INITIAL_SIGN_DATA.organizationLogo
+  }
 
   return normalized
 }

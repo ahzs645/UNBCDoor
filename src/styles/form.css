@@ -23,7 +23,8 @@ label {
     transition: color 0.2s ease;
 }
 
-input {
+input,
+textarea {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid var(--ui-border);
@@ -35,19 +36,28 @@ input {
     font-family: 'Inter', sans-serif;
 }
 
+textarea {
+    min-height: 72px;
+    resize: vertical;
+    line-height: 1.4;
+}
+
 /* Hover affordance for the text-like fields (not radios/checkboxes). Dropdowns use the
    custom <CustomSelect> control — see styles/select.css. */
-input:not([type="radio"]):not([type="checkbox"]):hover {
+input:not([type="radio"]):not([type="checkbox"]):hover,
+textarea:hover {
     border-color: var(--ui-border-strong);
 }
 
-input:focus {
+input:focus,
+textarea:focus {
     outline: none;
     border-color: var(--brand-green);
     box-shadow: var(--ui-focus-ring);
 }
 
-input::placeholder {
+input::placeholder,
+textarea::placeholder {
     color: #9ca3af;
     opacity: 1;
 }
@@ -56,6 +66,21 @@ input::placeholder {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
+}
+
+.contact-label-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: -6px 0 20px;
+    padding: 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+.contact-label-group .form-group {
+    margin: 0;
 }
 
 .contact-info-group .form-group {

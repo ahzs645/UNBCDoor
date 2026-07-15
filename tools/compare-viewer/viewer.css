@@ -1,0 +1,74 @@
+:root {
+  --brand-header: #2a634d;
+  --sign-name-color: #373535;
+  --sign-secondary-color: #454343;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #17231f;
+  background: #eaf0ed;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, select { font: inherit; }
+
+.review-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: auto minmax(320px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: rgba(255, 255, 255, .96);
+  border-bottom: 1px solid #d4dfda;
+  backdrop-filter: blur(12px);
+}
+
+.review-header__title { display: flex; flex-direction: column; color: #155d47; }
+.review-header__title span { color: #68766f; font-size: .85rem; }
+select, button {
+  min-height: 42px;
+  padding: 8px 13px;
+  border: 1px solid #adbbb6;
+  border-radius: 9px;
+  color: #173d31;
+  background: white;
+}
+button { cursor: pointer; font-weight: 700; }
+button:hover, button.active { border-color: #176b51; background: #e4f3ed; }
+.review-navigation { display: flex; gap: 8px; }
+
+main { width: min(1700px, calc(100% - 36px)); margin: 22px auto 50px; }
+.review-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-bottom: 16px; }
+.review-toolbar > div:first-child { flex: 1; min-width: 320px; }
+h1 { margin: 0 0 4px; color: #173d31; font-size: 1.45rem; }
+.review-toolbar p { margin: 0; color: #67756f; }
+.segmented { display: flex; align-items: center; gap: 7px; }
+.segmented span { color: #5a6963; font-size: .85rem; font-weight: 700; }
+
+.comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.comparison-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #d4dfda;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 8px 28px rgba(18, 55, 43, .08);
+}
+.comparison-card h2 { margin: 0 0 10px; color: #155d47; font-size: 1rem; }
+.sign-stage { position: relative; width: 100%; overflow: hidden; border: 1px solid #d9e0dd; background: white; }
+.sign-stage > img { display: block; width: 100%; height: 100%; object-fit: fill; }
+.candidate-stage { display: grid; place-items: center; }
+.candidate-stage > svg { width: 100%; height: 100%; }
+.overlay-card { max-width: 1200px; margin: 0 auto; }
+.overlay-stage > img { position: absolute; inset: 0; opacity: .5; }
+.overlay-candidate { position: absolute; inset: 0; opacity: .5; }
+.overlay-candidate svg { width: 100%; height: 100%; }
+
+footer { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; color: #66736e; font-size: .84rem; overflow-wrap: anywhere; }
+
+@media (max-width: 900px) {
+  .review-header { position: static; grid-template-columns: 1fr; }
+  .comparison-grid { grid-template-columns: 1fr; }
+}

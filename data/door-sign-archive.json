@@ -10,19 +10,19 @@
       "id": "ann-duong",
       "label": "Ann Duong — Sustainability Manager",
       "source": "Ann/Door Sign Final.ai",
-      "signData": { "signType": "staff", "mainDepartment": "Sustainability", "name": "Ann Duong", "position": "Sustainability Manager", "email": "ann.duong@unbc.ca", "phone": "250-960-6707", "cellPhone": "778-349-5145", "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "staff", "name": "Ann Duong", "position": "Sustainability Manager", "email": "ann.duong@unbc.ca", "emailLabel": "", "phone": "250-960-6707", "phoneLabel": "Phone Number", "cellPhone": "778-349-5145", "cellPhoneLabel": "Cell Number", "showAlumni": true, "headlineWeight": "bold", "contentSize": "large", "contentSpacing": "compact", "contactSize": "large", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "10-3540-near-infrared-lab",
       "label": "10-3540 — Near-Infrared Spectroscopy Research Laboratory",
       "source": "Building 10/10-3540/Main.ai",
-      "signData": { "signType": "lab", "mainDepartment": "School of Health Sciences", "roomName": "Northern BC Near-Infrared Spectroscopy Research Laboratory", "contactName": "Contact: Luke Harris", "email": "luke.harris@unbc.ca", "phone": "250-960-5109", "cardHolderType": "Building 10" }
+      "signData": { "signType": "lab", "mainDepartment": "School of Health Sciences", "roomName": "Northern BC Near-Infrared\nSpectroscopy Research\nLaboratory", "contactName": "Contact: Luke Harris", "email": "luke.harris@unbc.ca", "phone": "250-960-5109", "contentSpacing": "compact", "contentWidth": "wide", "cardHolderType": "Building 10" }
     },
     {
       "id": "10-3566-co-lab",
       "label": "10-3566 — The Co-Lab",
       "source": "Building 10/10-3566/Main.ai",
-      "signData": { "signType": "lab", "mainDepartment": "School of Nursing", "roomName": "The Co-Lab", "contactName": "Contact: Davina Banner Lukaris", "email": "davina.banner-lukaris@unbc.ca", "phone": "250-960-5259", "showSecondOccupant": true, "roomName2": "Research Manager: Shayna Dolan", "email2": "shayna.dolan@unbc.ca", "showPhone2": false, "cardHolderType": "Building 10" }
+      "signData": { "signType": "lab", "mainDepartment": "School of Nursing", "roomName": "The Co-Lab", "contactName": "Contact: Davina Banner Lukaris", "email": "davina.banner-lukaris@unbc.ca", "phone": "250-960-5259", "showSecondOccupant": true, "secondaryEntryType": "contact", "contactName2": "Research Manager: Shayna Dolan", "email2": "shayna.dolan@unbc.ca", "showPhone2": false, "contentSize": "large", "contentSpacing": "compact", "contentWidth": "wide", "cardHolderType": "Building 10" }
     },
     {
       "id": "10-3570-social-psychology-lab",
@@ -40,19 +40,19 @@
       "id": "advanced-physics-lab",
       "label": "Advanced Physics Lab",
       "source": "Building 10/Advanced Physical Lab/Advanced Physics Lab.ai",
-      "signData": { "signType": "lab", "mainDepartment": "Department of Physics", "roomName": "Advanced Physics Lab", "showEmail": false, "showPhone": false, "cardHolderType": "Building 10" }
+      "signData": { "signType": "lab", "mainDepartment": "Department of Physics", "roomName": "Advanced\nPhysics\nLab", "showEmail": false, "showPhone": false, "contentSize": "largest", "cardHolderType": "Building 10" }
     },
     {
       "id": "engineering-it-room",
       "label": "School of Engineering — IT Room",
       "source": "Building 10/Building 10 basement/Final Black/10-504 copy 4.ai",
-      "signData": { "signType": "general-room", "mainDepartment": "School of Engineering", "roomName": "IT Room", "showEmail": false, "showPhone": false, "cardHolderType": "Building 10" }
+      "signData": { "signType": "general-room", "mainDepartment": "School of Engineering", "roomName": "IT Room", "showEmail": false, "showPhone": false, "contentSize": "largest", "textAlignment": "center", "cardHolderType": "Building 10" }
     },
     {
       "id": "engineering-materials-lab",
       "label": "School of Engineering — Materials Lab",
       "source": "Building 10/Building 10 basement/Final Black/10-504 copy 5.ai",
-      "signData": { "signType": "lab", "mainDepartment": "School of Engineering", "roomName": "Materials Lab", "showEmail": false, "showPhone": false, "cardHolderType": "Building 10" }
+      "signData": { "signType": "lab", "mainDepartment": "School of Engineering", "roomName": "Materials\nLab", "showEmail": false, "showPhone": false, "contentSize": "largest", "cardHolderType": "Building 10" }
     },
     {
       "id": "engineering-civil-environmental-labs",
@@ -64,7 +64,7 @@
       "id": "engineering-hydrology-lab",
       "label": "School of Engineering — Hydrology Lab",
       "source": "Building 10/Building 10 basement/Final Black/10-504 copy 7.ai",
-      "signData": { "signType": "lab", "mainDepartment": "School of Engineering", "roomName": "Hydrology Lab", "showEmail": false, "showPhone": false, "cardHolderType": "Building 10" }
+      "signData": { "signType": "lab", "mainDepartment": "School of Engineering", "roomName": "Hydrology\nLab", "showEmail": false, "showPhone": false, "contentSize": "largest", "cardHolderType": "Building 10" }
     },
     {
       "id": "engineering-custodian-closet",
@@ -100,7 +100,7 @@
       "id": "erik-jensen",
       "label": "Erik Jensen — Chair & Professor",
       "source": "Building 10/Erik Jensen/Erik Jensen.ai",
-      "signData": { "signType": "faculty", "mainDepartment": "Department of Physics", "name": "Erik Jensen", "position": "Chair & Professor", "email": "erik.jensen@unbc.ca", "phone": "250-960-5755", "showDesignations": true, "designations": ["PhD"], "cardHolderType": "Building 10" }
+      "signData": { "signType": "faculty", "mainDepartment": "Department of Physics", "name": "Erik Jensen", "position": "Chair & Professor", "email": "erik.jensen@unbc.ca", "phone": "250-960-5755", "showDesignations": true, "designations": ["PhD"], "designationLayout": "below", "positionSize": "large", "contentSize": "large", "contentSpacing": "compact", "cardHolderType": "Building 10" }
     },
     {
       "id": "margot-parkes",
@@ -136,7 +136,7 @@
       "id": "4-203-jordan-wilbey",
       "label": "4-203 — Jordan Wilbey",
       "source": "Building 4/4-203/Door Sign Final.ai",
-      "signData": { "signType": "staff", "name": "Jordan Wilbey", "position": "Dispensing Chemist · Chemical Safety Officer · Radiation Safety Officer", "email": "jordan.wilbey@unbc.ca", "phone": "250-960-6472", "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "staff", "name": "Jordan Wilbey", "position": "Dispensing Chemist · Chemical Safety Officer · Radiation Safety Officer", "email": "jordan.wilbey@unbc.ca", "phone": "250-960-6472", "showAlumni": true, "contentSize": "large", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "4-205-archaeology-lab",
@@ -154,13 +154,13 @@
       "id": "4-211-research-autoclave",
       "label": "4-211 — Research Autoclave",
       "source": "Building 4/4-211/Final 2.ai",
-      "signData": { "signType": "lab", "roomName": "Research Autoclave", "contactName": "Shift Engineer", "email": "shift.engineer@unbc.ca", "phone": "250-961-2844", "showSecondOccupant": true, "roomName2": "Andy Simpson", "email2": "andrew.simpson@unbc.ca", "phone2": "250-960-6449", "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "lab", "roomName": "Research Autoclave", "contactName": "Shift Engineer", "email": "shift.engineer@unbc.ca", "phone": "250-961-2844", "showSecondOccupant": true, "secondaryEntryType": "contact", "contactName2": "Andy Simpson", "email2": "andrew.simpson@unbc.ca", "phone2": "250-960-6449", "roomContactGrouping": "by-field", "contentSize": "large", "contentSpacing": "compact", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "4-215-atmospheric-hydrometeorology-labs",
       "label": "4-215 — Atmospheric Measurement & Hydrometeorology Labs",
       "source": "Building 4/4-215/Door Sign Final.ai",
-      "signData": { "signType": "lab", "roomName": "Laboratory for Atmospheric Measurement and Prediction", "contactName": "Dr. Peter Jackson", "showEmail": false, "showPhone": false, "showSecondOccupant": true, "roomName2": "Northern Hydrometeorology Research Group", "contactName2": "Dr. Stephen Déry", "showEmail2": false, "showPhone2": false, "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "lab", "roomName": "Laboratory for\nAtmospheric Measurement\nand Prediction", "contactName": "Dr. Peter Jackson", "showEmail": false, "showPhone": false, "showSecondOccupant": true, "roomName2": "Northern Hydrometeorology\nResearch Group", "contactName2": "Dr. Stephen Déry", "showEmail2": false, "showPhone2": false, "contentSpacing": "compact", "contentWidth": "wide", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "4-220-gas-cylinder-room",
@@ -177,8 +177,8 @@
     {
       "id": "4-229-bradshaw-schouwenburg",
       "label": "4-229 — Charles Bradshaw & Mya Schouwenburg",
-      "source": "Building 4/4-229/Door Sign Final.ai",
-      "signData": { "signType": "staff", "name": "Charles Bradshaw", "position": "Analytical Lab Specialist", "email": "charles.bradshaw@unbc.ca", "showPhone": false, "showSecondOccupant": true, "name2": "Mya Schouwenburg", "position2": "Analytical Lab Specialist", "email2": "mya.schouwenburg@unbc.ca", "showPhone2": false, "cardHolderType": "Non-Building 10" }
+      "source": "Building 4/4-229/Final.ai",
+      "signData": { "signType": "staff", "mainDepartment": "Northern Analytical Laboratory Services", "name": "Charles Bradshaw", "position": "Analytical Lab Specialist", "email": "charles.bradshaw@unbc.ca", "showPhone": false, "showAlumni": true, "showSecondOccupant": true, "twoPersonSpacing": "compact", "name2": "Mya Schouwenburg", "position2": "Analytical Lab Specialist", "email2": "mya.schouwenburg@unbc.ca", "showPhone2": false, "showAlumni2": true, "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "4-230-lab-supplies-storage",
@@ -226,7 +226,7 @@
       "id": "dorna-sobhani-erwin-rehl",
       "label": "Dorna Sobhani & Erwin Rehl",
       "source": "Building 4/Dorna Door Sign/Final.ai",
-      "signData": { "signType": "staff", "mainDepartment": "Northern Analytical Laboratory Services", "name": "Dorna Sobhani", "position": "Analytical Lab Specialist", "email": "dorna.sobhani@unbc.ca", "showPhone": false, "showSecondOccupant": true, "name2": "Erwin Rehl", "position2": "Analytical Lab Specialist", "email2": "erwin.rehl@unbc.ca", "showPhone2": false, "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "staff", "mainDepartment": "Northern Analytical Laboratory Services", "name": "Dorna Sobhani", "position": "Analytical Lab Specialist", "email": "dorna.sobhani@unbc.ca", "showPhone": false, "showAlumni": true, "showSecondOccupant": true, "name2": "Erwin Rehl", "position2": "Analytical Lab Specialist", "email2": "erwin.rehl@unbc.ca", "showPhone2": false, "showAlumni2": true, "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "hossein-kazemian",
@@ -238,7 +238,7 @@
       "id": "afton-zral",
       "label": "5-141A — Afton Zral",
       "source": "Building 5/5-141A - Afton Zral.ai",
-      "signData": { "signType": "staff", "mainDepartment": "Student Life & Orientation", "name": "Afton Zral", "position": "Student Leadership & Engagement Coordinator", "email": "afton.zral@unbc.ca", "phone": "250-960-5449", "showDesignations": true, "designations": ["M.Ed"], "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "staff", "mainDepartment": "Student Life & Orientation", "name": "Afton Zral", "position": "Student Leadership & Engagement Coordinator", "email": "afton.zral@unbc.ca", "phone": "250-960-5449", "showAlumni": true, "showDesignations": true, "designations": ["M.Ed"], "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "nbcgss-main-office",
@@ -251,13 +251,13 @@
       "id": "8-109-richard-mcaloney",
       "label": "8-109 — Richard McAloney",
       "source": "Building 8/8-109/Roger Wheate copy.ai",
-      "signData": { "signType": "staff", "mainDepartment": "Centre for Technology Adoption for Aging in the North", "name": "Richard McAloney", "position": "Director", "email": "richard.mcaloney@unbc.ca", "showPhone": false, "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "staff", "name": "Richard McAloney", "position": "Director | Centre for Technology Adoption\nfor Aging in the North", "positionLayout": "inline", "textAlignment": "center", "contentSize": "large", "contentSpacing": "compact", "contentWidth": "wide", "email": "richard.mcaloney@unbc.ca", "showPhone": false, "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "8-114-agetech-lab",
       "label": "8-114 — AgeTech Lab",
       "source": "Building 8/8-114/Roger Wheate.ai",
-      "signData": { "signType": "lab", "roomName": "AgeTech Lab", "contactName": "Contact: Richard McAloney", "email": "richard.mcaloney@unbc.ca", "showPhone": false, "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "lab", "roomName": "AgeTech Lab", "contactName": "Contact: Richard McAloney", "email": "richard.mcaloney@unbc.ca", "showPhone": false, "organizationLogo": "ctaan", "contentSpacing": "compact", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "8-125-gis-lab",
@@ -269,13 +269,13 @@
       "id": "8-307-roger-wheate",
       "label": "8-307 — Roger Wheate",
       "source": "Building 8/8-307 - Roger Wheate/Roger Wheate.ai",
-      "signData": { "signType": "faculty", "mainDepartment": "Faculty of Environment", "name": "Roger Wheate", "position": "Professor | Geography", "email": "wheate@unbc.ca", "phone": "250-960-5865", "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "faculty", "mainDepartment": "Faculty of Environment", "name": "Roger Wheate", "position": "Professor | Geography", "positionLayout": "inline", "textAlignment": "center", "contentSize": "large", "contentSpacing": "compact", "email": "wheate@unbc.ca", "phone": "250-960-5865", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "8-331-brian-menounos",
       "label": "8-331 — Brian Menounos",
       "source": "Building 8/8-331 - Brian Menounos/Brian Menounos.ai",
-      "signData": { "signType": "faculty", "mainDepartment": "Faculty of Environment", "name": "Brian Menounos", "position": "Professor | Geography", "email": "brian.menounos@unbc.ca", "phone": "250-960-6266", "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "faculty", "mainDepartment": "Faculty of Environment", "name": "Brian Menounos", "position": "Professor | Geography", "positionLayout": "inline", "textAlignment": "center", "contentSize": "large", "contentSpacing": "compact", "email": "brian.menounos@unbc.ca", "phone": "250-960-6266", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "8-266-nicola-koper",
@@ -293,7 +293,7 @@
       "id": "shelley-raper",
       "label": "Shelley Raper — Admission/Student Affairs",
       "source": "Building 9/5-141A - Afton Zral.ai",
-      "signData": { "signType": "staff", "mainDepartment": "Northern Medical Program · Division of Medical Science", "name": "Shelley Raper", "position": "Admission/Student Affairs", "email": "shelley.raper@unbc.ca", "phone": "250-960-5165", "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "staff", "mainDepartment": "Division of Medical Science", "name": "Shelley Raper", "position": "Admission/Student Affairs · Northern Medical Program", "email": "shelley.raper@unbc.ca", "phone": "250-960-5165", "showAlumni": true, "contentSpacing": "compact", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "nugss-cfur",

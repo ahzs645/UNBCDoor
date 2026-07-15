@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CustomSelect } from './CustomSelect'
 import { createSignArchive, parseSignArchive } from '../sign/signArchive'
 import productionArchive from '../../data/door-sign-archive.json'
@@ -20,6 +20,23 @@ export const SignArchiveControls = ({ signData, onLoadSign }) => {
   const [archive, setArchive] = useState(null)
   const [selectedId, setSelectedId] = useState('')
   const [message, setMessage] = useState('')
+
+  // Keep edits attached to the selected archive entry. Without this, switching away and
+  // back reloads the original imported data and loses preferences such as the alumni badge.
+  useEffect(() => {
+    if (!selectedId) return
+
+    setArchive(currentArchive => {
+      if (!currentArchive) return currentArchive
+
+      return {
+        ...currentArchive,
+        signs: currentArchive.signs.map(entry => (
+          entry.id === selectedId ? { ...entry, signData } : entry
+        ))
+      }
+    })
+  }, [selectedId, signData])
 
   const loadEntry = (entry, importedArchive = archive) => {
     setSelectedId(entry.id)

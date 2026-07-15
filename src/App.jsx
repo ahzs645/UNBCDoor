@@ -77,13 +77,18 @@ function App() {
           onUpdate={(cardHolderType) => updateSignData({ cardHolderType })}
         />
 
-        <SignPreview signData={signData} cardHolders={cardHolders} />
+        <SignPreview signData={signData} cardHolders={cardHolders} onUpdate={updateSignData} />
 
         <ToggleButtons 
           signType={signData.signType}
           showAlumni={signData.showAlumni}
+          showAlumni2={signData.showAlumni2}
+          showSecondOccupant={signData.showSecondOccupant}
+          occupantName={signData.name}
+          occupantName2={signData.name2}
           showDesignations={signData.showDesignations}
           onToggleAlumni={() => updateSignData({ showAlumni: !signData.showAlumni })}
+          onToggleAlumni2={() => updateSignData({ showAlumni2: !signData.showAlumni2 })}
           onToggleDesignations={() => updateSignData({ showDesignations: !signData.showDesignations })}
         />
 

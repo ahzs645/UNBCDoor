@@ -6,6 +6,10 @@ const BADGE_INNER = extractSvgInner(badgeRaw)
 
 // The UNBC Alumni crest as an SVG <g>. `transform` positions/scales it in the parent SVG
 // (native 59.27×67.82 viewBox). Fills are presentation attributes so it survives svg2pdf.
-export const AlumniCrest = ({ transform }) => (
-  <g transform={transform} dangerouslySetInnerHTML={{ __html: BADGE_INNER }} />
+export const AlumniCrest = ({ transform, occupant = 'primary' }) => (
+  <g
+    transform={transform}
+    data-alumni-occupant={occupant}
+    dangerouslySetInnerHTML={{ __html: BADGE_INNER }}
+  />
 )

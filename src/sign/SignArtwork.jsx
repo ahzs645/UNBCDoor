@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react'
 import { UnbcLogoMark, AlumniCrest } from '../unbc'
 import { splitDepartmentText } from '../unbc/logo/logoText'
 import { PT_PER_INCH, DEFAULT_INSERT_SIZE } from './signConstants'
+import ctaanLogo from '../assets/ctaan-logo.png'
 
 export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
 
@@ -31,24 +32,25 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
   if (!value) return []
 
   const ctx = getMeasureContext()
-  if (!ctx) return [value]
+  const paragraphs = value.split(/\r?\n/).map(line => line.trim()).filter(Boolean)
+  if (!ctx) return paragraphs
 
   ctx.font = `${style} ${weight} ${size}px ${family}`
-  const words = value.split(/\s+/)
   const lines = []
-  let current = ''
-
-  words.forEach((word) => {
-    const candidate = current ? `${current} ${word}` : word
-    if (ctx.measureText(candidate).width > maxWidth && current) {
-      lines.push(current)
-      current = word
-    } else {
-      current = candidate
-    }
+  paragraphs.forEach((paragraph) => {
+    const words = paragraph.split(/\s+/)
+    let current = ''
+    words.forEach((word) => {
+      const candidate = current ? `${current} ${word}` : word
+      if (ctx.measureText(candidate).width > maxWidth && current) {
+        lines.push(current)
+        current = word
+      } else {
+        current = candidate
+      }
+    })
+    if (current) lines.push(current)
   })
-
-  if (current) lines.push(current)
   return lines
 }
 
@@ -57,18 +59,38 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
 const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   const blocks = []
   const isRoom = content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet'
-  const headlineWeight = content.headlineWeight === 'black' ? 900 : 700
+  const compactTwoPerson = !isRoom && content.showSecondOccupant && content.name2 && content.twoPersonSpacing !== 'relaxed'
+  const contentScale = content.contentSize === 'largest' ? 1.55 : content.contentSize === 'large' ? 1.2 : 1
+  const compactContent = content.contentSpacing === 'compact'
+  const spacingScale = compactContent ? 0.48 : 1
+  const contactScale = content.contactSize === 'large' ? 1.25 : 1
+  const headlineWeight = content.headlineWeight === 'black' ? 900 : content.headlineWeight === 'bold' ? 700 : 400
+  const gap = value => value * spacingScale
+  const contactLine = (label, value) => {
+    if (!value) return ''
+    const cleanLabel = (label || '').trim().replace(/:\s*$/, '')
+    return cleanLabel ? `${cleanLabel}: ${value}` : value
+  }
+  const contactLinesFor = (group) => {
+    const lines = [
+      group.email ? contactLine(content.emailLabel, group.email) : '',
+      group.phone ? contactLine(content.phoneLabel, group.phone) : '',
+      group.cellPhone ? contactLine(content.cellPhoneLabel, group.cellPhone) : ''
+    ].filter(Boolean)
+    return content.contactLayout === 'inline' && lines.length > 1 ? [lines.join(' · ')] : lines
+  }
 
-  const pushContactLines = (lines, gapBefore) => {
+  const pushContactLines = (lines, gapBefore, options = {}) => {
     lines.filter(Boolean).forEach((line, index) => {
       blocks.push({
         text: line,
-        size: H * 0.046,
+        size: H * (options.compact ? 0.06 : 0.046) * contentScale * contactScale,
         weight: 400,
         style: 'italic',
         fill: secondaryColor,
-        lineHeightRatio: 1.32,
-        gapBefore: index === 0 ? gapBefore : 0
+        lineHeightRatio: options.compact || compactContent ? 1.12 : 1.32,
+        gapBefore: index === 0 ? gapBefore : 0,
+        wrap: true
       })
     })
   }
@@ -76,13 +98,13 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   // Room signs: big room name, optionally followed by a contact line ("Contact: …" or a
   // PI's name, rendered as typed) and Email / Phone lines — the dominant lab pattern in
   // the production archive. The headline drops a step when a contact block shares the card.
-  const pushRoomGroup = (group, gapBefore) => {
+  const pushRoomGroup = (group, gapBefore, options = {}) => {
     if (!group.roomName) return
     const italic = content.roomNameStyle === 'italic'
-    const hasDetails = Boolean(group.contactName || group.email || group.phone)
+    const hasDetails = options.hasDetails ?? Boolean(group.contactName || group.email || group.phone)
     blocks.push({
       text: group.roomName,
-      size: italic ? H * 0.1 : (hasDetails ? H * 0.105 : H * 0.135),
+      size: (italic ? H * 0.1 : (hasDetails ? H * 0.105 : H * 0.135)) * contentScale,
       weight: italic ? 400 : headlineWeight,
       style: italic ? 'italic' : 'normal',
       fill: nameColor,
@@ -93,19 +115,39 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     if (group.contactName) {
       blocks.push({
         text: group.contactName,
-        size: H * 0.05,
+        size: H * 0.05 * contentScale,
         weight: 500,
         style: 'normal',
         fill: secondaryColor,
         lineHeightRatio: 1.3,
-        gapBefore: H * 0.045,
+        gapBefore: gap(H * 0.045),
         wrap: true
       })
     }
-    pushContactLines([
-      group.email ? `Email: ${group.email}` : '',
-      group.phone ? `Phone: ${group.phone}` : ''
-    ], H * 0.035)
+    if (!options.headlineOnly) {
+      pushContactLines(contactLinesFor(group), gap(H * 0.035))
+    }
+  }
+
+  // Some room signs have multiple people attached to one room (for example, The Co-Lab
+  // has a primary contact and a research manager). Keep these as contact blocks instead of
+  // incorrectly promoting the second person to another room headline.
+  const pushAdditionalRoomContact = (group, gapBefore) => {
+    if (!group.contactName && !group.email && !group.phone) return
+
+    if (group.contactName) {
+      blocks.push({
+        text: group.contactName,
+        size: H * 0.05 * contentScale,
+        weight: 500,
+        style: 'normal',
+        fill: secondaryColor,
+        lineHeightRatio: 1.3,
+        gapBefore: gap(gapBefore),
+        wrap: true
+      })
+    }
+    pushContactLines(contactLinesFor(group), group.contactName ? gap(H * 0.035) : gap(gapBefore))
   }
 
   // Person (faculty / staff / student) group: name + credentials, wrapped position,
@@ -113,49 +155,87 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   const pushPersonGroup = (group, gapBefore) => {
     if (!group.name) return
     blocks.push({
-      text: group.name + (group.credentials ? `, (${group.credentials})` : ''),
-      size: H * 0.1,
+      text: group.name + (group.credentials
+        ? content.designationLayout === 'below' ? ',' : `, (${group.credentials})`
+        : ''),
+      size: H * (compactTwoPerson ? 0.115 : 0.1) * contentScale,
       weight: headlineWeight,
       style: 'normal',
       fill: nameColor,
-      lineHeightRatio: 1.12,
+      lineHeightRatio: compactTwoPerson || compactContent ? 1.02 : 1.12,
       gapBefore,
       wrap: true
     })
-    if (group.position) {
+    if (group.credentials && content.designationLayout === 'below') {
       blocks.push({
-        text: group.position,
-        size: H * 0.05,
-        weight: 500,
+        text: `(${group.credentials})`,
+        size: H * (compactTwoPerson ? 0.08 : 0.075) * contentScale,
+        weight: headlineWeight,
         style: 'normal',
-        fill: secondaryColor,
-        lineHeightRatio: 1.3,
-        gapBefore: H * 0.03,
+        fill: nameColor,
+        lineHeightRatio: 1.05,
+        gapBefore: 0,
         wrap: true
+      })
+    }
+    if (group.position) {
+      const positions = content.positionLayout === 'inline'
+        ? [group.position]
+        : group.position.split(/\s*(?:\r?\n|[·•|;])\s*/).filter(Boolean)
+
+      positions.forEach((position, index) => {
+        blocks.push({
+          text: position,
+          size: H * (compactTwoPerson ? 0.065 : content.positionSize === 'large' ? 0.065 : 0.05) * contentScale,
+          weight: 400,
+          style: 'normal',
+          fill: secondaryColor,
+          lineHeightRatio: compactTwoPerson || compactContent ? 1.08 : 1.3,
+          gapBefore: index === 0 ? (compactContent ? 0 : gap(H * (compactTwoPerson ? 0.01 : 0.03))) : 0,
+          wrap: true
+        })
       })
     }
     if (group.tagline) {
       blocks.push({
         text: group.tagline,
-        size: H * 0.046,
+        size: H * 0.046 * contentScale,
         weight: 400,
         style: 'italic',
         fill: secondaryColor,
         lineHeightRatio: 1.32,
-        gapBefore: H * 0.03,
+        gapBefore: gap(H * 0.03),
         wrap: true
       })
     }
-    pushContactLines([
-      group.email ? `Email: ${group.email}` : '',
-      group.phone ? `Phone: ${group.phone}` : '',
-      group.cellPhone ? `Cell: ${group.cellPhone}` : ''
-    ], H * 0.035)
+    const contactLines = compactTwoPerson
+      ? [group.email, group.phone, group.cellPhone].filter(Boolean)
+      : contactLinesFor(group)
+    pushContactLines(contactLines, gap(H * (compactTwoPerson ? 0.012 : 0.035)), { compact: compactTwoPerson })
   }
 
-  const groupGap = H * 0.07
+  const groupGap = gap(H * (compactTwoPerson ? 0.045 : 0.07))
 
   if (isRoom) {
+    if (content.roomContactGrouping === 'by-field' && content.showSecondOccupant && content.secondaryEntryType === 'contact') {
+      const primaryEmail = content.showEmail ? content.email : ''
+      const secondaryEmail = content.showEmail2 ? content.email2 : ''
+      const primaryPhone = content.showPhone ? content.phone : ''
+      const secondaryPhone = content.showPhone2 ? content.phone2 : ''
+      pushRoomGroup({ roomName: content.roomName }, 0, { headlineOnly: true, hasDetails: true })
+      pushContactLines([
+        primaryEmail ? contactLine(content.emailLabel, primaryEmail) : '',
+        secondaryEmail
+      ], gap(H * 0.045))
+      pushContactLines([
+        primaryPhone ? `${contactLine(content.phoneLabel, primaryPhone)}${content.contactName ? ` (${content.contactName})` : ''}` : '',
+        secondaryPhone ? `${secondaryPhone}${content.contactName2 ? ` (${content.contactName2})` : ''}` : ''
+      ], gap(H * 0.025))
+      if (content.organizationLogo === 'ctaan') {
+        blocks.push({ kind: 'logo', gapBefore: gap(H * 0.04), height: H * 0.23 })
+      }
+      return blocks
+    }
     pushRoomGroup({
       roomName: content.roomName,
       contactName: content.contactName,
@@ -163,12 +243,20 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
       phone: content.showPhone ? content.phone : ''
     }, 0)
     if (content.showSecondOccupant) {
-      pushRoomGroup({
+      const secondaryGroup = {
         roomName: content.roomName2,
         contactName: content.contactName2,
         email: content.showEmail2 ? content.email2 : '',
         phone: content.showPhone2 ? content.phone2 : ''
-      }, blocks.length ? groupGap : 0)
+      }
+      if (content.secondaryEntryType === 'contact') {
+        pushAdditionalRoomContact(secondaryGroup, blocks.length ? groupGap : 0)
+      } else {
+        pushRoomGroup(secondaryGroup, blocks.length ? groupGap : 0)
+      }
+    }
+    if (content.organizationLogo === 'ctaan') {
+      blocks.push({ kind: 'logo', gapBefore: gap(H * 0.04), height: H * 0.23 })
     }
     return blocks
   }
@@ -227,7 +315,7 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   // top-left corner. The content <g> is translated out by BLEED + the viewable inset.
   // Production files measure ~12% left margin, a ~20.5% header band that grows ~3.3% per
   // department line, and a logo lockup spanning ~35.5% of the card width.
-  const PAD_X = VW * 0.12
+  const PAD_X = VW * (content.contentWidth === 'wide' ? 0.08 : 0.12)
   const departmentLineCount = splitDepartmentText(content.departmentText || '').length
   const HEADER_H = VH * (0.205 + 0.033 * departmentLineCount)
 
@@ -239,19 +327,41 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   // push it up under the frame.
   const logoY = Math.max((HEADER_H - logoHeight) / 2, 0)
 
-  const hasAlumni = Boolean(content.showAlumni)
-  const badgeHeight = (VH - HEADER_H) * 0.46
+  const isRoom = content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet'
+  const hasSecondPerson = !isRoom && Boolean(content.showSecondOccupant && content.name2)
+  const compactTwoPerson = hasSecondPerson && content.twoPersonSpacing !== 'relaxed'
+  const showPrimaryAlumni = !isRoom && Boolean(content.showAlumni)
+  const showSecondaryAlumni = hasSecondPerson && Boolean(content.showAlumni2)
+  const hasAlumni = showPrimaryAlumni || showSecondaryAlumni
+  const bodyHeight = VH - HEADER_H
+  const badgeHeight = bodyHeight * (hasSecondPerson ? 0.3 : 0.34)
   const badgeScale = badgeHeight / 67.82
   const badgeWidth = 59.27 * badgeScale
   const badgeX = VW - PAD_X - badgeWidth
-  const badgeY = HEADER_H + ((VH - HEADER_H) - badgeHeight) / 2
+  const badgeCenterY = HEADER_H + (bodyHeight - badgeHeight) / 2
+  const primaryBadgeY = hasSecondPerson
+    ? HEADER_H + bodyHeight * 0.25 - badgeHeight / 2
+    : badgeCenterY
+  const secondaryBadgeY = HEADER_H + bodyHeight * 0.75 - badgeHeight / 2
 
-  const textMaxWidth = (VW - 2 * PAD_X) - (hasAlumni ? badgeWidth + VW * 0.025 : 0)
+  // The source two-person templates let long names run close to their individual crest.
+  // Relaxed/single-person layouts retain a little more breathing room beside the badge.
+  const badgeGap = compactTwoPerson ? 0 : VW * 0.025
+  const textMaxWidth = (VW - 2 * PAD_X) - (hasAlumni ? badgeWidth + badgeGap : 0)
 
   const blocks = buildBlocks(content, { H: VH, nameColor, secondaryColor })
 
   const items = []
   blocks.forEach((block) => {
+    if (block.kind === 'logo') {
+      items.push({
+        kind: 'logo',
+        lineHeight: block.height,
+        height: block.height,
+        marginTop: block.gapBefore || 0
+      })
+      return
+    }
     const lines = block.wrap
       ? wrapText(block.text, { weight: block.weight, style: block.style, size: block.size, family: fontFamily, maxWidth: textMaxWidth })
       : [(block.text || '').toString()]
@@ -275,7 +385,8 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   const shrink = rawHeight > availableHeight ? availableHeight / rawHeight : 1
   if (shrink < 1) {
     items.forEach((item) => {
-      item.size *= shrink
+      if (item.size) item.size *= shrink
+      if (item.height) item.height *= shrink
       item.lineHeight *= shrink
       item.marginTop *= shrink
     })
@@ -286,6 +397,11 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
 
   const texts = items.map((item) => {
     cursorY += item.marginTop
+    if (item.kind === 'logo') {
+      const y = cursorY
+      cursorY += item.lineHeight
+      return { ...item, y }
+    }
     const baseline = cursorY + item.size * 0.8
     cursorY += item.lineHeight
     return { ...item, baseline }
@@ -324,23 +440,44 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
           fontFamily={fontFamily}
         />
 
-        {texts.map((text, index) => (
+        {texts.map((item, index) => item.kind === 'logo' ? (
+          <image
+            key={index}
+            href={ctaanLogo}
+            x={content.textAlignment === 'center' ? (VW - item.height * 2.076) / 2 : PAD_X}
+            y={item.y}
+            width={item.height * 2.076}
+            height={item.height}
+            preserveAspectRatio="xMidYMid meet"
+          />
+        ) : (
           <text
             key={index}
-            x={PAD_X}
-            y={text.baseline}
+            x={content.textAlignment === 'center' ? VW / 2 : PAD_X}
+            y={item.baseline}
+            textAnchor={content.textAlignment === 'center' ? 'middle' : 'start'}
             fontFamily={fontFamily}
-            fontSize={text.size}
-            fontWeight={text.weight}
-            fontStyle={text.style}
-            fill={text.fill}
+            fontSize={item.size}
+            fontWeight={item.weight}
+            fontStyle={item.style}
+            fill={item.fill}
           >
-            {text.text}
+            {item.text}
           </text>
         ))}
 
-        {hasAlumni && (
-          <AlumniCrest transform={`translate(${badgeX}, ${badgeY}) scale(${badgeScale})`} />
+        {showPrimaryAlumni && (
+          <AlumniCrest
+            occupant="primary"
+            transform={`translate(${badgeX}, ${primaryBadgeY}) scale(${badgeScale})`}
+          />
+        )}
+
+        {showSecondaryAlumni && (
+          <AlumniCrest
+            occupant="secondary"
+            transform={`translate(${badgeX}, ${secondaryBadgeY}) scale(${badgeScale})`}
+          />
         )}
       </g>
     </svg>

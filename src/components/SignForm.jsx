@@ -13,6 +13,11 @@ const SIGN_TYPE_OPTIONS = [
   { value: 'custodian-closet', label: 'Custodian Closet' }
 ]
 
+const SECONDARY_ROOM_ENTRY_OPTIONS = [
+  { value: 'contact', label: 'Another contact for this room' },
+  { value: 'room', label: 'Another room or lab' }
+]
+
 export const SignForm = ({ signData, onUpdate, departments }) => {
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -68,11 +73,11 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
 
           <div className="form-group">
             <label htmlFor="position">Position</label>
-            <input
-              type="text"
+            <textarea
               id="position"
               name="position"
-              placeholder="Enter Position"
+              rows="2"
+              placeholder="Enter position. Use Enter for a fixed line break; pipes are preserved in Inline / pipe mode."
               value={signData.position}
               onChange={handleInputChange}
             />
@@ -96,11 +101,11 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
         <>
           <div className="form-group">
             <label htmlFor="roomName">Room Name</label>
-            <input
-              type="text"
+            <textarea
               id="roomName"
               name="roomName"
-              placeholder="Enter room name"
+              rows="3"
+              placeholder="Enter room name. Use Enter to control line breaks."
               value={signData.roomName}
               onChange={handleInputChange}
             />
@@ -193,8 +198,46 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
         )}
       </div>
 
+      <div className="contact-label-group" aria-label="Contact line labels">
+        <div className="form-group">
+          <label htmlFor="emailLabel">Email label</label>
+          <input
+            type="text"
+            id="emailLabel"
+            name="emailLabel"
+            placeholder="Leave blank for no label"
+            value={signData.emailLabel}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="phoneLabel">Phone label</label>
+          <input
+            type="text"
+            id="phoneLabel"
+            name="phoneLabel"
+            placeholder="e.g. Phone Number"
+            value={signData.phoneLabel}
+            onChange={handleInputChange}
+          />
+        </div>
+        {isPerson && (
+          <div className="form-group">
+            <label htmlFor="cellPhoneLabel">Cell label</label>
+            <input
+              type="text"
+              id="cellPhoneLabel"
+              name="cellPhoneLabel"
+              placeholder="e.g. Cell Number"
+              value={signData.cellPhoneLabel}
+              onChange={handleInputChange}
+            />
+          </div>
+        )}
+      </div>
+
       <fieldset className="occupant-section">
-        <legend>{isRoom ? 'Second room or lab' : 'Second occupant'}</legend>
+        <legend>{isRoom ? 'Additional room content' : 'Second occupant'}</legend>
         <div className="form-group occupant-section__toggle">
           <label className="switch">
           <input
@@ -208,18 +251,31 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
           />
           <span className="switch__track" aria-hidden="true" />
           <span className="switch__text">
-            {isRoom ? 'Add a second room / lab to this sign' : 'Add a second occupant to this sign'}
+            {isRoom ? 'Add another contact, room, or lab to this sign' : 'Add a second occupant to this sign'}
           </span>
           </label>
           {!signData.showSecondOccupant && (
             <p className="occupant-section__hint">
-              Turn this on to reveal the second {isRoom ? 'room or lab' : 'person'} fields.
+              Turn this on to reveal the {isRoom ? 'additional contact or room' : 'second person'} fields.
             </p>
           )}
         </div>
 
       {signData.showSecondOccupant && (
         <div id="second-occupant-fields" className="occupant-section__fields">
+          {isRoom && (
+            <div className="form-group">
+              <label htmlFor="secondaryEntryType">What are you adding?</label>
+              <CustomSelect
+                id="secondaryEntryType"
+                name="secondaryEntryType"
+                options={SECONDARY_ROOM_ENTRY_OPTIONS}
+                value={signData.secondaryEntryType}
+                onChange={(value) => onUpdate({ secondaryEntryType: value })}
+              />
+            </div>
+          )}
+
           {isPerson && (
             <>
               <div className="form-group">
@@ -236,11 +292,11 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
 
               <div className="form-group">
                 <label htmlFor="position2">Second Occupant Position</label>
-                <input
-                  type="text"
+                <textarea
                   id="position2"
                   name="position2"
-                  placeholder="Enter Position"
+                  rows="2"
+                  placeholder="Enter position. Use Enter for a fixed line break."
                   value={signData.position2}
                   onChange={handleInputChange}
                 />
@@ -260,32 +316,38 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
             </>
           )}
 
-          {isRoom && (
+          {isRoom && signData.secondaryEntryType === 'room' && (
             <>
               <div className="form-group">
                 <label htmlFor="roomName2">Second Room Name</label>
-                <input
-                  type="text"
+                <textarea
                   id="roomName2"
                   name="roomName2"
-                  placeholder="Enter room name"
+                  rows="3"
+                  placeholder="Enter room name. Use Enter to control line breaks."
                   value={signData.roomName2}
                   onChange={handleInputChange}
                 />
               </div>
-
-              <div className="form-group">
-                <label htmlFor="contactName2">Second Contact Line (optional)</label>
-                <input
-                  type="text"
-                  id="contactName2"
-                  name="contactName2"
-                  placeholder="e.g. Contact: Dr. Jane Doe — or just a name"
-                  value={signData.contactName2}
-                  onChange={handleInputChange}
-                />
-              </div>
             </>
+          )}
+
+          {isRoom && (
+            <div className="form-group">
+              <label htmlFor="contactName2">
+                {signData.secondaryEntryType === 'contact' ? 'Additional Contact / Role' : 'Second Contact Line (optional)'}
+              </label>
+              <input
+                type="text"
+                id="contactName2"
+                name="contactName2"
+                placeholder={signData.secondaryEntryType === 'contact'
+                  ? 'e.g. Research Manager: Shayna Dolan'
+                  : 'e.g. Contact: Dr. Jane Doe — or just a name'}
+                value={signData.contactName2}
+                onChange={handleInputChange}
+              />
+            </div>
           )}
 
           <div className="contact-info-group">

@@ -11,7 +11,7 @@ export const DEPARTMENT_LINE = {
   fontWeight: 800
 }
 
-const MAX_CHARS_PER_LINE = 24
+const MAX_CHARS_PER_LINE = 30
 
 export const splitDepartmentText = (departmentText, maxCharsPerLine = MAX_CHARS_PER_LINE) => {
   if (!departmentText) {

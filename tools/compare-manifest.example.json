@@ -1,0 +1,17 @@
+{
+  "title": "UNBC Door Sign Review",
+  "comparisons": [
+    {
+      "id": "4-203",
+      "label": "4-203 - Jordan Wilbey",
+      "reference": "../reference-signs/4-203.ai",
+      "candidate": "../generator-exports/4-203.png"
+    },
+    {
+      "id": "4-229",
+      "label": "4-229 - Charles Bradshaw and Mya Schouwenburg",
+      "reference": "../reference-signs/4-229.ai",
+      "candidate": "../generator-exports/4-229.pdf"
+    }
+  ]
+}

@@ -9,6 +9,9 @@ lerna-debug.log*
 # Build outputs
 dist/
 dist-ssr/
+output/compare/
+tools/compare-viewer/generated-manifest.json
+tools/compare-viewer/public/references/
 *.local
 
 # Environment variables
@@ -46,6 +49,8 @@ pids
 *.pid
 *.seed
 *.pid.lock
+__pycache__/
+*.py[cod]
 
 # Coverage directory used by tools like istanbul
 coverage/

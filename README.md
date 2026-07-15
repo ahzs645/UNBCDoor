@@ -19,7 +19,8 @@ A web-based tool for generating standardized door signs for the University of No
   - Room name display
   - Professional designations
   - Alumni badge option
-  - Optional second occupant or second room/lab, with independent contact visibility
+  - Optional second occupant, second room/lab, or additional contact for a shared room
+  - Independent alumni badges and contact visibility for each occupant
 
 - **Saved Sign Archives**
   - Import a single sign or a multi-sign JSON archive
@@ -89,6 +90,74 @@ A web-based tool for generating standardized door signs for the University of No
    - Choose **Import JSON** under Saved signs
    - For a multi-sign archive, choose any imported entry from the new selector
    - A transcribed 89-sign production archive is included at `data/door-sign-archive.json`
+
+## Local Visual Comparison Utility
+
+The standalone comparison utility under `tools/` is for checking generator output against the
+PDF-compatible Illustrator source files. It is not imported by or bundled into the website.
+
+Install its local dependencies once:
+
+```bash
+python3 -m pip install -r tools/requirements-compare.txt
+brew install poppler
+```
+
+Export a PNG from the generator for the cleanest comparison, then run:
+
+```bash
+npm run compare-sign -- \
+  --reference "/path/to/source/Final.ai" \
+  --candidate "/path/to/unbc-door-sign.png" \
+  --output "output/compare/4-229"
+```
+
+PDF generator exports are also supported. The tool automatically finds the green sign artwork
+inside the print-ready PDF page and removes the paper/crop-mark area:
+
+```bash
+npm run compare-sign -- \
+  --reference "/path/to/source/Final.ai" \
+  --candidate "/path/to/unbc-door-sign-staff.pdf" \
+  --output "output/compare/4-229-pdf"
+```
+
+Open the generated `report.html` to review the normalized source/export images, side-by-side view,
+50% overlay, amplified difference heatmap, blink animation, and pixel-difference diagnostics.
+Run `python3 tools/compare_door_sign.py --help` for crop overrides and rendering options.
+
+To flip through a group of signs one by one, copy `tools/compare-manifest.example.json`, list each
+source/export pair, and run:
+
+```bash
+npm run compare-sign -- \
+  --manifest "/path/to/compare-manifest.json" \
+  --output "output/compare/archive-review"
+```
+
+Open `output/compare/archive-review/index.html`. The local gallery has Previous/Next buttons, a sign
+picker, left/right-arrow navigation, and Side by side, Overlay, Difference, and Blink views. Every
+entry also links to its full diagnostic report. Manifest paths may be absolute or relative to the
+manifest file.
+
+### Review the full production archive
+
+To compare every archived source against the current live generator without exporting 89 files:
+
+```bash
+npm run compare-all
+```
+
+This renders all PDF-compatible Illustrator sources, builds a standalone local viewer, and writes:
+
+```text
+output/compare/all-signs/index.html
+```
+
+The viewer contains all 89 production entries with Previous/Next controls, a sign picker, keyboard
+navigation, side-by-side and overlay modes, and a temporary Standard/Larger content-size switch for
+testing each person sign. The viewer imports the real `SignArtwork` renderer but is built separately
+under `tools/compare-viewer`; it is never included in the production website.
 
 ## Technical Details
 
