@@ -10,7 +10,7 @@
       "id": "ann-duong",
       "label": "Ann Duong — Sustainability Manager",
       "source": "Ann/Door Sign Final.ai",
-      "signData": { "signType": "staff", "name": "Ann Duong", "position": "Sustainability Manager", "email": "ann.duong@unbc.ca", "emailLabel": "", "phone": "250-960-6707", "phoneLabel": "Phone Number", "cellPhone": "778-349-5145", "cellPhoneLabel": "Cell Number", "showAlumni": true, "headlineWeight": "bold", "contentSize": "large", "contentSpacing": "compact", "contactSize": "large", "cardHolderType": "Non-Building 10" }
+      "signData": { "signType": "staff", "name": "Ann Duong", "position": "Sustainability Manager", "email": "ann.duong@unbc.ca", "emailLabel": "", "phone": "250-960-6707", "phoneLabel": "Phone Number", "cellPhone": "778-349-5145", "cellPhoneLabel": "Cell Number", "showAlumni": true, "headlineWeight": "bold", "contentSize": "large", "contentSpacing": "compact", "contactSize": "large", "bodyTextMode": "uniform", "cardHolderType": "Non-Building 10" }
     },
     {
       "id": "10-3540-near-infrared-lab",

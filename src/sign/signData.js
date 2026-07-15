@@ -46,6 +46,7 @@ export const INITIAL_SIGN_DATA = {
   textAlignment: 'left',
   contactLayout: 'stacked',
   contactSize: 'standard',
+  bodyTextMode: 'hierarchy',
   roomContactGrouping: 'by-person',
   organizationLogo: 'none',
   showDesignations: false,

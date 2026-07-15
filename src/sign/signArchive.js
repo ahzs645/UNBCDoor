@@ -58,6 +58,9 @@ export const normalizeSignData = (value = {}) => {
   if (!['standard', 'large'].includes(normalized.contactSize)) {
     normalized.contactSize = INITIAL_SIGN_DATA.contactSize
   }
+  if (!['hierarchy', 'uniform'].includes(normalized.bodyTextMode)) {
+    normalized.bodyTextMode = INITIAL_SIGN_DATA.bodyTextMode
+  }
   if (!['by-person', 'by-field'].includes(normalized.roomContactGrouping)) {
     normalized.roomContactGrouping = INITIAL_SIGN_DATA.roomContactGrouping
   }

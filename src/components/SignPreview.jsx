@@ -93,6 +93,7 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
     textAlignment: signData.textAlignment,
     contactLayout: signData.contactLayout,
     contactSize: signData.contactSize,
+    bodyTextMode: signData.bodyTextMode,
     roomContactGrouping: signData.roomContactGrouping,
     organizationLogo: signData.organizationLogo,
     insert: insertSize,
@@ -189,6 +190,8 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onContactLayoutChange={(contactLayout) => onUpdate({ contactLayout })}
         contactSize={signData.contactSize}
         onContactSizeChange={(contactSize) => onUpdate({ contactSize })}
+        bodyTextMode={signData.bodyTextMode}
+        onBodyTextModeChange={(bodyTextMode) => onUpdate({ bodyTextMode })}
         roomContactGrouping={signData.roomContactGrouping}
         onRoomContactGroupingChange={(roomContactGrouping) => onUpdate({ roomContactGrouping })}
         positionSize={signData.positionSize}

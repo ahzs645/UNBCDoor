@@ -64,6 +64,7 @@ const buildContent = (rawSignData, contentSizeOverride) => {
     textAlignment: signData.textAlignment,
     contactLayout: signData.contactLayout,
     contactSize: signData.contactSize,
+    bodyTextMode: signData.bodyTextMode,
     roomContactGrouping: signData.roomContactGrouping,
     organizationLogo: signData.organizationLogo,
     insert: insertSize,

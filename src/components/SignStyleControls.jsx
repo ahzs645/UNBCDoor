@@ -46,6 +46,8 @@ export const SignStyleControls = ({
   onContactLayoutChange,
   contactSize,
   onContactSizeChange,
+  bodyTextMode,
+  onBodyTextModeChange,
   roomContactGrouping,
   onRoomContactGroupingChange,
   organizationLogo,
@@ -115,6 +117,13 @@ export const SignStyleControls = ({
 
     {!isRoomType && (
       <>
+        <OptionControl
+          label="Body Text Sizing"
+          name="bodyTextMode"
+          value={bodyTextMode}
+          onChange={onBodyTextModeChange}
+          options={[{ value: 'hierarchy', label: 'Hierarchy' }, { value: 'uniform', label: 'Uniform' }]}
+        />
         <OptionControl
           label="Position Layout"
           name="positionLayout"

@@ -64,8 +64,11 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   const compactContent = content.contentSpacing === 'compact'
   const spacingScale = compactContent ? 0.48 : 1
   const contactScale = content.contactSize === 'large' ? 1.25 : 1
+  const uniformBodyText = content.bodyTextMode === 'uniform'
   const headlineWeight = content.headlineWeight === 'black' ? 900 : content.headlineWeight === 'bold' ? 700 : 400
   const gap = value => value * spacingScale
+  const contactTextSize = H * 0.046 * contentScale * contactScale
+  const contactLineHeight = compactContent ? 1.12 : 1.32
   const contactLine = (label, value) => {
     if (!value) return ''
     const cleanLabel = (label || '').trim().replace(/:\s*$/, '')
@@ -84,11 +87,11 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     lines.filter(Boolean).forEach((line, index) => {
       blocks.push({
         text: line,
-        size: H * (options.compact ? 0.06 : 0.046) * contentScale * contactScale,
+        size: options.compact && !uniformBodyText ? H * 0.06 * contentScale * contactScale : contactTextSize,
         weight: 400,
         style: 'italic',
         fill: secondaryColor,
-        lineHeightRatio: options.compact || compactContent ? 1.12 : 1.32,
+        lineHeightRatio: options.compact && !uniformBodyText ? 1.12 : contactLineHeight,
         gapBefore: index === 0 ? gapBefore : 0,
         wrap: true
       })
@@ -186,11 +189,13 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
       positions.forEach((position, index) => {
         blocks.push({
           text: position,
-          size: H * (compactTwoPerson ? 0.065 : content.positionSize === 'large' ? 0.065 : 0.05) * contentScale,
+          size: uniformBodyText
+            ? contactTextSize
+            : H * (compactTwoPerson ? 0.065 : content.positionSize === 'large' ? 0.065 : 0.05) * contentScale,
           weight: 400,
           style: 'normal',
           fill: secondaryColor,
-          lineHeightRatio: compactTwoPerson || compactContent ? 1.08 : 1.3,
+          lineHeightRatio: uniformBodyText ? contactLineHeight : compactTwoPerson || compactContent ? 1.08 : 1.3,
           gapBefore: index === 0 ? (compactContent ? 0 : gap(H * (compactTwoPerson ? 0.01 : 0.03))) : 0,
           wrap: true
         })
@@ -199,11 +204,11 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     if (group.tagline) {
       blocks.push({
         text: group.tagline,
-        size: H * 0.046 * contentScale,
+        size: uniformBodyText ? contactTextSize : H * 0.046 * contentScale,
         weight: 400,
         style: 'italic',
         fill: secondaryColor,
-        lineHeightRatio: 1.32,
+        lineHeightRatio: uniformBodyText ? contactLineHeight : 1.32,
         gapBefore: gap(H * 0.03),
         wrap: true
       })
@@ -211,7 +216,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     const contactLines = compactTwoPerson
       ? [group.email, group.phone, group.cellPhone].filter(Boolean)
       : contactLinesFor(group)
-    pushContactLines(contactLines, gap(H * (compactTwoPerson ? 0.012 : 0.035)), { compact: compactTwoPerson })
+    pushContactLines(contactLines, uniformBodyText ? 0 : gap(H * (compactTwoPerson ? 0.012 : 0.035)), { compact: compactTwoPerson })
   }
 
   const groupGap = gap(H * (compactTwoPerson ? 0.045 : 0.07))
