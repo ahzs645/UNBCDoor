@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "test": "node --test",
     "preview": "vite preview",
     "compare-sign": "python3 tools/compare_door_sign.py",
     "compare-all": "python3 tools/prepare_archive_compare.py && vite build --config tools/compare-viewer/vite.config.js && python3 tools/inline_compare_build.py",
