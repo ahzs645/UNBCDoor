@@ -34,6 +34,10 @@ export const SignStyleControls = ({
   onDesignationLayoutChange,
   twoPersonSpacing,
   onTwoPersonSpacingChange,
+  alumniCrestSize,
+  onAlumniCrestSizeChange,
+  alumniCrestSpacing,
+  onAlumniCrestSpacingChange,
   contentSize,
   onContentSizeChange,
   contentSpacing,
@@ -52,6 +56,7 @@ export const SignStyleControls = ({
   onRoomContactGroupingChange,
   organizationLogo,
   onOrganizationLogoChange,
+  hasAlumni,
   hasSecondOccupant,
   hasDesignations,
   isRoomType
@@ -159,6 +164,36 @@ export const SignStyleControls = ({
         onChange={onTwoPersonSpacingChange}
         options={[{ value: 'compact', label: 'Compact' }, { value: 'relaxed', label: 'Relaxed' }]}
       />
+    )}
+
+    {!isRoomType && hasAlumni && (
+      <>
+        <OptionControl
+          label="Alumni Crest Size"
+          name="alumniCrestSize"
+          value={alumniCrestSize}
+          onChange={onAlumniCrestSizeChange}
+          options={[
+            { value: 'small', label: 'Small' },
+            { value: 'standard', label: 'Standard' },
+            { value: 'large', label: 'Large' },
+            { value: 'maximum', label: 'Maximum' }
+          ]}
+        />
+        <OptionControl
+          label="Text-to-Crest Spacing"
+          name="alumniCrestSpacing"
+          value={alumniCrestSpacing}
+          onChange={onAlumniCrestSpacingChange}
+          options={[
+            { value: 'auto', label: 'Auto' },
+            { value: 'tight', label: 'Tight' },
+            { value: 'standard', label: 'Standard' },
+            { value: 'wide', label: 'Wide' },
+            { value: 'maximum', label: 'Maximum' }
+          ]}
+        />
+      </>
     )}
 
     {isRoomType && hasSecondOccupant && (

@@ -161,6 +161,14 @@ textarea::placeholder {
     margin-top: 10px !important;
 }
 
+.sign-archive-controls__edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 14px;
+    text-decoration: none;
+}
+
 .occupant-section {
     min-width: 0;
     margin: 4px 0 0;

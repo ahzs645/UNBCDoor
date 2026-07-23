@@ -6,6 +6,20 @@ import ctaanLogo from '../assets/ctaan-logo.png'
 
 export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
 
+const ALUMNI_CREST_SIZE_SCALE = {
+  small: 0.85,
+  standard: 1,
+  large: 1.15,
+  maximum: 1.25
+}
+
+const ALUMNI_CREST_GAP_RATIO = {
+  tight: 0.015,
+  standard: 0.025,
+  wide: 0.04,
+  maximum: 0.06
+}
+
 const readBrandVar = (name, fallback) => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return fallback
@@ -86,6 +100,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   const pushContactLines = (lines, gapBefore, options = {}) => {
     lines.filter(Boolean).forEach((line, index) => {
       blocks.push({
+        occupant: options.occupant,
         text: line,
         size: options.compact && !uniformBodyText ? H * 0.06 * contentScale * contactScale : contactTextSize,
         weight: 400,
@@ -155,9 +170,10 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
 
   // Person (faculty / staff / student) group: name + credentials, wrapped position,
   // optional italic tagline, then Email / Phone / Cell lines.
-  const pushPersonGroup = (group, gapBefore) => {
+  const pushPersonGroup = (group, gapBefore, occupant) => {
     if (!group.name) return
     blocks.push({
+      occupant,
       text: group.name + (group.credentials
         ? content.designationLayout === 'below' ? ',' : `, (${group.credentials})`
         : ''),
@@ -171,6 +187,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     })
     if (group.credentials && content.designationLayout === 'below') {
       blocks.push({
+        occupant,
         text: `(${group.credentials})`,
         size: H * (compactTwoPerson ? 0.08 : 0.075) * contentScale,
         weight: headlineWeight,
@@ -188,6 +205,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
 
       positions.forEach((position, index) => {
         blocks.push({
+          occupant,
           text: position,
           size: uniformBodyText
             ? contactTextSize
@@ -203,6 +221,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     }
     if (group.tagline) {
       blocks.push({
+        occupant,
         text: group.tagline,
         size: uniformBodyText ? contactTextSize : H * 0.046 * contentScale,
         weight: 400,
@@ -216,7 +235,11 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     const contactLines = compactTwoPerson
       ? [group.email, group.phone, group.cellPhone].filter(Boolean)
       : contactLinesFor(group)
-    pushContactLines(contactLines, uniformBodyText ? 0 : gap(H * (compactTwoPerson ? 0.012 : 0.035)), { compact: compactTwoPerson })
+    pushContactLines(
+      contactLines,
+      uniformBodyText ? 0 : gap(H * (compactTwoPerson ? 0.012 : 0.035)),
+      { compact: compactTwoPerson, occupant }
+    )
   }
 
   const groupGap = gap(H * (compactTwoPerson ? 0.045 : 0.07))
@@ -274,7 +297,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     email: content.showEmail ? content.email : '',
     phone: content.showPhone ? content.phone : '',
     cellPhone: content.showCellPhone ? content.cellPhone : ''
-  }, 0)
+  }, 0, 'primary')
   if (content.showSecondOccupant) {
     pushPersonGroup({
       name: content.name2,
@@ -283,7 +306,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
       email: content.showEmail2 ? content.email2 : '',
       phone: content.showPhone2 ? content.phone2 : '',
       cellPhone: content.showCellPhone2 ? content.cellPhone2 : ''
-    }, blocks.length ? groupGap : 0)
+    }, blocks.length ? groupGap : 0, 'secondary')
   }
 
   return blocks
@@ -339,19 +362,25 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   const showSecondaryAlumni = hasSecondPerson && Boolean(content.showAlumni2)
   const hasAlumni = showPrimaryAlumni || showSecondaryAlumni
   const bodyHeight = VH - HEADER_H
-  const badgeHeight = bodyHeight * (hasSecondPerson ? 0.3 : 0.34)
+  const baseBadgeHeight = bodyHeight * (hasSecondPerson ? 0.3 : 0.34)
+  const badgeSizeScale = ALUMNI_CREST_SIZE_SCALE[content.alumniCrestSize] || 1
+  // The largest preset is capped at 37.5% of a two-person body or 42.5% of a
+  // single-person body so crests cannot overrun their occupant area.
+  const maxBadgeHeight = bodyHeight * (hasSecondPerson ? 0.375 : 0.425)
+  const badgeHeight = Math.min(baseBadgeHeight * badgeSizeScale, maxBadgeHeight)
   const badgeScale = badgeHeight / 67.82
   const badgeWidth = 59.27 * badgeScale
   const badgeX = VW - PAD_X - badgeWidth
   const badgeCenterY = HEADER_H + (bodyHeight - badgeHeight) / 2
-  const primaryBadgeY = hasSecondPerson
+  const fallbackPrimaryBadgeY = hasSecondPerson
     ? HEADER_H + bodyHeight * 0.25 - badgeHeight / 2
     : badgeCenterY
-  const secondaryBadgeY = HEADER_H + bodyHeight * 0.75 - badgeHeight / 2
+  const fallbackSecondaryBadgeY = HEADER_H + bodyHeight * 0.75 - badgeHeight / 2
 
   // The source two-person templates let long names run close to their individual crest.
   // Relaxed/single-person layouts retain a little more breathing room beside the badge.
-  const badgeGap = compactTwoPerson ? 0 : VW * 0.025
+  const configuredGapRatio = ALUMNI_CREST_GAP_RATIO[content.alumniCrestSpacing]
+  const badgeGap = VW * (configuredGapRatio ?? (compactTwoPerson ? 0 : 0.025))
   const textMaxWidth = (VW - 2 * PAD_X) - (hasAlumni ? badgeWidth + badgeGap : 0)
 
   const blocks = buildBlocks(content, { H: VH, nameColor, secondaryColor })
@@ -361,6 +390,7 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     if (block.kind === 'logo') {
       items.push({
         kind: 'logo',
+        occupant: block.occupant,
         lineHeight: block.height,
         height: block.height,
         marginTop: block.gapBefore || 0
@@ -372,6 +402,7 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
       : [(block.text || '').toString()]
     lines.filter(Boolean).forEach((line, index) => {
       items.push({
+        occupant: block.occupant,
         text: line,
         size: block.size,
         weight: block.weight,
@@ -411,6 +442,18 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     cursorY += item.lineHeight
     return { ...item, baseline }
   })
+
+  // Centre each crest on the visible text bounds for its occupant. This keeps the badge
+  // aligned with the complete name/title/contact block even when lines wrap or are hidden.
+  const badgeYFor = (occupant, fallbackY) => {
+    const occupantTexts = texts.filter(item => item.occupant === occupant && item.size)
+    if (!occupantTexts.length) return fallbackY
+    const top = Math.min(...occupantTexts.map(item => item.baseline - item.size * 0.8))
+    const bottom = Math.max(...occupantTexts.map(item => item.baseline + item.size * 0.2))
+    return (top + bottom - badgeHeight) / 2
+  }
+  const primaryBadgeY = badgeYFor('primary', fallbackPrimaryBadgeY)
+  const secondaryBadgeY = badgeYFor('secondary', fallbackSecondaryBadgeY)
 
   // Canvas-space top-left of the viewable window (bleed + frame inset).
   const originX = BLEED + VL

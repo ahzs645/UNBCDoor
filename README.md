@@ -19,10 +19,12 @@ A web-based tool for generating standardized door signs for the University of No
   - Room name display
   - Professional designations
   - Alumni badge option
+  - Adjustable Alumni crest size and minimum text spacing with safe maximums
   - Optional second occupant, second room/lab, or additional contact for a shared room
   - Independent alumni badges and contact visibility for each occupant
 
 - **Saved Sign Archives**
+  - Dedicated `/saved-signs/` page linked from the editor
   - Import a single sign or a multi-sign JSON archive
   - Switch between imported signs and continue editing them
   - Export the current sign as versioned, re-importable JSON
@@ -73,6 +75,7 @@ A web-based tool for generating standardized door signs for the University of No
 
 4. **Customize Display**
    - Toggle alumni badge for faculty/staff
+   - Choose the Alumni crest size and text-to-crest spacing
    - Enable and select designations
    - Add custom designations if needed
 

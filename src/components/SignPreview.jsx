@@ -81,6 +81,8 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
     contactName2: values.contactName2,
     showAlumni: shouldShowAlumni,
     showAlumni2: shouldShowAlumni2,
+    alumniCrestSize: signData.alumniCrestSize,
+    alumniCrestSpacing: signData.alumniCrestSpacing,
     headlineWeight: signData.headlineWeight,
     roomNameStyle: signData.roomNameStyle,
     positionLayout: signData.positionLayout,
@@ -178,6 +180,10 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onPositionLayoutChange={(positionLayout) => onUpdate({ positionLayout })}
         twoPersonSpacing={signData.twoPersonSpacing}
         onTwoPersonSpacingChange={(twoPersonSpacing) => onUpdate({ twoPersonSpacing })}
+        alumniCrestSize={signData.alumniCrestSize}
+        onAlumniCrestSizeChange={(alumniCrestSize) => onUpdate({ alumniCrestSize })}
+        alumniCrestSpacing={signData.alumniCrestSpacing}
+        onAlumniCrestSpacingChange={(alumniCrestSpacing) => onUpdate({ alumniCrestSpacing })}
         contentSize={signData.contentSize}
         onContentSizeChange={(contentSize) => onUpdate({ contentSize })}
         contentSpacing={signData.contentSpacing}
@@ -200,6 +206,7 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onDesignationLayoutChange={(designationLayout) => onUpdate({ designationLayout })}
         organizationLogo={signData.organizationLogo}
         onOrganizationLogoChange={(organizationLogo) => onUpdate({ organizationLogo })}
+        hasAlumni={shouldShowAlumni || shouldShowAlumni2}
         hasSecondOccupant={signData.showSecondOccupant}
         hasDesignations={signData.showDesignations && signData.designations?.length > 0}
         isRoomType={isRoomType}

@@ -34,6 +34,8 @@ export const INITIAL_SIGN_DATA = {
   cardHolderType: '',
   showAlumni: false,
   showAlumni2: false,
+  alumniCrestSize: 'standard',
+  alumniCrestSpacing: 'auto',
   headlineWeight: 'black',
   roomNameStyle: 'standard',
   positionLayout: 'stacked',

@@ -52,6 +52,8 @@ const buildContent = (rawSignData, contentSizeOverride) => {
     contactName2: values.contactName2,
     showAlumni: supportsAlumni && signData.showAlumni,
     showAlumni2: supportsAlumni && signData.showAlumni2,
+    alumniCrestSize: signData.alumniCrestSize,
+    alumniCrestSpacing: signData.alumniCrestSpacing,
     headlineWeight: signData.headlineWeight,
     roomNameStyle: signData.roomNameStyle,
     positionLayout: signData.positionLayout,

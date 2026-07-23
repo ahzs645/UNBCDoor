@@ -15,7 +15,7 @@ const downloadJson = (archive, filename) => {
   window.setTimeout(() => URL.revokeObjectURL(url), 0)
 }
 
-export const SignArchiveControls = ({ signData, onLoadSign }) => {
+export const SignArchiveControls = ({ signData, onLoadSign, onEditSign }) => {
   const inputRef = useRef(null)
   const [archive, setArchive] = useState(null)
   const [selectedId, setSelectedId] = useState('')
@@ -118,16 +118,23 @@ export const SignArchiveControls = ({ signData, onLoadSign }) => {
       />
 
       {archive?.signs.length > 0 && (
-        <div className="sign-archive-controls__picker">
-          <label htmlFor="savedSign">Imported sign ({archive.signs.length})</label>
-          <CustomSelect
-            id="savedSign"
-            name="savedSign"
-            value={selectedId}
-            options={archive.signs.map(sign => ({ value: sign.id, label: sign.label }))}
-            onChange={handleSelection}
-          />
-        </div>
+        <>
+          <div className="sign-archive-controls__picker">
+            <label htmlFor="savedSign">Imported sign ({archive.signs.length})</label>
+            <CustomSelect
+              id="savedSign"
+              name="savedSign"
+              value={selectedId}
+              options={archive.signs.map(sign => ({ value: sign.id, label: sign.label }))}
+              onChange={handleSelection}
+            />
+          </div>
+          {selectedId && onEditSign && (
+            <a className="archive-btn sign-archive-controls__edit" href={import.meta.env.BASE_URL} onClick={onEditSign}>
+              Open selected sign in editor
+            </a>
+          )}
+        </>
       )}
 
       {message && <p className="sign-archive-controls__message" role="status">{message}</p>}

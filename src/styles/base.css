@@ -30,6 +30,10 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: linear-gradient(135deg, #035642 0%, #2d5a3d 100%);
@@ -76,6 +80,58 @@ body.dark-mode {
     margin-bottom: 0;
     text-align: left;
     flex: 1;
+}
+
+.controls-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-page-link {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    border: 1px solid var(--brand-green);
+    border-radius: 999px;
+    background: var(--ui-surface);
+    color: var(--brand-green);
+    font-size: 0.86rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.app-page-link:hover {
+    background: var(--brand-green);
+    color: white;
+}
+
+.app-page-link:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-ring);
+}
+
+.saved-signs-page {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.saved-signs-card {
+    padding: 32px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    box-shadow: var(--ui-shadow-md);
+}
+
+.saved-signs-card .sign-archive-controls {
+    margin: 0;
+    padding: 24px;
 }
 
 .theme-toggle-button {
@@ -128,11 +184,23 @@ body.dark-mode {
 }
 
 body.dark-mode .controls,
-body.dark-mode .card-holder-selector-container {
+body.dark-mode .card-holder-selector-container,
+body.dark-mode .saved-signs-card {
     background: #111827;
     box-shadow: 0 25px 50px rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(148, 163, 184, 0.15);
     color: #e2e8f0;
+}
+
+body.dark-mode .app-page-link {
+    border-color: #22c55e;
+    background: #0b1120;
+    color: #22c55e;
+}
+
+body.dark-mode .app-page-link:hover {
+    background: #22c55e;
+    color: #0b1120;
 }
 
 body.dark-mode .controls {
@@ -142,6 +210,10 @@ body.dark-mode .controls {
 body.dark-mode .controls h1 {
     color: #f8fafc;
     text-shadow: 0 2px 6px rgba(15, 23, 42, 0.6);
+}
+
+body.dark-mode .saved-signs-card h1 {
+    color: #f8fafc;
 }
 
 body.dark-mode .controls-header h1 {
@@ -300,4 +372,3 @@ body.dark-mode .main-content .contact-info,
 body.dark-mode .main-content .designations {
     color: #cbd5f5;
 }
-

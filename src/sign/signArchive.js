@@ -40,6 +40,12 @@ export const normalizeSignData = (value = {}) => {
   if (!['compact', 'relaxed'].includes(normalized.twoPersonSpacing)) {
     normalized.twoPersonSpacing = INITIAL_SIGN_DATA.twoPersonSpacing
   }
+  if (!['small', 'standard', 'large', 'maximum'].includes(normalized.alumniCrestSize)) {
+    normalized.alumniCrestSize = INITIAL_SIGN_DATA.alumniCrestSize
+  }
+  if (!['auto', 'tight', 'standard', 'wide', 'maximum'].includes(normalized.alumniCrestSpacing)) {
+    normalized.alumniCrestSpacing = INITIAL_SIGN_DATA.alumniCrestSpacing
+  }
   if (!['standard', 'large', 'largest'].includes(normalized.contentSize)) {
     normalized.contentSize = INITIAL_SIGN_DATA.contentSize
   }
