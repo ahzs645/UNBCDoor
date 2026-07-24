@@ -29,8 +29,10 @@ body.dark-mode .print-fit-warning {
     color: #fcd34d;
 }
 
-/* Paper size uses the same segmented control as the appearance panel below it. */
-.paper-size-selector {
+/* Paper size and measuring-sheet mode use the same segmented control as the appearance panel
+   below them. */
+.paper-size-selector,
+.template-mode-selector {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,13 +41,15 @@ body.dark-mode .print-fit-warning {
     margin-bottom: 20px;
 }
 
-.paper-size-selector > label {
+.paper-size-selector > label,
+.template-mode-selector > label {
     display: inline;
     margin: 0;
     color: var(--ui-text-muted);
 }
 
-.paper-size-options {
+.paper-size-options,
+.template-mode-options {
     display: flex;
     gap: 2px;
     padding: 2px;
@@ -56,7 +60,8 @@ body.dark-mode .print-fit-warning {
     justify-content: center;
 }
 
-.paper-option {
+.paper-option,
+.template-mode-option {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -73,19 +78,23 @@ body.dark-mode .print-fit-warning {
     transition: background 0.15s ease, color 0.15s ease;
 }
 
-.paper-option:hover {
+.paper-option:hover,
+.template-mode-option:hover {
     background: var(--ui-surface-muted);
     color: var(--ui-text);
 }
 
 .paper-option.active,
-.paper-option.active:hover {
+.paper-option.active:hover,
+.template-mode-option.active,
+.template-mode-option.active:hover {
     background: var(--brand-green);
     color: #ffffff;
     font-weight: 600;
 }
 
-.paper-option input[type="radio"] {
+.paper-option input[type="radio"],
+.template-mode-option input[type="radio"] {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -354,27 +363,33 @@ body.dark-mode .style-option.active:hover {
     color: #0b1120;
 }
 
-/* Paper-size picker — dark-mode parity with the sign-style options above. */
-body.dark-mode .paper-size-selector > label {
+/* Paper-size and measuring-sheet pickers — dark-mode parity with the sign-style options. */
+body.dark-mode .paper-size-selector > label,
+body.dark-mode .template-mode-selector > label {
     color: #cbd5f5;
 }
 
-body.dark-mode .paper-size-options {
+body.dark-mode .paper-size-options,
+body.dark-mode .template-mode-options {
     background: #111827;
     border-color: #374151;
 }
 
-body.dark-mode .paper-option {
+body.dark-mode .paper-option,
+body.dark-mode .template-mode-option {
     color: #94a3b8;
 }
 
-body.dark-mode .paper-option:hover {
+body.dark-mode .paper-option:hover,
+body.dark-mode .template-mode-option:hover {
     background: #273449;
     color: #e2e8f0;
 }
 
 body.dark-mode .paper-option.active,
-body.dark-mode .paper-option.active:hover {
+body.dark-mode .paper-option.active:hover,
+body.dark-mode .template-mode-option.active,
+body.dark-mode .template-mode-option.active:hover {
     background: #22c55e;
     color: #0b1120;
 }
@@ -414,3 +429,232 @@ body.dark-mode .designation-checkbox {
     color: #e2e8f0;
 }
 
+
+/* Measuring sheets page — configuration on the left, live PDF preview on the right. The card
+   runs wider than the saved-signs one so a landscape sheet is legible next to the form. */
+.measuring-sheets-page {
+    max-width: 1180px;
+}
+
+.measuring-sheets__intro {
+    margin: -10px 0 22px;
+    color: var(--ui-text-muted);
+    font-size: 0.88rem;
+    line-height: 1.55;
+}
+
+.measuring-sheets {
+    display: grid;
+    grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.measuring-sheets__config {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+}
+
+.measuring-sheets__group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.measuring-sheets__group > label {
+    margin: 0;
+}
+
+/* The segmented controls stack their options on this page rather than sitting inline with a
+   caption, so they fill the column instead of the row. */
+.measuring-sheets .template-mode-options {
+    justify-content: flex-start;
+}
+
+.measuring-sheets__hint {
+    margin: 0;
+    color: var(--ui-text-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.measuring-sheets__units {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: var(--ui-text-muted);
+    font-size: 0.8rem;
+}
+
+.measuring-sheets__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.measuring-sheets__field label {
+    margin-bottom: 6px;
+    font-size: 0.72rem;
+}
+
+.measuring-sheets__field input {
+    padding: 9px 11px;
+    font-size: 0.9rem;
+}
+
+.measuring-sheets__summary {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+.measuring-sheets__summary > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.8rem;
+}
+
+.measuring-sheets__summary dt {
+    color: var(--ui-text-muted);
+}
+
+.measuring-sheets__summary dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+.measuring-sheets__switch {
+    align-self: flex-start;
+}
+
+.measuring-sheets__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.measuring-sheets__actions .export-btn {
+    flex: 1;
+    min-width: 150px;
+}
+
+.measuring-sheets__warning {
+    margin: 0;
+    color: #8b0000;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+body.dark-mode .measuring-sheets__warning {
+    color: #fca5a5;
+}
+
+.measuring-sheets__message {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.measuring-sheets__preset {
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: var(--ui-text-muted);
+}
+
+.measuring-sheets__preset summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ui-text);
+}
+
+.measuring-sheets__preset pre {
+    margin: 10px 0 0;
+    padding: 10px;
+    border-radius: 6px;
+    background: var(--ui-surface-muted);
+    color: var(--ui-text);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+.measuring-sheets__preview {
+    position: sticky;
+    top: 20px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    overflow: hidden;
+    display: flex;
+    /* Landscape, like every sheet, so the PDF viewer's fit-to-width fills the panel instead
+       of leaving a band of grey under it. */
+    aspect-ratio: 11 / 8.5;
+    min-height: 460px;
+}
+
+.measuring-sheets__preview object {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #ffffff;
+}
+
+/* The PDF preview needs the room more than the form does. */
+@media (max-width: 900px) {
+    .measuring-sheets {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .measuring-sheets__preview {
+        position: static;
+        min-height: 320px;
+    }
+}
+
+/* The editor's pointer to this page, under the export buttons. */
+.template-export__link {
+    margin: 18px auto 0;
+    max-width: 620px;
+    color: var(--ui-text-muted);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    text-align: center;
+}
+
+.template-export__link a {
+    color: var(--brand-green);
+    font-weight: 600;
+}
+
+body.dark-mode .template-export__link a {
+    color: #4ade80;
+}
+
+/* Quieter outline variant of the export button, for the secondary action on the sheets page. */
+.export-btn.template-export__btn {
+    background: transparent;
+    border: 1px solid var(--ui-border);
+    color: var(--ui-text-muted);
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.export-btn.template-export__btn:hover {
+    background: rgba(3, 86, 66, 0.06);
+    border-color: var(--brand-green);
+    color: var(--brand-green);
+}

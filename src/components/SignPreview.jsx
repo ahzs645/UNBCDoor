@@ -24,7 +24,13 @@ const buildFitWarning = (layout) => {
     : "There's no room for crop marks on this sheet; cut to the insert size by hand."
 }
 
-export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
+export const SignPreview = ({
+  signData,
+  cardHolders,
+  onUpdate,
+  measuringSheetsHref,
+  onOpenMeasuringSheets
+}) => {
   const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
   const [showGuides, setShowGuides] = useState(true)
@@ -177,6 +183,8 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onPaperSizeChange={setPaperSize}
         onExportPNG={handleExportPNG}
         onExportPDF={handleExportPDF}
+        measuringSheetsHref={measuringSheetsHref}
+        onOpenMeasuringSheets={onOpenMeasuringSheets}
         fitWarning={fitWarning}
       />
     </>

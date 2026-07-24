@@ -1,13 +1,16 @@
 import React from 'react'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 
-// Paper size selection, an optional print-fit warning, and the PNG / print-ready PDF buttons.
-// Paper options are derived from PAPER_DIMENSIONS so adding a sheet there surfaces it here.
+// Paper size selection, an optional print-fit warning, the PNG / print-ready PDF buttons, and
+// a pointer to the measuring sheets page. Paper options are derived from PAPER_DIMENSIONS so
+// adding a sheet there surfaces it here.
 export const SignExportControls = ({
   paperSize,
   onPaperSizeChange,
   onExportPNG,
   onExportPDF,
+  measuringSheetsHref,
+  onOpenMeasuringSheets,
   fitWarning
 }) => (
   <div className="export-section">
@@ -41,5 +44,11 @@ export const SignExportControls = ({
         Export as PDF (Print-Ready)
       </button>
     </div>
+
+    <p className="template-export__link">
+      Need to check a holder? <a href={measuringSheetsHref} onClick={onOpenMeasuringSheets}>Measuring sheets</a>{' '}
+      prints a 1:1 template of the selected holder, or a grid you cut down to measure one that
+      has no preset yet.
+    </p>
   </div>
 )

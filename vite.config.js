@@ -11,7 +11,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         editor: fileURLToPath(new URL('./index.html', import.meta.url)),
-        savedSigns: fileURLToPath(new URL('./saved-signs/index.html', import.meta.url))
+        savedSigns: fileURLToPath(new URL('./saved-signs/index.html', import.meta.url)),
+        measuringSheets: fileURLToPath(new URL('./measuring-sheets/index.html', import.meta.url))
       }
     }
   }
