@@ -172,40 +172,8 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
       </div>
 
       <SignStyleControls
-        headlineWeight={signData.headlineWeight}
-        onHeadlineWeightChange={(headlineWeight) => onUpdate({ headlineWeight })}
-        roomNameStyle={signData.roomNameStyle}
-        onRoomNameStyleChange={(roomNameStyle) => onUpdate({ roomNameStyle })}
-        positionLayout={signData.positionLayout}
-        onPositionLayoutChange={(positionLayout) => onUpdate({ positionLayout })}
-        twoPersonSpacing={signData.twoPersonSpacing}
-        onTwoPersonSpacingChange={(twoPersonSpacing) => onUpdate({ twoPersonSpacing })}
-        alumniCrestSize={signData.alumniCrestSize}
-        onAlumniCrestSizeChange={(alumniCrestSize) => onUpdate({ alumniCrestSize })}
-        alumniCrestSpacing={signData.alumniCrestSpacing}
-        onAlumniCrestSpacingChange={(alumniCrestSpacing) => onUpdate({ alumniCrestSpacing })}
-        contentSize={signData.contentSize}
-        onContentSizeChange={(contentSize) => onUpdate({ contentSize })}
-        contentSpacing={signData.contentSpacing}
-        onContentSpacingChange={(contentSpacing) => onUpdate({ contentSpacing })}
-        contentWidth={signData.contentWidth}
-        onContentWidthChange={(contentWidth) => onUpdate({ contentWidth })}
-        textAlignment={signData.textAlignment}
-        onTextAlignmentChange={(textAlignment) => onUpdate({ textAlignment })}
-        contactLayout={signData.contactLayout}
-        onContactLayoutChange={(contactLayout) => onUpdate({ contactLayout })}
-        contactSize={signData.contactSize}
-        onContactSizeChange={(contactSize) => onUpdate({ contactSize })}
-        bodyTextMode={signData.bodyTextMode}
-        onBodyTextModeChange={(bodyTextMode) => onUpdate({ bodyTextMode })}
-        roomContactGrouping={signData.roomContactGrouping}
-        onRoomContactGroupingChange={(roomContactGrouping) => onUpdate({ roomContactGrouping })}
-        positionSize={signData.positionSize}
-        onPositionSizeChange={(positionSize) => onUpdate({ positionSize })}
-        designationLayout={signData.designationLayout}
-        onDesignationLayoutChange={(designationLayout) => onUpdate({ designationLayout })}
-        organizationLogo={signData.organizationLogo}
-        onOrganizationLogoChange={(organizationLogo) => onUpdate({ organizationLogo })}
+        signData={signData}
+        onUpdate={onUpdate}
         hasAlumni={shouldShowAlumni || shouldShowAlumni2}
         hasSecondOccupant={signData.showSecondOccupant}
         hasDesignations={signData.showDesignations && signData.designations?.length > 0}

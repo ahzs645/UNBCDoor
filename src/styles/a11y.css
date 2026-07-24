@@ -3,10 +3,6 @@
     .export-buttons {
         flex-direction: column;
     }
-    .sign-style-section {
-        flex-direction: column;
-        gap: 18px;
-    }
     .export-btn {
         width: 100%;
     }
@@ -26,6 +22,8 @@
 .toggle-button:focus-visible,
 .export-btn:focus-visible,
 .archive-btn:focus-visible,
+.sign-style-panel__toggle:focus-visible,
+.sign-style-panel__reset:focus-visible,
 .custom-designation button:focus-visible,
 .designation-tag button:focus-visible {
     outline: none;
@@ -44,11 +42,21 @@
     border: 0 !important;
 }
 
-.paper-option:focus-within,
-.style-option:focus-within,
 .designation-option:focus-within {
     border-color: var(--brand-green);
     box-shadow: var(--ui-focus-ring);
+}
+
+/* The segmented options sit flush inside their track, so the ring is drawn inset to keep
+   it from spilling over the neighbouring segments. */
+.style-option:focus-within,
+.paper-option:focus-within {
+    box-shadow: inset 0 0 0 2px var(--brand-green);
+}
+
+.style-option.active:focus-within,
+.paper-option.active:focus-within {
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85);
 }
 
 /* Respect users who prefer reduced motion. */
