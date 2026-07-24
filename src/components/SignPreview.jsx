@@ -9,8 +9,6 @@ import { SignStyleControls } from './SignStyleControls'
 import { SignExportControls } from './SignExportControls'
 import { PreviewMeasurements } from './PreviewMeasurements'
 
-const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']
-
 // Turns the print-fit result into a one-line caution shown above the export buttons. Returns
 // null when the insert + bleed + crop marks all fit the chosen sheet at the required 1:1 scale.
 const buildFitWarning = (layout) => {
@@ -37,7 +35,6 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
   const values = resolveSignValues(signData)
   const shouldShowAlumni = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni
   const shouldShowAlumni2 = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni2
-  const isRoomType = ROOM_TYPES.includes(signData.signType)
 
   const doorSignClass = [
     'door-sign',
@@ -171,14 +168,9 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         <PreviewMeasurements measurementSummary={measurementSummary} />
       </div>
 
-      <SignStyleControls
-        signData={signData}
-        onUpdate={onUpdate}
-        hasAlumni={shouldShowAlumni || shouldShowAlumni2}
-        hasSecondOccupant={signData.showSecondOccupant}
-        hasDesignations={signData.showDesignations && signData.designations?.length > 0}
-        isRoomType={isRoomType}
-      />
+      {/* The panel decides which options apply from the same content object the artwork
+          renders, so an option is only offered when it has something to act on. */}
+      <SignStyleControls signData={signData} content={signContent} onUpdate={onUpdate} />
 
       <SignExportControls
         paperSize={paperSize}

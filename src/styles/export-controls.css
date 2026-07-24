@@ -189,6 +189,13 @@ body.dark-mode .print-fit-warning {
     padding: 6px 14px 16px;
 }
 
+.sign-style-panel__hint {
+    margin: -4px 0 0;
+    color: var(--ui-text-muted);
+    font-size: 0.76rem;
+    line-height: 1.4;
+}
+
 .style-group {
     display: grid;
     gap: 8px;
