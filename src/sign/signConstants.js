@@ -4,6 +4,10 @@
 
 export const PT_PER_INCH = 72
 
+// Sign types that name a room rather than a person. They render a headline + contact block
+// instead of a name/position group, so a different set of style options applies to them.
+export const ROOM_SIGN_TYPES = ['lab', 'general-room', 'custodian-closet']
+
 // Bleed is the industry-standard 1/8"; the safe area keeps critical content clear of the
 // cut. Both are used by the preview guides, the artwork canvas, and the PDF crop marks.
 export const BLEED_INCHES = 0.125
