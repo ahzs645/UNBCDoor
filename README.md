@@ -48,6 +48,7 @@ A web-based tool for generating standardized door signs for the University of No
   - Multiple card holder type options
   - Automatic scaling based on card holder dimensions
   - Detailed specifications display
+  - Printable 1:1 holder template for checking a holder against the preset
 
 - **Designation System**
   - Pre-defined professional designations
@@ -88,7 +89,16 @@ A web-based tool for generating standardized door signs for the University of No
    - Export the artwork as PNG or print-ready PDF
    - Use **Export current** in Saved signs to save editable JSON
 
-7. **Import an Archive**
+7. **Check a Physical Holder**
+   - Choose **Print holder template (PDF)** under the export buttons
+   - Print it at 100% ("Actual size" — never "Fit to page") and check the two scale-check
+     rulers on the sheet before measuring anything
+   - Cut on the solid trim line, slide the sheet into the holder, and trace the frame edge
+   - Anything outside the green window is hidden by the acrylic frame on a real sign
+   - Record the measurements in the worksheet line and update the preset in
+     `src/data/cardHolders.js` if they differ from the estimate
+
+8. **Import an Archive**
    - Choose **Load production archive** to use the included 89-sign collection immediately
    - Choose **Import JSON** under Saved signs
    - For a multi-sign archive, choose any imported entry from the new selector
@@ -177,6 +187,7 @@ under `tools/compare-viewer`; it is never included in the production website.
 - `index.html` - Main application file
 - `src/components` - Form, preview, archive, and export controls
 - `src/sign` - Sign defaults, geometry, artwork, archive, and export logic
+- `src/sign/signTemplate.js` - Printable 1:1 holder measuring template
 - `src/unbc` - Department hierarchy and UNBC artwork assets
 - `data/door-sign-archive.json` - Re-importable production-sign archive
 

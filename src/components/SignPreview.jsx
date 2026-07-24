@@ -4,6 +4,7 @@ import { BLEED_INCHES } from '../sign/signConstants'
 import { resolveSignValues } from '../sign/signDefaults'
 import { resolveCardHolderGeometry, getPrintLayout } from '../sign/signGeometry'
 import { exportSignPNG, exportSignPDF } from '../sign/signExport'
+import { exportHolderTemplatePDF } from '../sign/signTemplate'
 import { getDepartmentDisplayName } from '../unbc'
 import { SignStyleControls } from './SignStyleControls'
 import { SignExportControls } from './SignExportControls'
@@ -30,7 +31,7 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
   const [showGuides, setShowGuides] = useState(true)
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
-  const { insertSize, viewableOffset, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
+  const { insertSize, viewableSize, viewableOffset, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
 
   const values = resolveSignValues(signData)
   const shouldShowAlumni = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni
@@ -109,6 +110,17 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
     paperSize,
     signType: signData.signType
   })
+  // The blank measuring sheet needs no artwork — only the holder geometry the preview already
+  // resolved, so it prints identically whatever is currently on the sign.
+  const handleExportTemplate = () => exportHolderTemplatePDF({
+    insertSize,
+    viewableSize,
+    viewableOffset,
+    paperSize,
+    holderKey: signData.cardHolderType,
+    holderName: selectedCardHolder?.name,
+    holderNotes: selectedCardHolder?.notes
+  })
 
   return (
     <>
@@ -177,6 +189,8 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onPaperSizeChange={setPaperSize}
         onExportPNG={handleExportPNG}
         onExportPDF={handleExportPDF}
+        onExportTemplate={handleExportTemplate}
+        hasCardHolder={Boolean(selectedCardHolder)}
         fitWarning={fitWarning}
       />
     </>

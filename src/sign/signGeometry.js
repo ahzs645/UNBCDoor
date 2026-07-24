@@ -6,10 +6,10 @@ import {
   PT_PER_INCH,
   PAPER_DIMENSIONS,
   PAPER_ORDER
-} from './signConstants'
+} from './signConstants.js'
 
 // Trims trailing zeros so 8.50 -> "8.5" and 11.00 -> "11" in the measurement readout.
-const formatInches = (value) => {
+export const formatInches = (value) => {
   if (Number.isInteger(value)) {
     return value.toString()
   }
