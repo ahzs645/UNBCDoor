@@ -9,6 +9,7 @@ import {
   formatDual,
   formatDualSize
 } from './templateGeometry.js'
+import { inchLines } from './pdfPrimitives.js'
 
 const holder = {
   insertSize: { width: 6.97, height: 4.17 },
@@ -129,4 +130,11 @@ test('presets larger than the grid are left off rather than clipped', () => {
   assert.ok(layout.rows < 5.5, 'A4 grid is under 5.5 inches tall')
   assert.ok(!keys.includes('Legacy Letter-Half'), 'oversized preset omitted')
   assert.ok(keys.includes('Building 10'), 'fitting presets kept')
+})
+
+test('inch lines stop inside the rectangle they grid', () => {
+  // A 6.97" insert gets whole-inch lines at 0–6; the leftover 0.97" has no closing line.
+  assert.deepEqual(inchLines(6.97 * PT_PER_INCH), [0, 1, 2, 3, 4, 5, 6])
+  // An exact multiple keeps its closing edge.
+  assert.deepEqual(inchLines(4 * PT_PER_INCH), [0, 1, 2, 3, 4])
 })

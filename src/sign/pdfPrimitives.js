@@ -174,3 +174,67 @@ export const fileSlug = (value, fallback = 'holder') => (value || fallback)
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '') || fallback
+
+// --- Inch grid ----------------------------------------------------------------------------
+// Shared by the blank cutting grid and by the grid overlay on the holder template. Both draw
+// the same thing over a rectangle: quarter-inch lines to cut along, whole-inch lines over the
+// top of them, and coordinates repeated across the interior so a cut-off piece still says
+// where it came from.
+
+// Whole-inch line positions from a rectangle's origin, including the closing edge when it
+// lands exactly on an inch.
+export const inchLines = (lengthPoints) => {
+  const positions = []
+  for (let inch = 0; inch * PT_PER_INCH <= lengthPoints + 0.001; inch += 1) {
+    positions.push(inch)
+  }
+  return positions
+}
+
+export const drawInchGrid = (doc, rect, { subdivisions = 4, fine = GRID_FINE_INK, major = GRID_MAJOR_INK } = {}) => {
+  const step = PT_PER_INCH / subdivisions
+
+  stroke(doc, fine, 0.4)
+  for (let i = 1; i * step <= rect.width + 0.001; i += 1) {
+    if (i % subdivisions === 0) continue
+    doc.line(rect.x + i * step, rect.y, rect.x + i * step, rect.y + rect.height)
+  }
+  for (let i = 1; i * step <= rect.height + 0.001; i += 1) {
+    if (i % subdivisions === 0) continue
+    doc.line(rect.x, rect.y + i * step, rect.x + rect.width, rect.y + i * step)
+  }
+
+  stroke(doc, major, 0.5)
+  inchLines(rect.width).forEach((inch) => {
+    const x = rect.x + inch * PT_PER_INCH
+    doc.line(x, rect.y, x, rect.y + rect.height)
+  })
+  inchLines(rect.height).forEach((inch) => {
+    const y = rect.y + inch * PT_PER_INCH
+    doc.line(rect.x, y, rect.x + rect.width, y)
+  })
+}
+
+// "3,2" at every interior inch intersection — across, then down, both from the grid origin.
+// Cut a strip out of the middle of the sheet and it still carries its own coordinates.
+export const drawInteriorCoordinates = (doc, rect, { size = 4.8, color = MUTED, spacing = 1 } = {}) => {
+  const columns = inchLines(rect.width)
+  const rows = inchLines(rect.height)
+
+  columns.forEach((column) => {
+    if (column === 0 || column % spacing !== 0) return
+    rows.forEach((row) => {
+      if (row === 0 || row % spacing !== 0) return
+      if (column === columns[columns.length - 1] && row === rows[rows.length - 1]) return
+      // Tucked into the cell below-right of the intersection so the crossing point itself
+      // stays visible to measure from.
+      label(
+        doc,
+        `${column},${row}`,
+        rect.x + column * PT_PER_INCH + size * 1.8,
+        rect.y + row * PT_PER_INCH + size * 1.3,
+        { size, color }
+      )
+    })
+  })
+}

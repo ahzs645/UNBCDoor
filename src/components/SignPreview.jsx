@@ -30,6 +30,7 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
   const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
   const [showGuides, setShowGuides] = useState(true)
+  const [templateMode, setTemplateMode] = useState('template')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
   const { insertSize, viewableSize, viewableOffset, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
@@ -111,20 +112,26 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
     paperSize,
     signType: signData.signType
   })
-  // The blank measuring sheet needs no artwork — only the holder geometry the preview already
-  // resolved, so it prints identically whatever is currently on the sign.
-  const handleExportTemplate = () => exportHolderTemplatePDF({
-    insertSize,
-    viewableSize,
-    viewableOffset,
-    paperSize,
-    holderKey: signData.cardHolderType,
-    holderName: selectedCardHolder?.name,
-    holderNotes: selectedCardHolder?.notes
-  })
-  // The cutting grid is for holders that aren't in the presets yet, so it ignores the current
-  // selection entirely and prints every known preset as an outline to measure against.
-  const handleExportGrid = () => exportMeasuringGridPDF({ paperSize, cardHolders })
+  // The measuring sheets need no artwork — only the holder geometry the preview already
+  // resolved — so they print identically whatever is currently on the sign. The cutting grid
+  // is for holders that aren't in the presets yet, so it ignores the current selection
+  // entirely and prints every known preset as an outline to measure against.
+  const handleExportTemplateSheet = () => {
+    if (templateMode === 'grid') {
+      return exportMeasuringGridPDF({ paperSize, cardHolders })
+    }
+
+    return exportHolderTemplatePDF({
+      insertSize,
+      viewableSize,
+      viewableOffset,
+      paperSize,
+      holderKey: signData.cardHolderType,
+      holderName: selectedCardHolder?.name,
+      holderNotes: selectedCardHolder?.notes,
+      showGrid: templateMode === 'template-grid'
+    })
+  }
 
   return (
     <>
@@ -193,8 +200,9 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onPaperSizeChange={setPaperSize}
         onExportPNG={handleExportPNG}
         onExportPDF={handleExportPDF}
-        onExportTemplate={handleExportTemplate}
-        onExportGrid={handleExportGrid}
+        templateMode={templateMode}
+        onTemplateModeChange={setTemplateMode}
+        onExportTemplateSheet={handleExportTemplateSheet}
         hasCardHolder={Boolean(selectedCardHolder)}
         fitWarning={fitWarning}
       />

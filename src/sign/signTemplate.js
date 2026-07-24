@@ -6,6 +6,7 @@ import {
   formatDual,
   formatDualSize,
   CALLOUT_CLEARANCE_POINTS,
+  GRID_SUBDIVISIONS,
   TEMPLATE_FOOTER_POINTS
 } from './templateGeometry.js'
 import {
@@ -16,10 +17,14 @@ import {
   INK,
   MUTED,
   PAGE_MARGIN,
+  GRID_MAJOR_INK,
   RULE_INK,
   WINDOW_INK,
   dimension,
+  drawInchGrid,
+  drawInteriorCoordinates,
   drawScaleRulers,
+  inchLines,
   fileSlug,
   hatch,
   label,
@@ -34,13 +39,14 @@ import {
 // hatched bands show exactly how much of the insert the acrylic frame swallows. signGrid.js
 // covers the other case, where the holder's size isn't known yet.
 
-const drawHeader = (doc, layout, { holderName, insertSize, viewableSize, hasHolder }) => {
+const drawHeader = (doc, layout, { holderName, insertSize, viewableSize, hasHolder, showGrid }) => {
   const printSize = {
     width: insertSize.width + BLEED_INCHES * 2,
     height: insertSize.height + BLEED_INCHES * 2
   }
 
-  write(doc, `Door sign holder template — ${holderName || 'no holder selected'}`, PAGE_MARGIN, 24, {
+  const title = showGrid ? 'Door sign holder template + grid' : 'Door sign holder template'
+  write(doc, `${title} — ${holderName || 'no holder selected'}`, PAGE_MARGIN, 24, {
     size: 12.5, color: INK, style: 'bold'
   })
 
@@ -107,6 +113,28 @@ const drawCentreMarks = (doc, layout) => {
   doc.line(cx - 9, cy, cx + 9, cy)
   doc.line(cx, cy - 9, cx, cy + 9)
   setDash(doc)
+}
+
+// Optional measuring grid inside the insert, anchored to the trim corner so every number is a
+// distance from the cut edge. Drawn under the guides and the frame bands, and only inside the
+// trim: the bleed margin gets cut away, so gridding it would just be noise.
+const drawTemplateGrid = (doc, layout) => {
+  drawInchGrid(doc, layout.trim, { subdivisions: GRID_SUBDIVISIONS })
+  drawInteriorCoordinates(doc, layout.trim, { size: 4.6 })
+}
+
+// The axis numbers along the trim's top and left edges. Drawn after the frame bands, which
+// cover those same edges — the numbers have to read over the hatching, not under it.
+const drawTemplateGridNumbers = (doc, layout) => {
+  const { trim } = layout
+
+  inchLines(trim.width).forEach((inch) => {
+    label(doc, `${inch}`, trim.x + inch * PT_PER_INCH, trim.y + 7, { size: 5.5, color: MUTED })
+  })
+  inchLines(trim.height).forEach((inch) => {
+    if (inch === 0) return
+    label(doc, `${inch}`, trim.x + 7, trim.y + inch * PT_PER_INCH, { size: 5.5, color: MUTED })
+  })
 }
 
 const drawGuides = (doc, layout) => {
@@ -230,14 +258,15 @@ const drawCallouts = (doc, layout, { insertSize, viewableSize, hasHolder }) => {
   }
 }
 
-const drawLegend = (doc, y, hasHolder) => {
+const drawLegend = (doc, y, hasHolder, showGrid) => {
   const items = [
     { text: 'Bleed (print edge)', color: BLEED_INK, dash: [3, 3], width: 0.6 },
     { text: 'Trim — cut here', color: INK, dash: [], width: 1 },
     hasHolder
       ? { text: 'Viewable window', color: WINDOW_INK, dash: [], width: 1.2 }
       : { text: `Safe area (${formatDual(SAFE_INCHES)} inset)`, color: WINDOW_INK, dash: [4, 3], width: 0.7 },
-    ...(hasHolder ? [{ text: 'Hidden by the holder frame', color: HIDDEN_INK, dash: [1.5, 1.5], width: 0.6 }] : [])
+    ...(hasHolder ? [{ text: 'Hidden by the holder frame', color: HIDDEN_INK, dash: [1.5, 1.5], width: 0.6 }] : []),
+    ...(showGrid ? [{ text: '1" grid from the trim corner ("3,2" = 3" across, 2" down)', color: GRID_MAJOR_INK, dash: [], width: 0.5 }] : [])
   ]
 
   let x = PAGE_MARGIN
@@ -253,7 +282,7 @@ const drawLegend = (doc, y, hasHolder) => {
   })
 }
 
-const drawFooter = (doc, { holderNotes, hasHolder, pageWidth, pageHeight }) => {
+const drawFooter = (doc, { holderNotes, hasHolder, showGrid, pageWidth, pageHeight }) => {
   const top = pageHeight - TEMPLATE_FOOTER_POINTS
 
   stroke(doc, RULE_INK, 0.5)
@@ -265,7 +294,7 @@ const drawFooter = (doc, { holderNotes, hasHolder, pageWidth, pageHeight }) => {
 
   write(doc, steps, PAGE_MARGIN, top + 14, { size: 7.5, color: INK })
 
-  drawLegend(doc, top + 28, hasHolder)
+  drawLegend(doc, top + 28, hasHolder, showGrid)
   drawScaleRulers(doc, top + 66, pageWidth)
 
   write(
@@ -295,15 +324,20 @@ export const buildHolderTemplateDocument = ({
   paperSize,
   holderKey,
   holderName,
-  holderNotes
+  holderNotes,
+  showGrid = false
 }) => {
   const hasHolder = Boolean(holderKey)
   const layout = buildTemplateLayout({ insertSize, viewableOffset, paperSize, hasHolder })
 
   const doc = new jsPDF({ orientation: layout.orientation, unit: 'pt', format: paperSize })
 
-  drawHeader(doc, layout, { holderName, insertSize, viewableSize, hasHolder })
+  drawHeader(doc, layout, { holderName, insertSize, viewableSize, hasHolder, showGrid })
+  // Grid first, then the frame bands, then the guide rectangles: each layer is meant to read
+  // over the one before it.
+  if (showGrid) drawTemplateGrid(doc, layout)
   drawBands(doc, layout, viewableOffset)
+  if (showGrid) drawTemplateGridNumbers(doc, layout)
   drawGuides(doc, layout)
   drawCallouts(doc, layout, { insertSize, viewableSize, hasHolder })
   // Footer positions come from the same layout the guides use so the reserved band, the gap
@@ -311,6 +345,7 @@ export const buildHolderTemplateDocument = ({
   drawFooter(doc, {
     holderNotes,
     hasHolder,
+    showGrid,
     pageWidth: layout.pageWidth,
     pageHeight: layout.pageHeight
   })
@@ -321,7 +356,7 @@ export const buildHolderTemplateDocument = ({
 export const exportHolderTemplatePDF = (options) => {
   try {
     buildHolderTemplateDocument(options).save(
-      `unbc-door-sign-template-${fileSlug(options.holderKey)}.pdf`
+      `unbc-door-sign-template-${fileSlug(options.holderKey)}${options.showGrid ? '-grid' : ''}.pdf`
     )
   } catch (error) {
     console.error('Error exporting holder template:', error)

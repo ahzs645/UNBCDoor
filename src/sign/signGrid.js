@@ -17,6 +17,8 @@ import {
   PAGE_MARGIN,
   PRESET_INKS,
   RULE_INK,
+  drawInchGrid,
+  drawInteriorCoordinates,
   label,
   setDash,
   stroke,
@@ -76,30 +78,8 @@ const drawMillimetreTicks = (doc, layout) => {
 
 const drawGrid = (doc, layout) => {
   const { grid, columns, rows, cell } = layout
-  const step = cell / GRID_SUBDIVISIONS
 
-  // Quarter-inch lines first, then the whole inches over the top of them.
-  stroke(doc, GRID_FINE_INK, 0.4)
-  for (let i = 0; i <= columns * GRID_SUBDIVISIONS; i += 1) {
-    if (i % GRID_SUBDIVISIONS === 0) continue
-    const x = grid.x + i * step
-    doc.line(x, grid.y, x, grid.y + grid.height)
-  }
-  for (let i = 0; i <= rows * GRID_SUBDIVISIONS; i += 1) {
-    if (i % GRID_SUBDIVISIONS === 0) continue
-    const y = grid.y + i * step
-    doc.line(grid.x, y, grid.x + grid.width, y)
-  }
-
-  stroke(doc, GRID_MAJOR_INK, 0.5)
-  for (let column = 0; column <= columns; column += 1) {
-    const x = grid.x + column * cell
-    doc.line(x, grid.y, x, grid.y + grid.height)
-  }
-  for (let row = 0; row <= rows; row += 1) {
-    const y = grid.y + row * cell
-    doc.line(grid.x, y, grid.x + grid.width, y)
-  }
+  drawInchGrid(doc, grid, { subdivisions: GRID_SUBDIVISIONS })
 
   // Inch numbers on all four edges: whichever pair of edges survives the scissors, the
   // distance from the origin corner can still be read off.
@@ -115,6 +95,10 @@ const drawGrid = (doc, layout) => {
   }
 
   write(doc, 'inches', grid.x + grid.width + 5, grid.y - 5, { size: 6, color: MUTED })
+
+  // …and repeated across the middle, so an offcut that keeps none of the edges still says how
+  // far across and down it came from.
+  drawInteriorCoordinates(doc, grid)
 }
 
 // The corner every number is measured from, plus the first cell doubling as the scale check.
