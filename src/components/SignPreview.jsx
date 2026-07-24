@@ -5,6 +5,7 @@ import { resolveSignValues } from '../sign/signDefaults'
 import { resolveCardHolderGeometry, getPrintLayout } from '../sign/signGeometry'
 import { exportSignPNG, exportSignPDF } from '../sign/signExport'
 import { exportHolderTemplatePDF } from '../sign/signTemplate'
+import { exportMeasuringGridPDF } from '../sign/signGrid'
 import { getDepartmentDisplayName } from '../unbc'
 import { SignStyleControls } from './SignStyleControls'
 import { SignExportControls } from './SignExportControls'
@@ -121,6 +122,9 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
     holderName: selectedCardHolder?.name,
     holderNotes: selectedCardHolder?.notes
   })
+  // The cutting grid is for holders that aren't in the presets yet, so it ignores the current
+  // selection entirely and prints every known preset as an outline to measure against.
+  const handleExportGrid = () => exportMeasuringGridPDF({ paperSize, cardHolders })
 
   return (
     <>
@@ -190,6 +194,7 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onExportPNG={handleExportPNG}
         onExportPDF={handleExportPDF}
         onExportTemplate={handleExportTemplate}
+        onExportGrid={handleExportGrid}
         hasCardHolder={Boolean(selectedCardHolder)}
         fitWarning={fitWarning}
       />

@@ -323,8 +323,8 @@ body.dark-mode .door-sign {
     cursor: not-allowed;
 }
 
-/* The measuring template is a production aid rather than a sign export, so it sits below the
-   two artwork buttons as a quieter outline button with an explanation. */
+/* The measuring sheets are production aids rather than sign exports, so they sit below the
+   two artwork buttons as quieter outline buttons with an explanation each. */
 .template-export {
     margin-top: 14px;
     display: flex;
@@ -332,6 +332,13 @@ body.dark-mode .door-sign {
     align-items: center;
     gap: 8px;
     width: 100%;
+}
+
+.template-export__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
 }
 
 .export-btn.template-export__btn {
@@ -357,6 +364,10 @@ body.dark-mode .door-sign {
     font-size: 0.78rem;
     line-height: 1.5;
     text-align: center;
+}
+
+.template-export__hint strong {
+    color: var(--ui-text);
 }
 
 .general-room {

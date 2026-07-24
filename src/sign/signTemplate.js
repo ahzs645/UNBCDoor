@@ -8,131 +8,31 @@ import {
   CALLOUT_CLEARANCE_POINTS,
   TEMPLATE_FOOTER_POINTS
 } from './templateGeometry.js'
+import {
+  ALERT_INK,
+  BLEED_INK,
+  HIDDEN_FILL,
+  HIDDEN_INK,
+  INK,
+  MUTED,
+  PAGE_MARGIN,
+  RULE_INK,
+  WINDOW_INK,
+  dimension,
+  drawScaleRulers,
+  fileSlug,
+  hatch,
+  label,
+  setDash,
+  stroke,
+  strokeRect,
+  write
+} from './pdfPrimitives.js'
 
-// Printable 1:1 measuring template for a card holder. It carries no sign content — it is the
-// ruler you hold against the physical holder: cut on the trim line, drop it in, and the
-// hatched bands show exactly how much of the insert the acrylic frame swallows.
-//
-// Drawn with jsPDF primitives only (standard Helvetica, no embedded faces, no DOM), so it is
-// synchronous and independent of the artwork exporters in signExport.js.
-
-const INK = [17, 17, 17]
-const MUTED = [110, 110, 110]
-const BLEED_INK = [155, 155, 155]
-const WINDOW_INK = [3, 86, 66]
-const HIDDEN_FILL = [246, 238, 238]
-const HIDDEN_INK = [176, 110, 110]
-const ALERT_INK = [139, 0, 0]
-
-const PAGE_MARGIN = 36
-
-const setDash = (doc, pattern = []) => {
-  if (typeof doc.setLineDashPattern === 'function') {
-    doc.setLineDashPattern(pattern, 0)
-  }
-}
-
-const stroke = (doc, color, width, dash = []) => {
-  doc.setDrawColor(color[0], color[1], color[2])
-  doc.setLineWidth(width)
-  setDash(doc, dash)
-}
-
-const strokeRect = (doc, rect) => doc.rect(rect.x, rect.y, rect.width, rect.height, 'S')
-
-const write = (doc, string, x, y, { size = 8, color = MUTED, align = 'left', style = 'normal', angle } = {}) => {
-  doc.setFont('helvetica', style)
-  doc.setFontSize(size)
-  doc.setTextColor(color[0], color[1], color[2])
-  doc.text(string, x, y, angle ? { align, angle } : { align })
-}
-
-// Text centred on (x, y) and knocked out of whatever it crosses, so callout labels stay
-// readable over guides and hatching. jsPDF only honours `align` for unrotated text and always
-// runs rotated text upward from its anchor, so the rotated case is positioned by hand:
-// the anchor moves half the string's length down the line, and across it by the amount that
-// centres the glyph band (ascent above the baseline, descent below).
-const CAP_CENTRE_RATIO = 0.385
-const GLYPH_HALF_RATIO = 0.7
-
-const label = (doc, string, x, y, { size = 7, color = INK, style = 'normal', angle = 0 } = {}) => {
-  doc.setFont('helvetica', style)
-  doc.setFontSize(size)
-  const width = doc.getTextWidth(string)
-  const half = size * GLYPH_HALF_RATIO + 1.5
-
-  doc.setFillColor(255, 255, 255)
-  if (angle) {
-    doc.rect(x - half, y - width / 2 - 2, half * 2, width + 4, 'F')
-    write(doc, string, x + size * CAP_CENTRE_RATIO, y + width / 2, { size, color, style, angle })
-  } else {
-    doc.rect(x - width / 2 - 2, y - half, width + 4, half * 2, 'F')
-    write(doc, string, x, y + size * CAP_CENTRE_RATIO, { size, color, style, align: 'center' })
-  }
-}
-
-const arrowHead = (doc, x, y, dx, dy, color) => {
-  const length = 5
-  const half = 2
-  const baseX = x - dx * length
-  const baseY = y - dy * length
-  const leftX = baseX - dy * half
-  const leftY = baseY + dx * half
-  const rightX = baseX + dy * half
-  const rightY = baseY - dx * half
-
-  if (typeof doc.triangle === 'function') {
-    doc.setFillColor(color[0], color[1], color[2])
-    doc.triangle(x, y, leftX, leftY, rightX, rightY, 'F')
-    return
-  }
-
-  stroke(doc, color, 0.6)
-  doc.line(x, y, leftX, leftY)
-  doc.line(x, y, rightX, rightY)
-}
-
-// An arrowed dimension line with extension leaders back to the edges being measured.
-const dimension = (doc, { axis, from, to, at, edge, text, color = INK }) => {
-  if (to - from < 12) return
-
-  if (typeof edge === 'number') {
-    stroke(doc, BLEED_INK, 0.4, [1.5, 1.5])
-    if (axis === 'x') {
-      doc.line(from, edge, from, at)
-      doc.line(to, edge, to, at)
-    } else {
-      doc.line(edge, from, at, from)
-      doc.line(edge, to, at, to)
-    }
-  }
-
-  stroke(doc, color, 0.6)
-  if (axis === 'x') {
-    doc.line(from, at, to, at)
-    arrowHead(doc, from, at, -1, 0, color)
-    arrowHead(doc, to, at, 1, 0, color)
-    label(doc, text, (from + to) / 2, at, { color })
-  } else {
-    doc.line(at, from, at, to)
-    arrowHead(doc, at, from, 0, -1, color)
-    arrowHead(doc, at, to, 0, 1, color)
-    label(doc, text, at, (from + to) / 2, { color, angle: 90 })
-  }
-}
-
-// 45° fill used for the strips the holder frame covers, clipped to the band by hand.
-const hatch = (doc, rect, spacing = 5) => {
-  const span = rect.width + rect.height
-  for (let offset = spacing; offset < span; offset += spacing) {
-    doc.line(
-      rect.x + Math.min(offset, rect.width),
-      rect.y + Math.max(offset - rect.width, 0),
-      rect.x + Math.max(offset - rect.height, 0),
-      rect.y + Math.min(offset, rect.height)
-    )
-  }
-}
+// Printable 1:1 measuring template for a known card holder. It carries no sign content — it is
+// the ruler you hold against the physical holder: cut on the trim line, drop it in, and the
+// hatched bands show exactly how much of the insert the acrylic frame swallows. signGrid.js
+// covers the other case, where the holder's size isn't known yet.
 
 const drawHeader = (doc, layout, { holderName, insertSize, viewableSize, hasHolder }) => {
   const printSize = {
@@ -353,42 +253,10 @@ const drawLegend = (doc, y, hasHolder) => {
   })
 }
 
-// Scale-check rulers. If these don't measure true the sheet was scaled by the print dialog
-// and every other number on it is wrong, so they sit right under the instructions.
-const drawRulers = (doc, y, pageWidth) => {
-  const gap = 26
-  const full = { inches: 4, millimetres: 100 }
-  const compact = { inches: 2, millimetres: 50 }
-  const available = pageWidth - PAGE_MARGIN * 2 - gap - 74
-  const scale = (full.inches * PT_PER_INCH) + (full.millimetres / 25.4 * PT_PER_INCH) <= available ? full : compact
-
-  const drawTicks = (x, unitLength, units, subdivisions, caption) => {
-    stroke(doc, INK, 0.6)
-    doc.line(x, y, x + unitLength * units, y)
-    for (let step = 0; step <= units * subdivisions; step += 1) {
-      const tickX = x + (step / subdivisions) * unitLength
-      const major = step % subdivisions === 0
-      const half = step % (subdivisions / 2) === 0
-      stroke(doc, INK, major ? 0.6 : 0.35)
-      doc.line(tickX, y, tickX, y - (major ? 9 : half ? 5.5 : 3))
-      if (major) {
-        write(doc, `${step / subdivisions}`, tickX, y - 11, { size: 6, color: MUTED, align: 'center' })
-      }
-    }
-    write(doc, caption, x + unitLength * units + 6, y, { size: 7.5, color: INK, style: 'bold' })
-  }
-
-  write(doc, 'Scale check — these bars must measure exactly:', PAGE_MARGIN, y - 20, { size: 7.5, color: MUTED })
-
-  drawTicks(PAGE_MARGIN, PT_PER_INCH, scale.inches, 8, `${scale.inches} in`)
-  const mmStart = PAGE_MARGIN + scale.inches * PT_PER_INCH + 42 + gap
-  drawTicks(mmStart, PT_PER_INCH / 2.54, scale.millimetres / 10, 10, `${scale.millimetres} mm`)
-}
-
 const drawFooter = (doc, { holderNotes, hasHolder, pageWidth, pageHeight }) => {
   const top = pageHeight - TEMPLATE_FOOTER_POINTS
 
-  stroke(doc, [225, 225, 225], 0.5)
+  stroke(doc, RULE_INK, 0.5)
   doc.line(PAGE_MARGIN, top, pageWidth - PAGE_MARGIN, top)
 
   const steps = hasHolder
@@ -398,7 +266,7 @@ const drawFooter = (doc, { holderNotes, hasHolder, pageWidth, pageHeight }) => {
   write(doc, steps, PAGE_MARGIN, top + 14, { size: 7.5, color: INK })
 
   drawLegend(doc, top + 28, hasHolder)
-  drawRulers(doc, top + 66, pageWidth)
+  drawScaleRulers(doc, top + 66, pageWidth)
 
   write(
     doc,
@@ -416,12 +284,6 @@ const drawFooter = (doc, { holderNotes, hasHolder, pageWidth, pageHeight }) => {
   const wrapped = doc.splitTextToSize(notes, pageWidth - PAGE_MARGIN * 2).slice(0, 2)
   write(doc, wrapped, PAGE_MARGIN, top + 95, { size: 6.8, color: MUTED })
 }
-
-const fileSlug = (value) => (value || 'holder')
-  .toString()
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-+|-+$/g, '') || 'holder'
 
 // Draws the template sheet and returns the jsPDF document. Everything on it is derived from
 // the same constants and card-holder geometry the preview and the artwork exporters use.

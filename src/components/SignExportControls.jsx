@@ -10,6 +10,7 @@ export const SignExportControls = ({
   onExportPNG,
   onExportPDF,
   onExportTemplate,
+  onExportGrid,
   hasCardHolder,
   fitWarning
 }) => (
@@ -46,13 +47,26 @@ export const SignExportControls = ({
     </div>
 
     <div className="template-export">
-      <button type="button" onClick={onExportTemplate} className="export-btn template-export__btn">
-        Print holder template (PDF)
-      </button>
+      <div className="template-export__buttons">
+        <button type="button" onClick={onExportTemplate} className="export-btn template-export__btn">
+          Print holder template (PDF)
+        </button>
+        <button type="button" onClick={onExportGrid} className="export-btn template-export__btn">
+          Print measuring grid (PDF)
+        </button>
+      </div>
+
       <p className="template-export__hint">
+        <strong>Holder template</strong> —{' '}
         {hasCardHolder
-          ? 'A blank 1:1 measuring sheet for this holder: bleed, cut line, the viewable window, and the strips the frame hides — with every dimension labelled. Print at 100%, cut it out, and drop it in the holder to check the numbers.'
-          : 'A blank 1:1 measuring sheet with the bleed, cut line and safe area. Select a card holder above to include its viewable window and frame coverage.'}
+          ? 'a blank 1:1 sheet for this holder: bleed, cut line, the viewable window, and the strips the frame hides, every dimension labelled. Print at 100%, cut it out, and drop it in the holder to check the numbers.'
+          : 'a blank 1:1 sheet with the bleed, cut line and safe area. Select a card holder above to include its viewable window and frame coverage.'}
+      </p>
+      <p className="template-export__hint">
+        <strong>Measuring grid</strong> — for a holder nobody has measured yet: a 1" grid you
+        trim with scissors until it slides in, then read the insert size off the numbered
+        edges. The known holder sizes are printed on it as outlines, so you can see at a
+        glance which preset a holder matches.
       </p>
     </div>
   </div>

@@ -49,6 +49,7 @@ A web-based tool for generating standardized door signs for the University of No
   - Automatic scaling based on card holder dimensions
   - Detailed specifications display
   - Printable 1:1 holder template for checking a holder against the preset
+  - Printable 1" cutting grid for measuring a holder that has no preset yet
 
 - **Designation System**
   - Pre-defined professional designations
@@ -98,7 +99,19 @@ A web-based tool for generating standardized door signs for the University of No
    - Record the measurements in the worksheet line and update the preset in
      `src/data/cardHolders.js` if they differ from the estimate
 
-8. **Import an Archive**
+8. **Measure an Unknown Holder**
+   - Choose **Print measuring grid (PDF)** when the holder has no preset (or you have no idea
+     what size it is) — a 1" grid numbered from its top-left corner, on the selected sheet size
+   - Print at 100% and check a square with a ruler: every large square is exactly 1" / 25.4 mm
+   - Cut along the grid lines with scissors, trying the sheet in the holder until it just
+     slides all the way in
+   - Read the width off the top numbers and the height off the side numbers — that is the
+     insert size; quarter-inch lines and a millimetre scale run along the origin edges
+   - Slide it in and trace the frame edge to get the viewable window
+   - Every known preset is drawn on the grid as a numbered dashed outline from the same
+     corner, so a cut sheet shows at a glance which preset the holder matches
+
+9. **Import an Archive**
    - Choose **Load production archive** to use the included 89-sign collection immediately
    - Choose **Import JSON** under Saved signs
    - For a multi-sign archive, choose any imported entry from the new selector
@@ -187,7 +200,8 @@ under `tools/compare-viewer`; it is never included in the production website.
 - `index.html` - Main application file
 - `src/components` - Form, preview, archive, and export controls
 - `src/sign` - Sign defaults, geometry, artwork, archive, and export logic
-- `src/sign/signTemplate.js` - Printable 1:1 holder measuring template
+- `src/sign/signTemplate.js` - Printable 1:1 template for a known holder
+- `src/sign/signGrid.js` - Printable 1" cutting grid for an unmeasured holder
 - `src/unbc` - Department hierarchy and UNBC artwork assets
 - `data/door-sign-archive.json` - Re-importable production-sign archive
 

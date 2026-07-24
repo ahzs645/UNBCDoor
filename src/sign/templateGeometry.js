@@ -1,12 +1,16 @@
 // Node's test runner resolves these specifiers directly, so the sign modules this file (and
 // its test) reach for are imported with explicit extensions.
-import { BLEED_INCHES, SAFE_INCHES, PT_PER_INCH } from './signConstants.js'
+import { BLEED_INCHES, PAPER_DIMENSIONS, SAFE_INCHES, PT_PER_INCH } from './signConstants.js'
 import { formatInches, getPrintLayout } from './signGeometry.js'
 
-// Pure geometry + label helpers for the printable holder template. Kept free of jsPDF and the
-// DOM so the layout maths can be unit-tested; signTemplate.js does the drawing.
+// Pure geometry + label helpers for the printable measuring sheets. Kept free of jsPDF and
+// the DOM so the layout maths can be unit-tested; signTemplate.js (holder template) and
+// signGrid.js (blank cutting grid) do the drawing.
 
 export const MM_PER_INCH = 25.4
+
+// Page margin shared by both sheets.
+export const PAGE_MARGIN = 36
 
 // Header/footer bands reserved on the sheet. The trim box is centred in what's left over so
 // the dimension callouts and the scale-check rulers can never overlap the guides.
@@ -112,3 +116,73 @@ export const buildTemplateLayout = ({ insertSize, viewableOffset, paperSize, has
     }
   }
 }
+
+// --- Blank cutting grid -------------------------------------------------------------------
+// The sheet for an unknown holder: a whole number of 1" cells, trimmed down with scissors
+// until it fits, then read off the numbered lines. Reserves less furniture than the holder
+// template so a Letter sheet still yields six full inches of grid height.
+
+export const GRID_HEADER_POINTS = 50
+export const GRID_FOOTER_POINTS = 86
+// Gutter outside the grid's origin edges, holding the inch numbers and then the millimetre
+// ticks beyond them, and the narrower strip on the far edges that only carries the closing
+// numbers. The grid itself is the scale check, so no ruler bars are reserved for.
+export const GRID_GUTTER_POINTS = 30
+export const GRID_EDGE_POINTS = 12
+// Fine lines per inch. Quarter inches are cuttable with scissors; anything finer just greys
+// the page out.
+export const GRID_SUBDIVISIONS = 4
+
+// Whole-inch grid for a sheet, always laid out landscape — door sign inserts are wider than
+// they are tall, so the long edge of the paper is the useful one.
+export const buildGridLayout = ({ paperSize }) => {
+  const paper = PAPER_DIMENSIONS[paperSize] || PAPER_DIMENSIONS.letter
+  const pageWidth = paper.height * PT_PER_INCH
+  const pageHeight = paper.width * PT_PER_INCH
+
+  const origin = {
+    x: PAGE_MARGIN + GRID_GUTTER_POINTS,
+    y: GRID_HEADER_POINTS + GRID_GUTTER_POINTS
+  }
+
+  const usableWidth = pageWidth - PAGE_MARGIN - GRID_EDGE_POINTS - origin.x
+  const usableHeight = pageHeight - GRID_FOOTER_POINTS - GRID_EDGE_POINTS - origin.y
+  const columns = Math.max(Math.floor(usableWidth / PT_PER_INCH), 1)
+  const rows = Math.max(Math.floor(usableHeight / PT_PER_INCH), 1)
+
+  return {
+    orientation: 'landscape',
+    pageWidth,
+    pageHeight,
+    origin,
+    columns,
+    rows,
+    cell: PT_PER_INCH,
+    grid: {
+      x: origin.x,
+      y: origin.y,
+      width: columns * PT_PER_INCH,
+      height: rows * PT_PER_INCH
+    }
+  }
+}
+
+// The preset outlines printed on the grid, largest last so the smaller ones stay readable on
+// top of it. Each shares the grid origin, so an insert cut to size lands on the one it matches.
+export const buildPresetOutlines = (cardHolders, layout) => Object.entries(cardHolders)
+  .map(([key, holder]) => ({ key, holder, insertSize: holder.insertSize }))
+  .filter(({ insertSize }) =>
+    insertSize.width <= layout.columns && insertSize.height <= layout.rows)
+  .sort((a, b) => (a.insertSize.width * a.insertSize.height) - (b.insertSize.width * b.insertSize.height))
+  .map(({ key, holder, insertSize }, index) => ({
+    key,
+    index,
+    name: holder.name,
+    insertSize,
+    rect: {
+      x: layout.origin.x,
+      y: layout.origin.y,
+      width: insertSize.width * PT_PER_INCH,
+      height: insertSize.height * PT_PER_INCH
+    }
+  }))
