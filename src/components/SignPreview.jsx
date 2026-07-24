@@ -4,8 +4,6 @@ import { BLEED_INCHES } from '../sign/signConstants'
 import { resolveSignValues } from '../sign/signDefaults'
 import { resolveCardHolderGeometry, getPrintLayout } from '../sign/signGeometry'
 import { exportSignPNG, exportSignPDF } from '../sign/signExport'
-import { exportHolderTemplatePDF } from '../sign/signTemplate'
-import { exportMeasuringGridPDF } from '../sign/signGrid'
 import { getDepartmentDisplayName } from '../unbc'
 import { SignStyleControls } from './SignStyleControls'
 import { SignExportControls } from './SignExportControls'
@@ -26,14 +24,19 @@ const buildFitWarning = (layout) => {
     : "There's no room for crop marks on this sheet; cut to the insert size by hand."
 }
 
-export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
+export const SignPreview = ({
+  signData,
+  cardHolders,
+  onUpdate,
+  measuringSheetsHref,
+  onOpenMeasuringSheets
+}) => {
   const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
   const [showGuides, setShowGuides] = useState(true)
-  const [templateMode, setTemplateMode] = useState('template')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
-  const { insertSize, viewableSize, viewableOffset, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
+  const { insertSize, viewableOffset, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
 
   const values = resolveSignValues(signData)
   const shouldShowAlumni = (signData.signType === 'faculty' || signData.signType === 'staff') && signData.showAlumni
@@ -112,26 +115,6 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
     paperSize,
     signType: signData.signType
   })
-  // The measuring sheets need no artwork — only the holder geometry the preview already
-  // resolved — so they print identically whatever is currently on the sign. The cutting grid
-  // is for holders that aren't in the presets yet, so it ignores the current selection
-  // entirely and prints every known preset as an outline to measure against.
-  const handleExportTemplateSheet = () => {
-    if (templateMode === 'grid') {
-      return exportMeasuringGridPDF({ paperSize, cardHolders })
-    }
-
-    return exportHolderTemplatePDF({
-      insertSize,
-      viewableSize,
-      viewableOffset,
-      paperSize,
-      holderKey: signData.cardHolderType,
-      holderName: selectedCardHolder?.name,
-      holderNotes: selectedCardHolder?.notes,
-      showGrid: templateMode === 'template-grid'
-    })
-  }
 
   return (
     <>
@@ -200,10 +183,8 @@ export const SignPreview = ({ signData, cardHolders, onUpdate }) => {
         onPaperSizeChange={setPaperSize}
         onExportPNG={handleExportPNG}
         onExportPDF={handleExportPDF}
-        templateMode={templateMode}
-        onTemplateModeChange={setTemplateMode}
-        onExportTemplateSheet={handleExportTemplateSheet}
-        hasCardHolder={Boolean(selectedCardHolder)}
+        measuringSheetsHref={measuringSheetsHref}
+        onOpenMeasuringSheets={onOpenMeasuringSheets}
         fitWarning={fitWarning}
       />
     </>

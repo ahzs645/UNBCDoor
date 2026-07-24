@@ -118,9 +118,9 @@ const drawCentreMarks = (doc, layout) => {
 // Optional measuring grid inside the insert, anchored to the trim corner so every number is a
 // distance from the cut edge. Drawn under the guides and the frame bands, and only inside the
 // trim: the bleed margin gets cut away, so gridding it would just be noise.
-const drawTemplateGrid = (doc, layout) => {
-  drawInchGrid(doc, layout.trim, { subdivisions: GRID_SUBDIVISIONS })
-  drawInteriorCoordinates(doc, layout.trim, { size: 4.6 })
+const drawTemplateGrid = (doc, layout, { subdivisions = GRID_SUBDIVISIONS, showCoordinates = true } = {}) => {
+  drawInchGrid(doc, layout.trim, { subdivisions })
+  if (showCoordinates) drawInteriorCoordinates(doc, layout.trim, { size: 4.6 })
 }
 
 // The axis numbers along the trim's top and left edges. Drawn after the frame bands, which
@@ -325,7 +325,9 @@ export const buildHolderTemplateDocument = ({
   holderKey,
   holderName,
   holderNotes,
-  showGrid = false
+  showGrid = false,
+  subdivisions,
+  showCoordinates = true
 }) => {
   const hasHolder = Boolean(holderKey)
   const layout = buildTemplateLayout({ insertSize, viewableOffset, paperSize, hasHolder })
@@ -335,7 +337,7 @@ export const buildHolderTemplateDocument = ({
   drawHeader(doc, layout, { holderName, insertSize, viewableSize, hasHolder, showGrid })
   // Grid first, then the frame bands, then the guide rectangles: each layer is meant to read
   // over the one before it.
-  if (showGrid) drawTemplateGrid(doc, layout)
+  if (showGrid) drawTemplateGrid(doc, layout, { subdivisions, showCoordinates })
   drawBands(doc, layout, viewableOffset)
   if (showGrid) drawTemplateGridNumbers(doc, layout)
   drawGuides(doc, layout)

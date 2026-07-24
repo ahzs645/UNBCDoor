@@ -323,47 +323,6 @@ body.dark-mode .door-sign {
     cursor: not-allowed;
 }
 
-/* The measuring sheets are production aids rather than sign exports, so they sit below the
-   two artwork buttons as a mode picker, a quieter outline button, and an explanation. */
-.template-export {
-    margin-top: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-}
-
-.template-mode-selector {
-    margin-bottom: 0;
-}
-
-.export-btn.template-export__btn {
-    flex: none;
-    padding: 11px 22px;
-    background: transparent;
-    border: 1px solid var(--ui-border);
-    color: var(--ui-text-muted);
-    font-size: 0.88rem;
-    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
-}
-
-.export-btn.template-export__btn:hover {
-    background: rgba(3, 86, 66, 0.06);
-    border-color: var(--brand-green);
-    color: var(--brand-green);
-}
-
-.template-export__hint {
-    margin: 0;
-    max-width: 620px;
-    color: var(--ui-text-muted);
-    font-size: 0.78rem;
-    line-height: 1.5;
-    text-align: center;
-}
-
-
 .general-room {
     text-align: center;
 }

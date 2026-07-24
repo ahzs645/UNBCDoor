@@ -76,10 +76,10 @@ const drawMillimetreTicks = (doc, layout) => {
   })
 }
 
-const drawGrid = (doc, layout) => {
+const drawGrid = (doc, layout, { subdivisions = GRID_SUBDIVISIONS, showCoordinates = true } = {}) => {
   const { grid, columns, rows, cell } = layout
 
-  drawInchGrid(doc, grid, { subdivisions: GRID_SUBDIVISIONS })
+  drawInchGrid(doc, grid, { subdivisions })
 
   // Inch numbers on all four edges: whichever pair of edges survives the scissors, the
   // distance from the origin corner can still be read off.
@@ -98,7 +98,7 @@ const drawGrid = (doc, layout) => {
 
   // …and repeated across the middle, so an offcut that keeps none of the edges still says how
   // far across and down it came from.
-  drawInteriorCoordinates(doc, grid)
+  if (showCoordinates) drawInteriorCoordinates(doc, grid)
 }
 
 // The corner every number is measured from, plus the first cell doubling as the scale check.
@@ -218,17 +218,25 @@ const drawFooter = (doc, layout, outlines, omitted) => {
 
 // Draws the cutting grid and returns the jsPDF document. Separate from the download so the
 // sheet can be rendered outside a browser.
-export const buildMeasuringGridDocument = ({ paperSize, cardHolders = {} }) => {
+export const buildMeasuringGridDocument = ({
+  paperSize,
+  cardHolders = {},
+  subdivisions,
+  showCoordinates = true,
+  showPresetOutlines = true
+}) => {
   const layout = buildGridLayout({ paperSize })
-  const outlines = buildPresetOutlines(cardHolders, layout)
+  const outlines = showPresetOutlines ? buildPresetOutlines(cardHolders, layout) : []
   // A preset bigger than the grid can't be drawn; say so rather than quietly dropping it.
   const drawn = new Set(outlines.map(({ key }) => key))
-  const omitted = Object.keys(cardHolders).filter((key) => !drawn.has(key))
+  const omitted = showPresetOutlines
+    ? Object.keys(cardHolders).filter((key) => !drawn.has(key))
+    : []
 
   const doc = new jsPDF({ orientation: layout.orientation, unit: 'pt', format: paperSize })
 
   drawHeader(doc, layout)
-  drawGrid(doc, layout)
+  drawGrid(doc, layout, { subdivisions, showCoordinates })
   drawMillimetreTicks(doc, layout)
   drawPresetOutlines(doc, outlines)
   drawOrigin(doc, layout)

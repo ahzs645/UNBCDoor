@@ -6,6 +6,7 @@ import { ToggleButtons } from './components/ToggleButtons'
 import { DesignationsContainer } from './components/DesignationsContainer'
 import { ThemeToggle } from './components/ThemeToggle'
 import { SignArchiveControls } from './components/SignArchiveControls'
+import { MeasuringSheetsPage } from './components/MeasuringSheetsPage'
 import { useCardHolders } from './hooks/useCardHolders'
 import { useSignState } from './hooks/useSignState'
 import { useTheme } from './hooks/useTheme'
@@ -13,11 +14,20 @@ import { departmentTypes } from './unbc'
 
 const EDITOR_PATH = import.meta.env.BASE_URL
 const SAVED_SIGNS_PATH = `${import.meta.env.BASE_URL}saved-signs/`
-const pageFromPath = () => (
-  window.location.pathname.replace(/\/+$/, '').endsWith('/saved-signs')
-    ? 'saved-signs'
-    : 'editor'
-)
+const MEASURING_SHEETS_PATH = `${import.meta.env.BASE_URL}measuring-sheets/`
+
+const PAGE_PATHS = {
+  editor: EDITOR_PATH,
+  'saved-signs': SAVED_SIGNS_PATH,
+  'measuring-sheets': MEASURING_SHEETS_PATH
+}
+
+const pageFromPath = () => {
+  const path = window.location.pathname.replace(/\/+$/, '')
+  if (path.endsWith('/saved-signs')) return 'saved-signs'
+  if (path.endsWith('/measuring-sheets')) return 'measuring-sheets'
+  return 'editor'
+}
 
 function App() {
   const [signData, setSignData] = useSignState()
@@ -42,8 +52,7 @@ function App() {
       event.preventDefault()
     }
 
-    const path = nextPage === 'saved-signs' ? SAVED_SIGNS_PATH : EDITOR_PATH
-    window.history.pushState({}, '', path)
+    window.history.pushState({}, '', PAGE_PATHS[nextPage] || EDITOR_PATH)
     setPage(nextPage)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -84,6 +93,13 @@ function App() {
             <div className="controls-header__actions">
               <a
                 className="app-page-link"
+                href={MEASURING_SHEETS_PATH}
+                onClick={(event) => navigateTo('measuring-sheets', event)}
+              >
+                Measuring sheets
+              </a>
+              <a
+                className="app-page-link"
                 href={SAVED_SIGNS_PATH}
                 onClick={(event) => navigateTo('saved-signs', event)}
               >
@@ -110,7 +126,13 @@ function App() {
             onUpdate={(cardHolderType) => updateSignData({ cardHolderType })}
           />
 
-          <SignPreview signData={signData} cardHolders={cardHolders} onUpdate={updateSignData} />
+          <SignPreview
+            signData={signData}
+            cardHolders={cardHolders}
+            onUpdate={updateSignData}
+            measuringSheetsHref={MEASURING_SHEETS_PATH}
+            onOpenMeasuringSheets={(event) => navigateTo('measuring-sheets', event)}
+          />
 
           <ToggleButtons
             signType={signData.signType}
@@ -133,6 +155,34 @@ function App() {
           )}
         </div>
       </div>
+
+      <main className="saved-signs-page measuring-sheets-page" hidden={page !== 'measuring-sheets'}>
+        <section className="saved-signs-card">
+          <div className="controls-header">
+            <h1>Measuring sheets</h1>
+            <div className="controls-header__actions">
+              <a
+                className="app-page-link"
+                href={EDITOR_PATH}
+                onClick={(event) => navigateTo('editor', event)}
+              >
+                Back to editor
+              </a>
+              <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
+            </div>
+          </div>
+          <p className="measuring-sheets__intro">
+            Printable sheets for checking a door sign holder against its preset — or for
+            measuring one that has no preset yet. Configure a sheet, watch it redraw, then
+            print it at 100%.
+          </p>
+          {/* Mounted only while the page is open so the preview isn't rebuilding a PDF in the
+              background the whole time the editor is in use. */}
+          {page === 'measuring-sheets' && (
+            <MeasuringSheetsPage cardHolders={cardHolders} initialHolderKey={signData.cardHolderType || ''} />
+          )}
+        </section>
+      </main>
 
       <main className="saved-signs-page" hidden={page !== 'saved-signs'}>
         <section className="saved-signs-card">
