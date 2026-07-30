@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "door-sign-editor",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--strictPort", "--port", "5199"],
+      "port": 5199
+    },
+    {
+      "name": "unbc-logo",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "vendor/unbc-logo", "run", "dev", "--", "--port", "5183"],
+      "port": 5183
+    }
+  ]
+}

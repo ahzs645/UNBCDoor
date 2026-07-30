@@ -6,7 +6,7 @@ import { normalizeSignData } from '../../src/sign/signArchive'
 import { resolveSignValues } from '../../src/sign/signDefaults'
 import { resolveCardHolderGeometry } from '../../src/sign/signGeometry'
 import { cardHolders } from '../../src/data/cardHolders'
-import { getDepartmentDisplayName } from '../../src/unbc'
+import { getDepartmentDisplayName } from '@unbc/logo'
 import '../../src/styles/fonts.css'
 import './viewer.css'
 
