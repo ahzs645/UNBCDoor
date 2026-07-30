@@ -242,9 +242,8 @@ Already cloned without it:
 git submodule update --init --recursive
 ```
 
-That repository is currently **private**, so cloning it requires access. CI reads a
-`SUBMODULE_TOKEN` secret (a PAT with `repo` scope) for the same reason; once `unbc-logo` is
-public, the default token suffices and the secret can be removed.
+It also ships a standalone generator for building a lockup from custom department text, live at
+<http://projects.ahmadjalil.com/unbc-logo/>.
 
 To pull a newer version of the brand kit into this app:
 
