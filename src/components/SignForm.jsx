@@ -1,5 +1,5 @@
 import React from 'react'
-import { DepartmentSelector } from '../unbc'
+import { DepartmentSelector } from '@unbc/logo'
 import { CustomSelect } from './CustomSelect'
 
 const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']

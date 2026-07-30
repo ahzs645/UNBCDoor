@@ -1,0 +1,3 @@
+[submodule "vendor/unbc-logo"]
+	path = vendor/unbc-logo
+	url = https://github.com/ahzs645/unbc-logo.git

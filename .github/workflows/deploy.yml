@@ -20,6 +20,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        # The UNBC brand kit is a submodule (ahzs645/unbc-logo) and the build imports from it.
+        submodules: recursive
+        # That repository is private, and the default GITHUB_TOKEN is scoped to this repository
+        # only, so it cannot clone it. SUBMODULE_TOKEN must be a PAT with `repo` scope, added
+        # under Settings → Secrets and variables → Actions. Once unbc-logo is public, the
+        # fallback to github.token is enough and the secret can be removed.
+        token: ${{ secrets.SUBMODULE_TOKEN || github.token }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v4

@@ -1,6 +1,5 @@
 import React, { forwardRef } from 'react'
-import { UnbcLogoMark, AlumniCrest } from '../unbc'
-import { splitDepartmentText } from '../unbc/logo/logoText'
+import { UnbcLogoMark, AlumniCrest, splitDepartmentText } from '@unbc/logo'
 import { PT_PER_INCH, DEFAULT_INSERT_SIZE } from './signConstants'
 import ctaanLogo from '../assets/ctaan-logo.png'
 

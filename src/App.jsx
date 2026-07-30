@@ -10,7 +10,7 @@ import { MeasuringSheetsPage } from './components/MeasuringSheetsPage'
 import { useCardHolders } from './hooks/useCardHolders'
 import { useSignState } from './hooks/useSignState'
 import { useTheme } from './hooks/useTheme'
-import { departmentTypes } from './unbc'
+import { departmentTypes } from '@unbc/logo'
 
 const EDITOR_PATH = import.meta.env.BASE_URL
 const SAVED_SIGNS_PATH = `${import.meta.env.BASE_URL}saved-signs/`

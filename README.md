@@ -220,8 +220,39 @@ under `tools/compare-viewer`; it is never included in the production website.
 - `src/sign/signTemplate.js` - Printable 1:1 template for a known holder (optional grid)
 - `src/sign/signGrid.js` - Printable 1" cutting grid for an unmeasured holder
 - `src/sign/pdfPrimitives.js` - Drawing helpers shared by the measuring sheets
-- `src/unbc` - Department hierarchy and UNBC artwork assets
+- `vendor/unbc-logo` - UNBC brand kit, as a git submodule (see below)
 - `data/door-sign-archive.json` - Re-importable production-sign archive
+
+## The UNBC brand kit submodule
+
+The logo lockup, department-line wrapping, department hierarchy, and artwork assets live in
+their own repository — [ahzs645/unbc-logo](https://github.com/ahzs645/unbc-logo) — so other
+projects can reuse them. It is vendored here as a git submodule and imported through the
+`@unbc/logo` alias defined in `vite.config.js`.
+
+Clone with it:
+
+```bash
+git clone --recurse-submodules https://github.com/ahzs645/UNBCDoor.git
+```
+
+Already cloned without it:
+
+```bash
+git submodule update --init --recursive
+```
+
+That repository is currently **private**, so cloning it requires access. CI reads a
+`SUBMODULE_TOKEN` secret (a PAT with `repo` scope) for the same reason; once `unbc-logo` is
+public, the default token suffices and the secret can be removed.
+
+To pull a newer version of the brand kit into this app:
+
+```bash
+git submodule update --remote vendor/unbc-logo
+```
+
+Then commit the updated submodule pointer.
 
 ## Dependencies
 
