@@ -6,13 +6,17 @@
     .export-btn {
         width: 100%;
     }
+    /* Four sheet sizes as a 2×2 grid: roomy tap targets without a tall single column. */
     .paper-size-options {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         width: 100%;
     }
     .paper-option {
         width: 100%;
+        padding: 9px 6px;
         justify-content: center;
+        text-align: center;
     }
 }
 

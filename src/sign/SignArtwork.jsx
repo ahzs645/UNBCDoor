@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react'
-import { UnbcLogoMark, AlumniCrest, splitDepartmentText } from '@unbc/logo'
+import { UnbcLogoMark, AlumniCrest } from '@unbc/logo'
 import { PT_PER_INCH, DEFAULT_INSERT_SIZE } from './signConstants'
+import { resolveHeaderGeometry } from './headerGeometry'
 import ctaanLogo from '../assets/ctaan-logo.png'
 
 export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
@@ -340,19 +341,21 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
 
   // Everything below is in DESIGN space — coordinates relative to the viewable window's
   // top-left corner. The content <g> is translated out by BLEED + the viewable inset.
-  // Production files measure ~12% left margin, a ~20.5% header band that grows ~3.3% per
-  // department line, and a logo lockup spanning ~35.5% of the card width.
+  // Production files measure a ~12% left margin for the body text. The header band and the
+  // lockup are measured against the trimmed card rather than the viewable window, so they are
+  // resolved in trim space (see headerGeometry.js) and shifted into design space here.
   const PAD_X = VW * (content.contentWidth === 'wide' ? 0.08 : 0.12)
-  const departmentLineCount = splitDepartmentText(content.departmentText || '').length
-  const HEADER_H = VH * (0.205 + 0.033 * departmentLineCount)
-
-  const logoWidth = VW * 0.355
-  const logoScale = logoWidth / 178
-  const logoHeight = 80 * logoScale
-  // Centre the logo in the header band, but never above the viewable top — for a wide-but-short
-  // window (e.g. Residence Compact) the band is shorter than the logo, which would otherwise
-  // push it up under the frame.
-  const logoY = Math.max((HEADER_H - logoHeight) / 2, 0)
+  const header = resolveHeaderGeometry({
+    width: W,
+    height: H,
+    viewable: { top: VT, right: VR, bottom: VB, left: VL },
+    textX: VL + PAD_X,
+    rightInset: PAD_X,
+    departmentText: content.departmentText
+  })
+  const HEADER_H = header.bandHeight - VT
+  const logoX = header.logoX - VL
+  const logoY = header.logoY - VT
 
   const isRoom = content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet'
   const hasSecondPerson = !isRoom && Boolean(content.showSecondOccupant && content.name2)
@@ -482,8 +485,9 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
 
       <g transform={`translate(${originX}, ${originY})`}>
         <UnbcLogoMark
-          transform={`translate(${PAD_X}, ${logoY}) scale(${logoScale})`}
+          transform={`translate(${logoX}, ${logoY}) scale(${header.scale})`}
           departmentText={content.departmentText}
+          maxWidth={header.departmentMaxWidth}
           fontFamily={fontFamily}
         />
 

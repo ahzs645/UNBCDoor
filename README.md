@@ -202,10 +202,15 @@ under `tools/compare-viewer`; it is never included in the production website.
 ## Technical Details
 
 - Built with HTML, CSS, and JavaScript
-- Responsive design
+- Responsive design: side-by-side editor and preview on desktop (the preview column stays in
+  view and scrolls on its own); Editor/Preview tabs on phones and tablets, with a live copy of the
+  sign pinned above the form while editing (tap it for the full preview, or hide it)
 - SVG-based logo and badge elements
 - Dynamic content updates
 - Real-time preview
+- Header band and logo lockup placed as in the production Illustrator files: a band 20.5% of the
+  card height, the lockup at its native size, and department names kept on one line
+  (`src/sign/headerGeometry.js`)
 - Enhanced form validation and formatting
 - Modern UI with smooth transitions and animations
 
@@ -219,6 +224,8 @@ under `tools/compare-viewer`; it is never included in the production website.
 - `src/sign/measuringSheets.js` - One entry point for the three printable measuring sheets
 - `src/sign/signTemplate.js` - Printable 1:1 template for a known holder (optional grid)
 - `src/sign/signGrid.js` - Printable 1" cutting grid for an unmeasured holder
+- `src/sign/signContent.js` - Builds the artwork content from the editor's sign data
+- `src/sign/headerGeometry.js` - Header band, lockup position, and department-line width
 - `src/sign/pdfPrimitives.js` - Drawing helpers shared by the measuring sheets
 - `vendor/unbc-logo` - UNBC brand kit, as a git submodule (see below)
 - `data/door-sign-archive.json` - Re-importable production-sign archive
