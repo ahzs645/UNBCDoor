@@ -3,75 +3,17 @@ import { createRoot } from 'react-dom/client'
 import archive from './generated-manifest.json'
 import { SignArtwork } from '../../src/sign/SignArtwork'
 import { normalizeSignData } from '../../src/sign/signArchive'
-import { resolveSignValues } from '../../src/sign/signDefaults'
-import { resolveCardHolderGeometry } from '../../src/sign/signGeometry'
+import { buildSignContent } from '../../src/sign/signContent'
 import { cardHolders } from '../../src/data/cardHolders'
-import { getDepartmentDisplayName } from '@unbc/logo'
 import '../../src/styles/fonts.css'
 import './viewer.css'
 
+// The review renders the trimmed card (no bleed) so it lines up with the source artboards.
 const buildContent = (rawSignData, contentSizeOverride) => {
   const signData = normalizeSignData(rawSignData)
-  const values = resolveSignValues(signData)
-  const selectedHolder = cardHolders[signData.cardHolderType]
-  const { insertSize, viewableOffset } = resolveCardHolderGeometry(selectedHolder)
-  const supportsAlumni = signData.signType === 'faculty' || signData.signType === 'staff'
-
   return {
-    signType: signData.signType,
-    departmentText: getDepartmentDisplayName(signData),
-    name: values.name,
-    credentials: signData.showDesignations && signData.designations.length
-      ? signData.designations.join(', ')
-      : '',
-    position: values.position,
-    tagline: values.tagline,
-    email: values.email,
-    emailLabel: signData.emailLabel,
-    phone: values.phone,
-    phoneLabel: signData.phoneLabel,
-    cellPhone: values.cellPhone,
-    cellPhoneLabel: signData.cellPhoneLabel,
-    showEmail: signData.showEmail,
-    showPhone: signData.showPhone,
-    showCellPhone: signData.showCellPhone,
-    roomName: values.roomName,
-    contactName: values.contactName,
-    showSecondOccupant: signData.showSecondOccupant,
-    secondaryEntryType: signData.secondaryEntryType,
-    name2: values.name2,
-    position2: values.position2,
-    tagline2: values.tagline2,
-    email2: values.email2,
-    phone2: values.phone2,
-    cellPhone2: values.cellPhone2,
-    showEmail2: signData.showEmail2,
-    showPhone2: signData.showPhone2,
-    showCellPhone2: signData.showCellPhone2,
-    roomName2: values.roomName2,
-    contactName2: values.contactName2,
-    showAlumni: supportsAlumni && signData.showAlumni,
-    showAlumni2: supportsAlumni && signData.showAlumni2,
-    alumniCrestSize: signData.alumniCrestSize,
-    alumniCrestSpacing: signData.alumniCrestSpacing,
-    headlineWeight: signData.headlineWeight,
-    roomNameStyle: signData.roomNameStyle,
-    positionLayout: signData.positionLayout,
-    positionSize: signData.positionSize,
-    designationLayout: signData.designationLayout,
-    twoPersonSpacing: signData.twoPersonSpacing,
-    contentSize: contentSizeOverride || signData.contentSize,
-    contentSpacing: signData.contentSpacing,
-    contentWidth: signData.contentWidth,
-    textAlignment: signData.textAlignment,
-    contactLayout: signData.contactLayout,
-    contactSize: signData.contactSize,
-    bodyTextMode: signData.bodyTextMode,
-    roomContactGrouping: signData.roomContactGrouping,
-    organizationLogo: signData.organizationLogo,
-    insert: insertSize,
-    viewable: viewableOffset,
-    bleed: 0
+    ...buildSignContent(signData, { cardHolders, bleed: 0 }),
+    contentSize: contentSizeOverride || signData.contentSize
   }
 }
 

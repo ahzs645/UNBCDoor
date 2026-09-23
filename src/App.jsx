@@ -7,9 +7,11 @@ import { DesignationsContainer } from './components/DesignationsContainer'
 import { ThemeToggle } from './components/ThemeToggle'
 import { SignArchiveControls } from './components/SignArchiveControls'
 import { MeasuringSheetsPage } from './components/MeasuringSheetsPage'
+import { LivePreview } from './components/LivePreview'
 import { useCardHolders } from './hooks/useCardHolders'
 import { useSignState } from './hooks/useSignState'
 import { useTheme } from './hooks/useTheme'
+import { useMediaQuery } from './hooks/useMediaQuery'
 import { departmentTypes } from '@unbc/logo'
 
 const EDITOR_PATH = import.meta.env.BASE_URL
@@ -20,6 +22,18 @@ const PAGE_PATHS = {
   editor: EDITOR_PATH,
   'saved-signs': SAVED_SIGNS_PATH,
   'measuring-sheets': MEASURING_SHEETS_PATH
+}
+
+const LIVE_PREVIEW_KEY = 'unbc-door-sign:live-preview-hidden'
+
+// Remembered per browser; storage can be unavailable (private mode, blocked site data), in
+// which case the live preview simply starts visible.
+const readLivePreviewHidden = () => {
+  try {
+    return window.localStorage.getItem(LIVE_PREVIEW_KEY) === 'true'
+  } catch (error) {
+    return false
+  }
 }
 
 const pageFromPath = () => {
@@ -34,6 +48,9 @@ function App() {
   const { cardHolders } = useCardHolders()
   const { isDarkMode, toggleTheme } = useTheme()
   const [activeMobileTab, setActiveMobileTab] = useState('editor')
+  const [livePreviewHidden, setLivePreviewHidden] = useState(readLivePreviewHidden)
+  // Matches the tabbed layout breakpoint in responsive.css.
+  const isTabbedLayout = useMediaQuery('(max-width: 1024px)')
   const [page, setPage] = useState(pageFromPath)
 
   const updateSignData = (updates) => {
@@ -45,6 +62,20 @@ function App() {
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
+
+  const updateLivePreviewHidden = (hidden) => {
+    setLivePreviewHidden(hidden)
+    try {
+      window.localStorage.setItem(LIVE_PREVIEW_KEY, String(hidden))
+    } catch (error) {
+      // Not remembered this time; the choice still applies for this visit.
+    }
+  }
+
+  const showPreviewTab = () => {
+    setActiveMobileTab('preview')
+    window.scrollTo({ top: 0 })
+  }
 
   const navigateTo = (nextPage, event) => {
     if (event) {
@@ -60,27 +91,49 @@ function App() {
   return (
     <>
       <div className="container" hidden={page !== 'editor'}>
-        <div className="mobile-editor-tabs" role="tablist" aria-label="Editor and preview">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeMobileTab === 'editor'}
-            aria-controls="editor-panel"
-            className={`mobile-editor-tab ${activeMobileTab === 'editor' ? 'active' : ''}`}
-            onClick={() => setActiveMobileTab('editor')}
-          >
-            Editor
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeMobileTab === 'preview'}
-            aria-controls="preview-panel"
-            className={`mobile-editor-tab ${activeMobileTab === 'preview' ? 'active' : ''}`}
-            onClick={() => setActiveMobileTab('preview')}
-          >
-            Preview
-          </button>
+        {/* Phones and tablets: the editor and the full preview are tabs, and a live copy of the
+            sign stays pinned above the form while editing. Hidden on desktop by CSS. */}
+        <div className="mobile-editor-bar">
+          <div className="mobile-editor-tabs" role="tablist" aria-label="Editor and preview">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeMobileTab === 'editor'}
+              aria-controls="editor-panel"
+              className={`mobile-editor-tab ${activeMobileTab === 'editor' ? 'active' : ''}`}
+              onClick={() => setActiveMobileTab('editor')}
+            >
+              Editor
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeMobileTab === 'preview'}
+              aria-controls="preview-panel"
+              className={`mobile-editor-tab ${activeMobileTab === 'preview' ? 'active' : ''}`}
+              onClick={() => setActiveMobileTab('preview')}
+            >
+              Preview
+            </button>
+          </div>
+          {isTabbedLayout && activeMobileTab === 'editor' && (
+            livePreviewHidden ? (
+              <button
+                type="button"
+                className="live-preview-show"
+                onClick={() => updateLivePreviewHidden(false)}
+              >
+                Show live preview
+              </button>
+            ) : (
+              <LivePreview
+                signData={signData}
+                cardHolders={cardHolders}
+                onOpenPreview={showPreviewTab}
+                onHide={() => updateLivePreviewHidden(true)}
+              />
+            )
+          )}
         </div>
 
         <div
@@ -113,6 +166,26 @@ function App() {
             onUpdate={updateSignData}
             departments={departmentTypes}
           />
+
+          <ToggleButtons
+            signType={signData.signType}
+            showAlumni={signData.showAlumni}
+            showAlumni2={signData.showAlumni2}
+            showSecondOccupant={signData.showSecondOccupant}
+            occupantName={signData.name}
+            occupantName2={signData.name2}
+            showDesignations={signData.showDesignations}
+            onToggleAlumni={() => updateSignData({ showAlumni: !signData.showAlumni })}
+            onToggleAlumni2={() => updateSignData({ showAlumni2: !signData.showAlumni2 })}
+            onToggleDesignations={() => updateSignData({ showDesignations: !signData.showDesignations })}
+          />
+
+          {signData.showDesignations && (signData.signType === 'faculty' || signData.signType === 'staff') && (
+            <DesignationsContainer
+              selectedDesignations={signData.designations}
+              onUpdate={(designations) => updateSignData({ designations })}
+            />
+          )}
         </div>
 
         <div
@@ -134,25 +207,6 @@ function App() {
             onOpenMeasuringSheets={(event) => navigateTo('measuring-sheets', event)}
           />
 
-          <ToggleButtons
-            signType={signData.signType}
-            showAlumni={signData.showAlumni}
-            showAlumni2={signData.showAlumni2}
-            showSecondOccupant={signData.showSecondOccupant}
-            occupantName={signData.name}
-            occupantName2={signData.name2}
-            showDesignations={signData.showDesignations}
-            onToggleAlumni={() => updateSignData({ showAlumni: !signData.showAlumni })}
-            onToggleAlumni2={() => updateSignData({ showAlumni2: !signData.showAlumni2 })}
-            onToggleDesignations={() => updateSignData({ showDesignations: !signData.showDesignations })}
-          />
-
-          {signData.showDesignations && (signData.signType === 'faculty' || signData.signType === 'staff') && (
-            <DesignationsContainer
-              selectedDesignations={signData.designations}
-              onUpdate={(designations) => updateSignData({ designations })}
-            />
-          )}
         </div>
       </div>
 

@@ -31,42 +31,29 @@
     .controls {
         order: 1;
     }
-    
-    .toggle-buttons-container {
+
+    /* Phones and tablets: editor and preview are tabs, with a live copy of the sign pinned
+       above the form so every edit is visible without switching tabs. */
+    .mobile-editor-bar {
+        position: sticky;
+        top: 8px;
+        z-index: 20;
+        order: 0;
+        display: flex;
         flex-direction: column;
-        gap: 8px;
-    }
-    
-    .toggle-button {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-
-    .container {
-        gap: 15px;
-        padding: 0;
+        gap: 4px;
+        padding: 4px;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-border);
+        border-radius: 22px;
+        box-shadow: var(--ui-shadow-md);
     }
 
     .mobile-editor-tabs {
-        position: sticky;
-        top: 10px;
-        z-index: 20;
-        order: 0;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 4px;
         width: 100%;
-        padding: 4px;
-        background: var(--ui-surface);
-        border: 1px solid var(--ui-border);
-        border-radius: 999px;
-        box-shadow: var(--ui-shadow-md);
     }
 
     .mobile-editor-tab {
@@ -90,6 +77,106 @@
     .mobile-editor-tab:focus-visible {
         outline: none;
         box-shadow: var(--ui-focus-ring);
+    }
+
+    .mobile-tab-panel {
+        display: none;
+    }
+
+    .mobile-tab-panel.active {
+        display: block;
+    }
+
+    .live-preview {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        padding: 2px 2px 4px;
+    }
+
+    /* Sized by whichever runs out first: the width of the screen, or ~30% of its height (the
+       dynamic unit shrinks with an on-screen keyboard where supported). */
+    .live-preview__sign {
+        display: block;
+        width: min(100%, calc(30vh * var(--live-preview-aspect)));
+        aspect-ratio: var(--live-preview-aspect);
+        padding: 0;
+        border: 0;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #ffffff;
+        cursor: pointer;
+        box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+    }
+
+    @supports (height: 1dvh) {
+        .live-preview__sign {
+            width: min(100%, calc(30dvh * var(--live-preview-aspect)));
+        }
+    }
+
+    .live-preview__sign:focus-visible,
+    .live-preview__hide:focus-visible,
+    .live-preview-show:focus-visible {
+        outline: none;
+        box-shadow: var(--ui-focus-ring);
+    }
+
+    .live-preview__hide {
+        position: absolute;
+        right: 10px;
+        bottom: 12px;
+        min-height: 32px;
+        padding: 0 12px;
+        border: 1px solid var(--ui-border);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--ui-text-muted);
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .live-preview-show {
+        min-height: 34px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--brand-green);
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    body.dark-mode .mobile-editor-bar {
+        background: #111827;
+        border-color: rgba(148, 163, 184, 0.15);
+        box-shadow: 0 18px 35px rgba(15, 23, 42, 0.45);
+    }
+
+    body.dark-mode .live-preview-show {
+        color: #22c55e;
+    }
+
+    body.dark-mode .live-preview__hide {
+        background: rgba(17, 24, 39, 0.92);
+        border-color: rgba(148, 163, 184, 0.3);
+        color: #cbd5f5;
+    }
+
+    
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        gap: 15px;
+        padding: 0;
     }
 
     .controls, .card-holder-selector-container {
@@ -145,14 +232,6 @@
         font-size: 16px;
     }
 
-    .mobile-tab-panel {
-        display: none;
-    }
-
-    .mobile-tab-panel.active {
-        display: block;
-    }
-
     /* Roomier touch targets for the custom dropdown on phones/tablets. */
     .custom-select__trigger {
         padding-top: 14px;
@@ -194,7 +273,38 @@
     }
 }
 
+/* Phones: one contact field per row, so addresses and numbers are readable while typing and
+   each "Show on sign" switch sits under its own field. */
+@media (max-width: 560px) {
+    .contact-info-group {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .contact-label-group {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .paper-size-selector {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+}
+
 @media (max-width: 480px) {
+    .toggle-buttons-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .toggle-button {
+        width: 100%;
+        text-align: center;
+    }
+
     body {
         padding: 5px;
     }
@@ -234,8 +344,11 @@
 
     .controls-header__actions {
         width: 100%;
-        justify-content: space-between;
         gap: 6px;
+    }
+
+    .controls-header__actions .app-page-link {
+        flex: 1;
     }
 
     .saved-signs-card {
