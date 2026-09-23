@@ -27,7 +27,7 @@
     height: 22px;
     border-radius: 999px;
     background: var(--ui-border-strong);
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .switch__track::after {
@@ -44,7 +44,7 @@
 }
 
 .switch input:checked + .switch__track {
-    background: var(--brand-green);
+    background: var(--ui-accent);
 }
 
 .switch input:checked + .switch__track::after {
@@ -62,18 +62,6 @@
     letter-spacing: normal;
     font-weight: 500;
     margin: 0;
-}
-
-body.dark-mode .switch__track {
-    background: #374151;
-}
-
-body.dark-mode .switch input:checked + .switch__track {
-    background: #22c55e;
-}
-
-body.dark-mode .switch__text {
-    color: #cbd5f5;
 }
 
 input:focus::placeholder {
