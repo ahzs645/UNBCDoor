@@ -15,7 +15,7 @@
     border-radius: var(--ui-radius-sm);
     font-size: 0.95rem;
     font-family: 'Inter', sans-serif;
-    background-color: var(--ui-surface);
+    background-color: var(--ui-field);
     color: var(--ui-text);
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -31,18 +31,23 @@
 
 .custom-select__trigger:focus-visible {
     outline: none;
-    border-color: var(--brand-green);
+    border-color: var(--ui-accent);
     box-shadow: var(--ui-focus-ring);
 }
 
 .custom-select--open .custom-select__trigger {
-    border-color: var(--brand-green);
+    border-color: var(--ui-accent);
     box-shadow: var(--ui-focus-ring);
 }
 
-/* Rotate the chevron when the menu is open. */
+/* Rotate the chevron when the menu is open. A data-URI SVG can't read CSS variables, so the
+   open-state chevron color is repeated per theme. */
 .custom-select--open .custom-select__trigger {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23035642' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 15l-6-6-6 6'/%3E%3C/svg%3E");
+}
+
+:root.dark-mode .custom-select--open .custom-select__trigger {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 15l-6-6-6 6'/%3E%3C/svg%3E");
 }
 
 .custom-select__value {
@@ -53,7 +58,7 @@
 }
 
 .custom-select__value--placeholder {
-    color: #9ca3af;
+    color: var(--ui-placeholder);
 }
 
 .custom-select__panel {
@@ -70,7 +75,7 @@
     max-height: 300px;
     overflow-y: auto;
     z-index: 9999;
-    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+    box-shadow: var(--ui-shadow-popover);
     -webkit-overflow-scrolling: touch;
 }
 
@@ -84,53 +89,14 @@
 }
 
 .custom-select__option--active {
-    background-color: #f0fdf4;
+    background-color: var(--ui-accent-soft);
 }
 
 .custom-select__option--selected {
-    color: var(--brand-green);
+    color: var(--ui-accent-text);
     font-weight: 600;
 }
 
 .custom-select__option--selected.custom-select__option--active {
-    background-color: #dcfce7;
-}
-
-/* Dark mode */
-body.dark-mode .custom-select__trigger {
-    background-color: #1f2937;
-    color: #f8fafc;
-    border-color: #374151;
-}
-
-body.dark-mode .custom-select__trigger:focus-visible,
-body.dark-mode .custom-select--open .custom-select__trigger {
-    border-color: #22c55e;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
-}
-
-body.dark-mode .custom-select--open .custom-select__trigger {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 15l-6-6-6 6'/%3E%3C/svg%3E");
-}
-
-body.dark-mode .custom-select__panel {
-    background: #111827;
-    border-color: #1f2937;
-    box-shadow: 0 18px 35px rgba(15, 23, 42, 0.55);
-}
-
-body.dark-mode .custom-select__option {
-    color: #e2e8f0;
-}
-
-body.dark-mode .custom-select__option--active {
-    background-color: rgba(34, 197, 94, 0.15);
-}
-
-body.dark-mode .custom-select__option--selected {
-    color: #22c55e;
-}
-
-body.dark-mode .custom-select__option--selected.custom-select__option--active {
-    background-color: rgba(34, 197, 94, 0.25);
+    background-color: var(--ui-accent-soft-strong);
 }

@@ -47,7 +47,7 @@
 }
 
 .designation-option:focus-within {
-    border-color: var(--brand-green);
+    border-color: var(--ui-accent);
     box-shadow: var(--ui-focus-ring);
 }
 
@@ -55,12 +55,12 @@
    it from spilling over the neighbouring segments. */
 .style-option:focus-within,
 .paper-option:focus-within {
-    box-shadow: inset 0 0 0 2px var(--brand-green);
+    box-shadow: inset 0 0 0 2px var(--ui-accent);
 }
 
 .style-option.active:focus-within,
 .paper-option.active:focus-within {
-    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 0 0 2px var(--ui-accent), inset 0 0 0 4px var(--ui-on-accent);
 }
 
 /* Respect users who prefer reduced motion. */

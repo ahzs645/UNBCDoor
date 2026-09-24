@@ -14,19 +14,13 @@
     margin: 0 auto 16px;
     max-width: 600px;
     padding: 12px 16px;
-    background: #fef3c7;
-    border: 1px solid #f59e0b;
+    background: var(--ui-warning-bg);
+    border: 1px solid var(--ui-warning-border);
     border-radius: var(--ui-radius-sm);
-    color: #92400e;
+    color: var(--ui-warning-text);
     font-size: 0.88rem;
     line-height: 1.45;
     text-align: center;
-}
-
-body.dark-mode .print-fit-warning {
-    background: rgba(245, 158, 11, 0.12);
-    border-color: rgba(245, 158, 11, 0.5);
-    color: #fcd34d;
 }
 
 /* Paper size and measuring-sheet mode use the same segmented control as the appearance panel
@@ -80,7 +74,7 @@ body.dark-mode .print-fit-warning {
 
 .paper-option:hover,
 .template-mode-option:hover {
-    background: var(--ui-surface-muted);
+    background: var(--ui-surface-hover);
     color: var(--ui-text);
 }
 
@@ -88,8 +82,8 @@ body.dark-mode .print-fit-warning {
 .paper-option.active:hover,
 .template-mode-option.active,
 .template-mode-option.active:hover {
-    background: var(--brand-green);
-    color: #ffffff;
+    background: var(--ui-accent);
+    color: var(--ui-on-accent);
     font-weight: 600;
 }
 
@@ -140,7 +134,7 @@ body.dark-mode .print-fit-warning {
 }
 
 .sign-style-panel__toggle:hover {
-    background: rgba(3, 86, 66, 0.06);
+    background: var(--ui-accent-soft);
 }
 
 .sign-style-panel__chevron {
@@ -169,7 +163,7 @@ body.dark-mode .print-fit-warning {
 }
 
 .sign-style-panel__summary--changed {
-    color: var(--brand-green);
+    color: var(--ui-accent-text);
     font-weight: 600;
 }
 
@@ -188,8 +182,8 @@ body.dark-mode .print-fit-warning {
 }
 
 .sign-style-panel__reset:hover {
-    border-color: var(--brand-green);
-    color: var(--brand-green);
+    border-color: var(--ui-accent);
+    color: var(--ui-accent-text);
 }
 
 .sign-style-panel__body {
@@ -268,14 +262,14 @@ body.dark-mode .print-fit-warning {
 }
 
 .style-option:hover {
-    background: var(--ui-surface-muted);
+    background: var(--ui-surface-hover);
     color: var(--ui-text);
 }
 
 .style-option.active,
 .style-option.active:hover {
-    background: var(--brand-green);
-    color: #ffffff;
+    background: var(--ui-accent);
+    color: var(--ui-on-accent);
     font-weight: 600;
 }
 
@@ -310,125 +304,6 @@ body.dark-mode .print-fit-warning {
         padding: 7px 8px;
     }
 }
-
-body.dark-mode .sign-style-panel {
-    background: #1f2937;
-    border-color: #374151;
-}
-
-body.dark-mode .sign-style-panel__toggle {
-    color: #f8fafc;
-}
-
-body.dark-mode .sign-style-panel__toggle:hover {
-    background: rgba(34, 197, 94, 0.1);
-}
-
-body.dark-mode .sign-style-panel__summary--changed {
-    color: #22c55e;
-}
-
-body.dark-mode .sign-style-panel__reset {
-    background: #111827;
-    border-color: #374151;
-    color: #cbd5f5;
-}
-
-body.dark-mode .sign-style-panel__reset:hover {
-    border-color: #22c55e;
-    color: #22c55e;
-}
-
-body.dark-mode .style-control__label {
-    color: #e2e8f0;
-}
-
-body.dark-mode .style-options {
-    background: #111827;
-    border-color: #374151;
-}
-
-body.dark-mode .style-option {
-    color: #94a3b8;
-}
-
-body.dark-mode .style-option:hover {
-    background: #273449;
-    color: #e2e8f0;
-}
-
-body.dark-mode .style-option.active,
-body.dark-mode .style-option.active:hover {
-    background: #22c55e;
-    color: #0b1120;
-}
-
-/* Paper-size and measuring-sheet pickers — dark-mode parity with the sign-style options. */
-body.dark-mode .paper-size-selector > label,
-body.dark-mode .template-mode-selector > label {
-    color: #cbd5f5;
-}
-
-body.dark-mode .paper-size-options,
-body.dark-mode .template-mode-options {
-    background: #111827;
-    border-color: #374151;
-}
-
-body.dark-mode .paper-option,
-body.dark-mode .template-mode-option {
-    color: #94a3b8;
-}
-
-body.dark-mode .paper-option:hover,
-body.dark-mode .template-mode-option:hover {
-    background: #273449;
-    color: #e2e8f0;
-}
-
-body.dark-mode .paper-option.active,
-body.dark-mode .paper-option.active:hover,
-body.dark-mode .template-mode-option.active,
-body.dark-mode .template-mode-option.active:hover {
-    background: #22c55e;
-    color: #0b1120;
-}
-
-/* Professional Designations — the container, option chips, and the custom-add row.
-   Without these the box keeps the light --ui-surface tokens and the generic
-   `body.dark-mode label` rule renders the chip labels as low-contrast lavender. */
-body.dark-mode #designationsContainer {
-    background: #0b1120;
-    border-color: rgba(148, 163, 184, 0.15);
-}
-
-body.dark-mode .designation-option {
-    background: #1f2937;
-    border-color: #374151;
-}
-
-body.dark-mode .designation-option:hover {
-    background-color: #273449;
-    border-color: #22c55e;
-}
-
-body.dark-mode .designation-option label {
-    color: #e2e8f0;
-}
-
-body.dark-mode .designation-option input[type="checkbox"]:checked + label {
-    color: #22c55e;
-}
-
-body.dark-mode .designation-option input[type="checkbox"] {
-    accent-color: #22c55e;
-}
-
-body.dark-mode .designation-checkbox {
-    background: #1f2937;
-    color: #e2e8f0;
-}
-
 
 /* Measuring sheets page — configuration on the left, live PDF preview on the right. The card
    runs wider than the saved-signs one so a landscape sheet is legible next to the form. */
@@ -471,6 +346,16 @@ body.dark-mode .designation-checkbox {
    caption, so they fill the column instead of the row. */
 .measuring-sheets .template-mode-options {
     justify-content: flex-start;
+}
+
+.measuring-sheets .template-mode-option {
+    flex: 1 1 auto;
+}
+
+/* Four long paper labels wrap three-and-one in the config column; a 2×2 grid reads cleaner. */
+.measuring-sheets .template-mode-options:has(> :nth-child(4)) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
 .measuring-sheets__hint {
@@ -528,7 +413,9 @@ body.dark-mode .designation-checkbox {
 
 .measuring-sheets__summary dd {
     margin: 0;
+    color: var(--ui-text);
     font-weight: 600;
+    text-align: right;
 }
 
 .measuring-sheets__switch {
@@ -548,14 +435,10 @@ body.dark-mode .designation-checkbox {
 
 .measuring-sheets__warning {
     margin: 0;
-    color: #8b0000;
+    color: var(--ui-danger-text);
     font-size: 0.8rem;
     font-weight: 600;
     line-height: 1.5;
-}
-
-body.dark-mode .measuring-sheets__warning {
-    color: #fca5a5;
 }
 
 .measuring-sheets__message {
@@ -604,14 +487,28 @@ body.dark-mode .measuring-sheets__warning {
     /* Landscape, like every sheet, so the PDF viewer's fit-to-width fills the panel instead
        of leaving a band of grey under it. */
     aspect-ratio: 11 / 8.5;
-    min-height: 460px;
+    /* No min-height: combined with the aspect-ratio it sets a minimum *width*, which pushed
+       the panel past the card on tablets and phones. */
 }
 
 .measuring-sheets__preview object {
     width: 100%;
     height: 100%;
     border: 0;
-    background: #ffffff;
+    background: var(--ui-surface-muted);
+}
+
+/* Fallback text (no built-in PDF viewer) and the "building" note sit centred in the panel
+   rather than jammed into its top-left corner. */
+.measuring-sheets__preview .measuring-sheets__hint {
+    margin: auto;
+    padding: 24px;
+    max-width: 36ch;
+    text-align: center;
+}
+
+.measuring-sheets__preview object {
+    display: flex;
 }
 
 /* The PDF preview needs the room more than the form does. */
@@ -622,7 +519,6 @@ body.dark-mode .measuring-sheets__warning {
 
     .measuring-sheets__preview {
         position: static;
-        min-height: 320px;
     }
 }
 
@@ -636,25 +532,22 @@ body.dark-mode .measuring-sheets__warning {
     text-align: center;
 }
 
-.template-export__link a {
-    color: var(--brand-green);
+.template-export__link a,
+.measuring-sheets a {
+    color: var(--ui-accent-text);
     font-weight: 600;
-}
-
-body.dark-mode .template-export__link a {
-    color: #4ade80;
 }
 
 /* Quieter outline variant of the export button, for the secondary action on the sheets page. */
 .export-btn.template-export__btn {
     background: transparent;
-    border: 1px solid var(--ui-border);
-    color: var(--ui-text-muted);
+    border: 1px solid var(--ui-border-strong);
+    color: var(--ui-text);
     transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .export-btn.template-export__btn:hover {
-    background: rgba(3, 86, 66, 0.06);
-    border-color: var(--brand-green);
-    color: var(--brand-green);
+    background: var(--ui-accent-soft);
+    border-color: var(--ui-accent);
+    color: var(--ui-accent-text);
 }

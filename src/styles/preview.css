@@ -52,12 +52,12 @@
 
 .print-trim {
     inset: var(--bleed-y, 0) var(--bleed-x, 0);
-    border: 1px dashed rgba(15, 23, 42, 0.6);
+    border: 1px dashed var(--ui-guide-trim);
 }
 
 .print-safe {
     inset: calc(var(--bleed-y, 0) + var(--safe-y, 0)) calc(var(--bleed-x, 0) + var(--safe-x, 0));
-    border: 1px dashed rgba(3, 86, 66, 0.55);
+    border: 1px dashed var(--ui-guide-safe);
 }
 
 /* With a holder selected, the viewable-window outline is the real safe area, so the generic
@@ -90,7 +90,7 @@
 
 .card-holder-bar {
     position: absolute;
-    background: rgba(15, 23, 42, 0.32);
+    background: var(--ui-holder-mask);
 }
 
 .card-holder-bar.top {
@@ -147,24 +147,25 @@
     flex-shrink: 0;
 }
 
-.preview-legend__item--trim { color: #334155; }
-.preview-legend__item--safe { color: #035642; }
+/* Legend swatches match the guides they describe; the label text stays readable on the
+   panel in either theme. */
+.preview-legend__item--trim { color: var(--ui-text); }
+.preview-legend__item--safe { color: var(--ui-accent-text); }
+.preview-legend__item--holder { color: var(--ui-text); }
 
-.preview-legend__item--bleed { color: #94a3b8; }
 .preview-legend__item--bleed::before {
     border-top: none;
     height: 11px;
-    background: #035642;
+    background: var(--brand-header);
     border-radius: 2px;
-    opacity: 0.5;
 }
 
-.preview-legend__item--holder { color: #334155; }
 .preview-legend__item--holder::before {
     border-top: none;
     height: 11px;
-    background: rgba(15, 23, 42, 0.32);
+    background: var(--ui-holder-mask);
     border-radius: 2px;
+    box-shadow: inset 0 0 0 1px var(--ui-border-strong);
 }
 
 .preview-measurements {
@@ -178,7 +179,7 @@
 
 .preview-measurements__title {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--ui-text);
     font-size: 1rem;
     text-align: center;
 }
@@ -191,7 +192,7 @@
 }
 
 .preview-measurements__item {
-    background: rgba(3, 86, 66, 0.08);
+    background: var(--ui-accent-soft-strong);
     border-radius: 12px;
     padding: 12px 16px;
     display: grid;
@@ -204,11 +205,11 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    color: #64748b;
+    color: var(--ui-text-muted);
 }
 
 .preview-measurements__item strong {
     font-size: 1.1rem;
-    color: #035642;
+    color: var(--ui-accent-text);
 }
 

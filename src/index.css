@@ -4,7 +4,7 @@
    reorder these imports. */
 
 @import './styles/fonts.css';            /* @font-face brand faces + Google Inter import */
-@import './styles/base.css';             /* design tokens, reset, app shell, dark-mode shell */
+@import './styles/base.css';             /* light + dark design tokens, reset, app shell */
 @import './styles/preview.css';          /* preview frame, print guides, holder window, measurements */
 @import './styles/form.css';             /* headings, form fields, card-holder info, toggle buttons */
 @import './styles/select.css';           /* custom (non-native) dropdown trigger + listbox */
