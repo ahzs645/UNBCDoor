@@ -37,6 +37,9 @@ export const normalizeSignData = (value = {}) => {
   if (!['stacked', 'inline'].includes(normalized.positionLayout)) {
     normalized.positionLayout = INITIAL_SIGN_DATA.positionLayout
   }
+  if (!['logo', 'band'].includes(normalized.departmentWrap)) {
+    normalized.departmentWrap = INITIAL_SIGN_DATA.departmentWrap
+  }
   if (!['compact', 'relaxed'].includes(normalized.twoPersonSpacing)) {
     normalized.twoPersonSpacing = INITIAL_SIGN_DATA.twoPersonSpacing
   }

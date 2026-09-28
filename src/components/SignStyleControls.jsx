@@ -36,6 +36,7 @@ const describeSign = (content) => {
     isRoom,
     hasAlumni: Boolean(content.showAlumni || content.showAlumni2),
     hasCredentials: Boolean(content.credentials),
+    hasDepartment: Boolean(content.departmentText),
     hasSecondPerson,
     hasPosition,
     hasTagline,
@@ -107,6 +108,16 @@ const STYLE_CONTROLS = {
     options: [
       { value: 'standard', label: 'Standard' },
       { value: 'large', label: 'Larger' }
+    ]
+  },
+  // The UNBC rule wraps the department at the lockup's width. "Full width" is only for matching
+  // older printed signs that ran a long department past "NORTHERN BRITISH COLUMBIA".
+  departmentWrap: {
+    label: 'Department line',
+    when: (sign) => sign.hasDepartment,
+    options: [
+      { value: 'logo', label: 'UNBC wrap' },
+      { value: 'band', label: 'Full width' }
     ]
   },
   textAlignment: {
@@ -207,7 +218,7 @@ const STYLE_CONTROLS = {
 
 const GROUPS = [
   { id: 'type', label: 'Type & size', keys: ['headlineWeight', 'contentSize', 'roomNameStyle', 'positionSize', 'contactSize'] },
-  { id: 'layout', label: 'Layout & spacing', keys: ['textAlignment', 'contentWidth', 'contentSpacing', 'positionLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
+  { id: 'layout', label: 'Layout & spacing', keys: ['departmentWrap', 'textAlignment', 'contentWidth', 'contentSpacing', 'positionLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
   { id: 'extras', label: 'Crest & logo', keys: ['alumniCrestSize', 'alumniCrestSpacing', 'organizationLogo'] }
 ]
 

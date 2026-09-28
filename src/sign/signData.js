@@ -41,6 +41,7 @@ export const INITIAL_SIGN_DATA = {
   positionLayout: 'stacked',
   positionSize: 'standard',
   designationLayout: 'inline',
+  departmentWrap: 'logo',
   twoPersonSpacing: 'compact',
   contentSize: 'standard',
   contentSpacing: 'standard',

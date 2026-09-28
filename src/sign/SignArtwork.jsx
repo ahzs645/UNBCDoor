@@ -368,7 +368,8 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     viewable: { top: VT, right: VR, bottom: VB, left: VL },
     textX: VL + PAD_X,
     rightInset: PAD_X,
-    departmentText: content.departmentText
+    departmentText: content.departmentText,
+    departmentWrap: content.departmentWrap
   })
   const HEADER_H = header.bandHeight - VT
   const logoX = header.logoX - VL

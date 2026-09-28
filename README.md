@@ -46,6 +46,7 @@ A web-based tool for generating standardized door signs for the University of No
   - Search functionality for departments
   - Support for academic and administrative departments
   - Sub-departments and units
+  - Department lines wrap by the UNBC logo kit's rule
 
 - **Card Holder Support**
   - Multiple card holder type options
@@ -216,8 +217,11 @@ under `tools/compare-viewer`; it is never included in the production website.
 - Dynamic content updates
 - Real-time preview
 - Header band and logo lockup placed as in the production Illustrator files: a band 20.5% of the
-  card height, the lockup at its native size, and department names kept on one line
-  (`src/sign/headerGeometry.js`)
+  card height and the lockup at its native size (`src/sign/headerGeometry.js`)
+- Department names wrap by the UNBC logo kit's rule (`splitDepartmentText` from the
+  `vendor/unbc-logo` submodule), so "Northern Analytical Laboratory Services" takes two lines
+  and the band grows to fit. **Appearance → Department line → Full width** instead runs a long
+  name across the band on one line, to match older printed signs
 - Enhanced form validation and formatting
 - Modern UI with smooth transitions and animations
 
