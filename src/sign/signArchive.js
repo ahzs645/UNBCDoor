@@ -73,7 +73,7 @@ export const normalizeSignData = (value = {}) => {
   if (!['standard', 'large'].includes(normalized.positionSize)) {
     normalized.positionSize = INITIAL_SIGN_DATA.positionSize
   }
-  if (!['inline', 'below'].includes(normalized.designationLayout)) {
+  if (!['inline', 'together', 'below'].includes(normalized.designationLayout)) {
     normalized.designationLayout = INITIAL_SIGN_DATA.designationLayout
   }
   if (!['none', 'ctaan'].includes(normalized.organizationLogo)) {

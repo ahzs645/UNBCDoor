@@ -152,6 +152,9 @@ const STYLE_CONTROLS = {
     when: (sign) => !sign.isRoom && sign.hasCredentials,
     options: [
       { value: 'inline', label: 'Beside name' },
+      // Beside the name, but if it doesn't fit the whole designation moves to the next line
+      // instead of breaking inside it.
+      { value: 'together', label: 'Keep together' },
       { value: 'below', label: 'Below name' }
     ]
   },

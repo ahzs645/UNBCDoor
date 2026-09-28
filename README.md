@@ -62,6 +62,8 @@ A web-based tool for generating standardized door signs for the University of No
   - Pre-defined professional designations
   - Custom designation support
   - Toggle functionality for designation display
+  - Place designations beside the name, below it, or beside it but kept together (if they
+    don't fit, the whole designation moves to the next line instead of breaking inside it)
 
 ## Usage
 

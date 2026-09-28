@@ -21,3 +21,8 @@ test('falls back safely for unsupported Alumni crest appearance settings', () =>
   assert.equal(sign.alumniCrestSize, 'standard')
   assert.equal(sign.alumniCrestSpacing, 'auto')
 })
+
+test('keeps the designation layout options it knows', () => {
+  assert.equal(normalizeSignData({ designationLayout: 'together' }).designationLayout, 'together')
+  assert.equal(normalizeSignData({ designationLayout: 'sideways' }).designationLayout, 'inline')
+})
