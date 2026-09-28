@@ -100,78 +100,6 @@ textarea::placeholder {
     margin-bottom: 0;
 }
 
-.sign-archive-controls {
-    margin: -8px 0 28px;
-    padding: 16px;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius-sm);
-    background: var(--ui-surface-muted);
-}
-
-.sign-archive-controls__heading {
-    display: grid;
-    gap: 16px;
-}
-
-.sign-archive-controls h2 {
-    color: var(--ui-text);
-    font-size: 1rem;
-    margin: 0 0 4px;
-}
-
-.sign-archive-controls p {
-    color: var(--ui-text-muted);
-    font-size: 0.82rem;
-    line-height: 1.45;
-    margin: 0;
-}
-
-.sign-archive-controls__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.archive-btn {
-    border: 1px solid var(--ui-primary);
-    border-radius: 8px;
-    padding: 9px 12px;
-    background: var(--ui-primary);
-    color: var(--ui-on-primary);
-    font: inherit;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.archive-btn--secondary {
-    border-color: var(--ui-accent-text);
-    background: var(--ui-surface);
-    color: var(--ui-accent-text);
-}
-
-.archive-btn:hover {
-    border-color: var(--ui-primary-hover);
-    background: var(--ui-primary-hover);
-    color: var(--ui-on-primary);
-}
-
-.sign-archive-controls__picker {
-    margin-top: 14px;
-}
-
-.sign-archive-controls__message {
-    margin-top: 10px !important;
-}
-
-.sign-archive-controls__edit {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 14px;
-    text-decoration: none;
-}
-
 .occupant-section {
     min-width: 0;
     margin: 4px 0 0;
@@ -210,11 +138,6 @@ textarea::placeholder {
 }
 
 @media (max-width: 600px) {
-    .sign-archive-controls__actions {
-        display: grid;
-        grid-template-columns: 1fr;
-    }
-
     .occupant-section {
         padding: 14px;
     }

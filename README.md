@@ -25,9 +25,12 @@ A web-based tool for generating standardized door signs for the University of No
 
 - **Saved Sign Archives**
   - Dedicated `/saved-signs/` page linked from the editor
-  - Import a single sign or a multi-sign JSON archive
-  - Switch between imported signs and continue editing them
-  - Export the current sign as versioned, re-importable JSON
+  - Import a single sign or a multi-sign JSON archive (or drop the file on the page)
+  - Search the archive by name, room, department, email or holder, filter by sign type, and
+    preview each sign before opening it
+  - Step through a loaded archive from the editor with a search box and Previous/Next buttons
+  - Edits stay with each sign (marked **Edited**, with **Revert**) until you export
+  - Export one sign or the whole archive, including edits, as versioned, re-importable JSON
 
 - **Enhanced Form Features**
   - Smart input validation
@@ -92,7 +95,7 @@ A web-based tool for generating standardized door signs for the University of No
 
 6. **Export**
    - Export the artwork as PNG or print-ready PDF
-   - Use **Export current** in Saved signs to save editable JSON
+   - Use **Export this sign** or **Export archive** in Saved signs to save editable JSON
 
 7. **Check a Physical Holder**
    - Open **Measuring sheets** from the editor header (or the link under the export buttons).
@@ -126,9 +129,11 @@ A web-based tool for generating standardized door signs for the University of No
      of the holder, and copy the preset snippet it generates into `src/data/cardHolders.js`
 
 9. **Import an Archive**
-   - Choose **Load production archive** to use the included 89-sign collection immediately
-   - Choose **Import JSON** under Saved signs
-   - For a multi-sign archive, choose any imported entry from the new selector
+   - Under Saved signs, choose **Production archive** to use the included 89-sign collection
+     immediately, or **Import JSON** for your own file
+   - Search or filter the list, then **Edit in generator** (or double-click / press Enter)
+   - Back in the editor, the archive bar above the form searches every sign and steps through
+     them with Previous/Next; **Browse all** returns to the list
    - A transcribed 89-sign production archive is included at `data/door-sign-archive.json`
 
 ## Local Visual Comparison Utility
