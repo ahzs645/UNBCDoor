@@ -41,18 +41,31 @@ const getMeasureContext = () => {
   return measureContext
 }
 
+// Spaces inside a phrase that should wrap as one unit (a designation kept together) are joined
+// with this no-break space. The wrapper treats the phrase as a single word, falls back to normal
+// wrapping only if the phrase can't fit on a line by itself, and hands back ordinary spaces.
+const KEEP_TOGETHER = '\u00a0'
+const keepTogether = (text) => text.replace(/ +/g, KEEP_TOGETHER)
+
 const wrapText = (text, { weight, style, size, family, maxWidth }) => {
   const value = (text || '').toString().trim()
   if (!value) return []
 
   const ctx = getMeasureContext()
+  const restoreSpaces = line => line.replaceAll(KEEP_TOGETHER, ' ')
   const paragraphs = value.split(/\r?\n/).map(line => line.trim()).filter(Boolean)
-  if (!ctx) return paragraphs
+  if (!ctx) return paragraphs.map(restoreSpaces)
 
   ctx.font = `${style} ${weight} ${size}px ${family}`
   const lines = []
   paragraphs.forEach((paragraph) => {
-    const words = paragraph.split(/\s+/)
+    const words = paragraph
+      .split(/[^\S\u00a0]+/)
+      .flatMap(word => (
+        word.includes(KEEP_TOGETHER) && ctx.measureText(word).width > maxWidth
+          ? word.split(KEEP_TOGETHER)
+          : [word]
+      ))
     let current = ''
     words.forEach((word) => {
       const candidate = current ? `${current} ${word}` : word
@@ -65,7 +78,7 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
     })
     if (current) lines.push(current)
   })
-  return lines
+  return lines.map(restoreSpaces)
 }
 
 // Block sizes are fractions of the viewable height, matched against the production
@@ -175,7 +188,11 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     blocks.push({
       occupant,
       text: group.name + (group.credentials
-        ? content.designationLayout === 'below' ? ',' : `, (${group.credentials})`
+        ? content.designationLayout === 'below'
+          ? ','
+          : content.designationLayout === 'together'
+            ? `, ${keepTogether(`(${group.credentials})`)}`
+            : `, (${group.credentials})`
         : ''),
       size: H * (compactTwoPerson ? 0.115 : 0.1) * contentScale,
       weight: headlineWeight,
@@ -351,7 +368,8 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     viewable: { top: VT, right: VR, bottom: VB, left: VL },
     textX: VL + PAD_X,
     rightInset: PAD_X,
-    departmentText: content.departmentText
+    departmentText: content.departmentText,
+    departmentWrap: content.departmentWrap
   })
   const HEADER_H = header.bandHeight - VT
   const logoX = header.logoX - VL

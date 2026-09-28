@@ -4,10 +4,13 @@
 //   * The lockup is placed at its native size (1pt per lockup unit), which is ~35.5% of the
 //     trimmed card width on the ~7" inserts. The department line is therefore 8.23pt.
 //   * The green band is ~20.5% of the trimmed card height, and the wordmark is centred in it.
-//   * A department line hangs under the wordmark on ONE line, running past "NORTHERN BRITISH
-//     COLUMBIA" when it is long ("Northern Analytical Laboratory Services" is ~171pt). The band
-//     does not grow for it — only an explicit second line (or one wider than the whole band)
-//     pushes the band down.
+//   * The department line hangs under the wordmark and wraps by the UNBC logo kit's rule
+//     (vendor/unbc-logo, splitDepartmentText at the lockup's 122-unit width), so "Northern
+//     Analytical Laboratory Services" breaks after "Analytical". A one-line department leaves
+//     the band alone; a second line pushes the band down.
+//   * Some older production files instead ran a long department line past "NORTHERN BRITISH
+//     COLUMBIA" on one line. `departmentWrap: 'band'` reproduces those: it wraps at the right
+//     edge of the band rather than the lockup.
 //   * The wordmark's slanted "U" sits ~2.5% of the width left of the body text column.
 //
 // Everything here is plain arithmetic in points so it runs under `node --test` as well as in the
@@ -35,6 +38,8 @@ const DEPARTMENT_BOTTOM_SPACE = 9.4
  * @param {number} options.textX      body text column, measured from the trim's left edge (pt)
  * @param {number} options.rightInset right-hand content padding inside the viewable window (pt)
  * @param {string} options.departmentText
+ * @param {'logo'|'band'} [options.departmentWrap] wrap at the lockup width (UNBC rule, default)
+ *        or run to the right edge of the band, as some older production files did
  * @returns trim-space geometry: band height, lockup origin/scale, wrapped department lines, and
  *          the wrap width (lockup units) the lockup should be rendered with.
  */
@@ -44,7 +49,8 @@ export const resolveHeaderGeometry = ({
   viewable = {},
   textX,
   rightInset = 0,
-  departmentText = ''
+  departmentText = '',
+  departmentWrap = 'logo'
 }) => {
   const top = Math.max(viewable.top || 0, 0)
   const left = Math.max(viewable.left || 0, 0)
@@ -59,11 +65,13 @@ export const resolveHeaderGeometry = ({
   const wordmarkEnd = WORDMARK.top + WORDMARK.height
   const logoY = Math.max(centredY, top - WORDMARK.top * scale)
 
-  // The department line may run to the right edge of the live area — the band is the limit,
-  // not the width of the wordmark above it.
+  // By default the department line wraps where the logo kit wraps it. The 'band' option lets it
+  // run to the right edge of the live area instead, as some older production files did.
   const departmentX = logoX + DEPARTMENT_LINE.x * scale
   const rightEdge = width - right - rightInset
-  const departmentMaxWidth = Math.max((rightEdge - departmentX) / scale, DEPARTMENT_LINE.maxWidth)
+  const departmentMaxWidth = departmentWrap === 'band'
+    ? Math.max((rightEdge - departmentX) / scale, DEPARTMENT_LINE.maxWidth)
+    : DEPARTMENT_LINE.maxWidth
   const departmentLines = splitDepartmentText(departmentText || '', departmentMaxWidth)
 
   // What the band must reach below the lockup: the same margin a centred wordmark gets, or the

@@ -4,7 +4,7 @@ import { PT_PER_INCH } from './signConstants.js'
 import { cardHolders } from '../data/cardHolders.js'
 import { resolveHeaderGeometry, HEADER_BAND_RATIO, WORDMARK } from './headerGeometry.js'
 
-const inPoints = (holder, departmentText) => {
+const inPoints = (holder, departmentText, departmentWrap) => {
   const width = holder.insertSize.width * PT_PER_INCH
   const height = holder.insertSize.height * PT_PER_INCH
   const view = holder.viewableOffset
@@ -25,7 +25,8 @@ const inPoints = (holder, departmentText) => {
       viewable,
       textX: viewable.left + padX,
       rightInset: padX,
-      departmentText
+      departmentText,
+      departmentWrap
     })
   }
 }
@@ -41,7 +42,14 @@ test('the lockup is drawn at its production size on a Building 10 insert', () =>
   close(geometry.logoY + WORDMARK.top * geometry.scale, 15.5, 1.5, 'wordmark top')
 })
 
-test('long department names stay on one line, as in the production files', () => {
+test('department names wrap by the UNBC logo kit rule by default', () => {
+  for (const holderName of ['Building 10', 'Non-Building 10']) {
+    const { geometry } = inPoints(cardHolders[holderName], 'Northern Analytical Laboratory Services')
+    assert.deepEqual(geometry.departmentLines, ['Northern Analytical', 'Laboratory Services'], holderName)
+  }
+})
+
+test('the full-width option keeps long names on one line, as in older production files', () => {
   const names = [
     'Northern Analytical Laboratory Services',
     'Faculty of Human and Health Sciences',
@@ -50,7 +58,7 @@ test('long department names stay on one line, as in the production files', () =>
   ]
   for (const holderName of ['Building 10', 'Non-Building 10']) {
     for (const name of names) {
-      const { geometry } = inPoints(cardHolders[holderName], name)
+      const { geometry } = inPoints(cardHolders[holderName], name, 'band')
       assert.deepEqual(geometry.departmentLines, [name], `${name} on ${holderName}`)
     }
   }
@@ -59,11 +67,20 @@ test('long department names stay on one line, as in the production files', () =>
 test('a one-line department does not make the band taller', () => {
   const holder = cardHolders['Building 10']
   const bare = inPoints(holder, '')
-  const withDepartment = inPoints(holder, 'Northern Analytical Laboratory Services')
+  const withDepartment = inPoints(holder, 'School of Engineering')
 
   close(bare.geometry.bandHeight, bare.height * HEADER_BAND_RATIO, 0.01, 'band without department')
   close(withDepartment.geometry.bandHeight, bare.geometry.bandHeight, 0.01, 'band with department')
   assert.equal(withDepartment.geometry.logoY, bare.geometry.logoY)
+})
+
+test('a wrapped department grows the band downward', () => {
+  const holder = cardHolders['Building 10']
+  const one = inPoints(holder, 'School of Engineering')
+  const two = inPoints(holder, 'Northern Analytical Laboratory Services')
+
+  assert.ok(two.geometry.bandHeight > one.geometry.bandHeight, 'band grows for the second line')
+  assert.equal(two.geometry.logoY, one.geometry.logoY, 'wordmark stays where it was')
 })
 
 test('an explicit second department line grows the band downward', () => {

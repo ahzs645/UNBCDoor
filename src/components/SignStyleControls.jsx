@@ -36,6 +36,7 @@ const describeSign = (content) => {
     isRoom,
     hasAlumni: Boolean(content.showAlumni || content.showAlumni2),
     hasCredentials: Boolean(content.credentials),
+    hasDepartment: Boolean(content.departmentText),
     hasSecondPerson,
     hasPosition,
     hasTagline,
@@ -109,6 +110,16 @@ const STYLE_CONTROLS = {
       { value: 'large', label: 'Larger' }
     ]
   },
+  // The UNBC rule wraps the department at the lockup's width. "Full width" is only for matching
+  // older printed signs that ran a long department past "NORTHERN BRITISH COLUMBIA".
+  departmentWrap: {
+    label: 'Department line',
+    when: (sign) => sign.hasDepartment,
+    options: [
+      { value: 'logo', label: 'UNBC wrap' },
+      { value: 'band', label: 'Full width' }
+    ]
+  },
   textAlignment: {
     label: 'Text alignment',
     options: [
@@ -152,6 +163,9 @@ const STYLE_CONTROLS = {
     when: (sign) => !sign.isRoom && sign.hasCredentials,
     options: [
       { value: 'inline', label: 'Beside name' },
+      // Beside the name, but if it doesn't fit the whole designation moves to the next line
+      // instead of breaking inside it.
+      { value: 'together', label: 'Keep together' },
       { value: 'below', label: 'Below name' }
     ]
   },
@@ -204,7 +218,7 @@ const STYLE_CONTROLS = {
 
 const GROUPS = [
   { id: 'type', label: 'Type & size', keys: ['headlineWeight', 'contentSize', 'roomNameStyle', 'positionSize', 'contactSize'] },
-  { id: 'layout', label: 'Layout & spacing', keys: ['textAlignment', 'contentWidth', 'contentSpacing', 'positionLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
+  { id: 'layout', label: 'Layout & spacing', keys: ['departmentWrap', 'textAlignment', 'contentWidth', 'contentSpacing', 'positionLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
   { id: 'extras', label: 'Crest & logo', keys: ['alumniCrestSize', 'alumniCrestSpacing', 'organizationLogo'] }
 ]
 

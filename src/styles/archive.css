@@ -1,0 +1,766 @@
+/* Saved signs: the archive browser page, the searchable sign combobox, and the navigator that
+   sits at the top of the editor while an archive is loaded. */
+
+.saved-signs-page--wide {
+    max-width: 1180px;
+}
+
+/* ---------- Shared buttons ---------- */
+
+.archive-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    border: 1px solid var(--ui-primary);
+    border-radius: 8px;
+    padding: 0 14px;
+    background: var(--ui-primary);
+    color: var(--ui-on-primary);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.archive-btn:hover {
+    border-color: var(--ui-primary-hover);
+    background: var(--ui-primary-hover);
+    color: var(--ui-on-primary);
+}
+
+.archive-btn--secondary {
+    border-color: var(--ui-border-strong);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+}
+
+.archive-btn--secondary:hover {
+    border-color: var(--ui-accent);
+    background: var(--ui-accent-soft);
+    color: var(--ui-accent-text);
+}
+
+.archive-btn--large {
+    min-height: 44px;
+    font-size: 0.9rem;
+}
+
+.archive-text-btn {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ui-accent-text);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
+.archive-edited-dot {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--ui-warning-bg);
+    color: var(--ui-warning-text);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    vertical-align: 1px;
+}
+
+.app-page-link__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    margin-left: 7px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--ui-accent);
+    color: var(--ui-on-accent);
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.app-page-link:hover .app-page-link__badge {
+    background: var(--ui-on-accent);
+    color: var(--ui-accent);
+}
+
+/* ---------- Browser page ---------- */
+
+.archive-browser {
+    position: relative;
+}
+
+.archive-browser__drop {
+    position: absolute;
+    inset: -12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--ui-accent);
+    border-radius: var(--ui-radius);
+    background: color-mix(in srgb, var(--ui-surface) 88%, transparent);
+    color: var(--ui-accent-text);
+    font-weight: 800;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.archive-empty {
+    display: grid;
+    gap: 24px;
+}
+
+.archive-empty__intro h2,
+.archive-browser__heading h2 {
+    margin: 0 0 6px;
+    color: var(--ui-text);
+    font-size: 1.25rem;
+    text-align: left;
+}
+
+.archive-empty__intro p,
+.archive-browser__heading p {
+    margin: 0;
+    color: var(--ui-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.archive-empty__intro p {
+    max-width: 38rem;
+}
+
+.archive-sources {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.archive-source {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 20px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.archive-source:hover {
+    border-color: var(--ui-accent);
+    background: var(--ui-accent-soft);
+}
+
+.archive-source:focus-visible {
+    outline: none;
+    border-color: var(--ui-accent);
+    box-shadow: var(--ui-focus-ring);
+}
+
+.archive-source__title {
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.archive-source__text {
+    flex: 1;
+    color: var(--ui-text-muted);
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
+.archive-source__cta {
+    margin-top: 8px;
+    color: var(--ui-accent-text);
+    font-size: 0.86rem;
+    font-weight: 800;
+}
+
+.archive-source__cta::after {
+    content: ' →';
+}
+
+.archive-empty__footer {
+    color: var(--ui-text-muted);
+    font-size: 0.86rem;
+}
+
+.archive-browser__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 16px;
+    margin-bottom: 18px;
+}
+
+.archive-browser__heading {
+    min-width: 0;
+}
+
+.archive-browser__heading strong {
+    color: var(--ui-warning-text);
+}
+
+.archive-browser__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.archive-browser__filters {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.archive-search {
+    position: relative;
+    display: block;
+    margin: 0;
+}
+
+.archive-search__icon,
+.sign-combobox__icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    fill: none;
+    stroke: var(--ui-text-muted);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+.archive-search input,
+.sign-combobox__input {
+    width: 100%;
+    margin: 0;
+    padding: 12px 14px 12px 40px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-field);
+    color: var(--ui-text);
+    font: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.archive-search input::placeholder,
+.sign-combobox__input::placeholder {
+    color: var(--ui-placeholder);
+}
+
+.archive-search input:hover,
+.sign-combobox__input:hover {
+    border-color: var(--ui-border-strong);
+}
+
+.archive-search input:focus,
+.sign-combobox__input:focus {
+    outline: none;
+    border-color: var(--ui-accent);
+    box-shadow: var(--ui-focus-ring);
+}
+
+.archive-type-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.archive-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--ui-border);
+    border-radius: 999px;
+    background: var(--ui-surface);
+    color: var(--ui-text-muted);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.archive-chip:hover {
+    border-color: var(--ui-border-strong);
+    color: var(--ui-text);
+}
+
+.archive-chip.active {
+    border-color: var(--ui-accent);
+    background: var(--ui-accent);
+    color: var(--ui-on-accent);
+}
+
+.archive-chip:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-ring);
+}
+
+.archive-chip__count {
+    font-size: 0.72rem;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.archive-browser__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+    gap: 20px;
+    align-items: start;
+}
+
+.archive-list-wrap {
+    min-width: 0;
+}
+
+.archive-list__summary {
+    margin: 0 0 8px;
+    color: var(--ui-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.archive-list {
+    max-height: min(62vh, 640px);
+    margin: 0;
+    padding: 4px;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface);
+    overscroll-behavior: contain;
+}
+
+.archive-list:focus-visible {
+    outline: none;
+    border-color: var(--ui-accent);
+    box-shadow: var(--ui-focus-ring);
+}
+
+.archive-list--empty {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 36px 16px;
+    color: var(--ui-text-muted);
+    font-size: 0.9rem;
+}
+
+.archive-list__item {
+    display: grid;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+}
+
+.archive-list__item:hover {
+    background: var(--ui-surface-hover);
+}
+
+.archive-list__item.selected {
+    background: var(--ui-accent-soft-strong);
+    box-shadow: inset 3px 0 0 var(--ui-accent);
+}
+
+.archive-list__label,
+.sign-combobox__label {
+    color: var(--ui-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.archive-list__item.selected .archive-list__label {
+    color: var(--ui-accent-text);
+}
+
+.archive-list__meta,
+.sign-combobox__meta {
+    overflow: hidden;
+    color: var(--ui-text-muted);
+    font-size: 0.76rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.archive-detail {
+    position: sticky;
+    top: 20px;
+    display: grid;
+    gap: 16px;
+    padding: 18px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+/* The sign is always drawn on white, like the printed card. */
+.archive-detail__sign {
+    width: min(100%, calc(42vh * var(--sign-aspect)));
+    aspect-ratio: var(--sign-aspect);
+    justify-self: center;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px var(--ui-border), var(--ui-shadow-sm);
+}
+
+.archive-detail__sign svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.archive-detail__info h3 {
+    margin: 0 0 4px;
+    color: var(--ui-text);
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.archive-detail__info p {
+    margin: 0;
+    color: var(--ui-text-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.archive-detail__source {
+    margin-top: 6px !important;
+    font-size: 0.74rem !important;
+    word-break: break-word;
+}
+
+.archive-detail__notes {
+    margin-top: 6px !important;
+}
+
+.archive-detail__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.archive-detail__actions .archive-btn--large {
+    flex: 1 1 100%;
+}
+
+.archive-detail__actions .archive-btn--secondary {
+    flex: 1 1 0;
+}
+
+.archive-detail__placeholder {
+    padding: 40px 0;
+    color: var(--ui-text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.archive-browser__message {
+    margin: 16px 0 0;
+    color: var(--ui-text-muted);
+    font-size: 0.82rem;
+}
+
+/* ---------- Searchable sign combobox ---------- */
+
+.sign-combobox {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.sign-combobox__input {
+    height: 44px;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-weight: 600;
+    text-overflow: ellipsis;
+}
+
+.sign-combobox--open .sign-combobox__input {
+    font-weight: 400;
+}
+
+.sign-combobox__panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 30;
+    overflow: hidden;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface);
+    box-shadow: var(--ui-shadow-popover);
+}
+
+.sign-combobox__list {
+    max-height: min(52vh, 380px);
+    margin: 0;
+    padding: 4px;
+    overflow-y: auto;
+    list-style: none;
+    overscroll-behavior: contain;
+}
+
+.sign-combobox__option {
+    display: grid;
+    gap: 2px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.sign-combobox__option--active {
+    background: var(--ui-accent-soft);
+}
+
+.sign-combobox__option--selected .sign-combobox__label {
+    color: var(--ui-accent-text);
+}
+
+.sign-combobox__option--selected.sign-combobox__option--active {
+    background: var(--ui-accent-soft-strong);
+}
+
+.sign-combobox__empty {
+    padding: 18px 14px 6px;
+    color: var(--ui-text-muted);
+    font-size: 0.86rem;
+    text-align: center;
+}
+
+.sign-combobox__footer {
+    padding: 7px 14px;
+    border-top: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+/* ---------- Editor navigator ---------- */
+
+.archive-nav {
+    margin: -8px 0 28px;
+    padding: 12px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+.archive-nav__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 16px;
+    margin: 0 2px 10px;
+    font-size: 0.78rem;
+}
+
+/* A small basis lets the title truncate before the links are pushed to a second row; on
+   phones the two groups still wrap onto their own rows. */
+.archive-nav__summary {
+    display: flex;
+    flex: 1 1 12rem;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.archive-nav__title {
+    overflow: hidden;
+    min-width: 0;
+    color: var(--ui-text);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.archive-nav__position {
+    flex: none;
+    color: var(--ui-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.archive-nav__edited {
+    flex: none;
+    margin-left: 0;
+}
+
+.archive-nav__links {
+    display: flex;
+    flex: none;
+    gap: 14px;
+}
+
+.archive-nav__link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ui-accent-text);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.archive-nav__link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.archive-nav__link:focus-visible {
+    outline: none;
+    border-radius: 4px;
+    box-shadow: var(--ui-focus-ring);
+}
+
+.archive-nav__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.archive-nav__step {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.archive-nav__step svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.archive-nav__step:hover:not(:disabled) {
+    border-color: var(--ui-accent);
+    background: var(--ui-accent-soft);
+    color: var(--ui-accent-text);
+}
+
+.archive-nav__step:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.archive-nav__step:focus-visible {
+    outline: none;
+    border-color: var(--ui-accent);
+    box-shadow: var(--ui-focus-ring);
+}
+
+/* ---------- Tablets and phones ---------- */
+
+@media (max-width: 860px) {
+    .archive-browser__body {
+        grid-template-columns: 1fr;
+    }
+
+    /* Preview first so picking a sign shows it without scrolling back up. */
+    .archive-detail {
+        position: static;
+        order: -1;
+    }
+
+    .archive-detail__sign {
+        width: min(100%, calc(30vh * var(--sign-aspect)));
+    }
+
+    .archive-list {
+        max-height: 55vh;
+    }
+}
+
+@media (max-width: 600px) {
+    .archive-sources {
+        grid-template-columns: 1fr;
+    }
+
+    .archive-browser__actions {
+        width: 100%;
+    }
+
+    .archive-browser__actions .archive-btn {
+        flex: 1;
+    }
+
+    /* The chips scroll sideways rather than wrapping into several rows. */
+    .archive-type-filter {
+        flex-wrap: nowrap;
+        margin: 0 -14px;
+        padding: 0 14px 2px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .archive-chip {
+        flex: none;
+    }
+
+    .archive-search input,
+    .sign-combobox__input {
+        font-size: 16px;
+    }
+
+    .archive-nav {
+        margin-top: -4px;
+        margin-bottom: 20px;
+        padding: 10px;
+    }
+
+    .archive-nav__row {
+        gap: 6px;
+    }
+
+    .archive-nav__step {
+        width: 40px;
+    }
+}

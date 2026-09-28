@@ -21,3 +21,14 @@ test('falls back safely for unsupported Alumni crest appearance settings', () =>
   assert.equal(sign.alumniCrestSize, 'standard')
   assert.equal(sign.alumniCrestSpacing, 'auto')
 })
+
+test('defaults the department line to the UNBC wrap', () => {
+  assert.equal(normalizeSignData({}).departmentWrap, 'logo')
+  assert.equal(normalizeSignData({ departmentWrap: 'band' }).departmentWrap, 'band')
+  assert.equal(normalizeSignData({ departmentWrap: 'sideways' }).departmentWrap, 'logo')
+})
+
+test('keeps the designation layout options it knows', () => {
+  assert.equal(normalizeSignData({ designationLayout: 'together' }).designationLayout, 'together')
+  assert.equal(normalizeSignData({ designationLayout: 'sideways' }).designationLayout, 'inline')
+})

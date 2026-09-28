@@ -5,11 +5,13 @@ import { CardHolderSelector } from './components/CardHolderSelector'
 import { ToggleButtons } from './components/ToggleButtons'
 import { DesignationsContainer } from './components/DesignationsContainer'
 import { ThemeToggle } from './components/ThemeToggle'
-import { SignArchiveControls } from './components/SignArchiveControls'
+import { SavedSignsBrowser } from './components/SavedSignsBrowser'
+import { ArchiveNavigator } from './components/ArchiveNavigator'
 import { MeasuringSheetsPage } from './components/MeasuringSheetsPage'
 import { LivePreview } from './components/LivePreview'
 import { useCardHolders } from './hooks/useCardHolders'
 import { useSignState } from './hooks/useSignState'
+import { useSignArchive } from './hooks/useSignArchive'
 import { useTheme } from './hooks/useTheme'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { departmentTypes } from '@unbc/logo'
@@ -52,6 +54,7 @@ function App() {
   // Matches the tabbed layout breakpoint in responsive.css.
   const isTabbedLayout = useMediaQuery('(max-width: 1024px)')
   const [page, setPage] = useState(pageFromPath)
+  const archiveState = useSignArchive(signData, setSignData)
 
   const updateSignData = (updates) => {
     setSignData(prev => ({ ...prev, ...updates }))
@@ -157,10 +160,18 @@ function App() {
                 onClick={(event) => navigateTo('saved-signs', event)}
               >
                 Saved signs
+                {archiveState.archive && (
+                  <span className="app-page-link__badge">{archiveState.signs.length}</span>
+                )}
               </a>
               <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
             </div>
           </div>
+          <ArchiveNavigator
+            archiveState={archiveState}
+            browseHref={SAVED_SIGNS_PATH}
+            onBrowse={(event) => navigateTo('saved-signs', event)}
+          />
           <SignForm
             signData={signData}
             onUpdate={updateSignData}
@@ -238,10 +249,10 @@ function App() {
         </section>
       </main>
 
-      <main className="saved-signs-page" hidden={page !== 'saved-signs'}>
+      <main className="saved-signs-page saved-signs-page--wide" hidden={page !== 'saved-signs'}>
         <section className="saved-signs-card">
           <div className="controls-header">
-            <h1>UNBC Door Sign Generator</h1>
+            <h1>Saved signs</h1>
             <div className="controls-header__actions">
               <a
                 className="app-page-link"
@@ -253,9 +264,10 @@ function App() {
               <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
             </div>
           </div>
-          <SignArchiveControls
-            signData={signData}
-            onLoadSign={(loadedSign) => setSignData(loadedSign)}
+          <SavedSignsBrowser
+            archiveState={archiveState}
+            cardHolders={cardHolders}
+            editorHref={EDITOR_PATH}
             onEditSign={(event) => navigateTo('editor', event)}
           />
         </section>

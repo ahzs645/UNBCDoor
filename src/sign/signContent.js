@@ -54,6 +54,7 @@ export const buildSignContent = (signData, { cardHolders = {}, bleed = BLEED_INC
     positionLayout: signData.positionLayout,
     positionSize: signData.positionSize,
     designationLayout: signData.designationLayout,
+    departmentWrap: signData.departmentWrap,
     twoPersonSpacing: signData.twoPersonSpacing,
     contentSize: signData.contentSize,
     contentSpacing: signData.contentSpacing,

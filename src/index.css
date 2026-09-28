@@ -12,4 +12,5 @@
 @import './styles/switch.css';           /* email/phone show-on-sign toggle switch */
 @import './styles/responsive.css';       /* 1024 / 768 / 480 breakpoints */
 @import './styles/export-controls.css';  /* export section, paper size, sign-style controls */
+@import './styles/archive.css';         /* saved-signs browser, sign search combobox, editor archive navigator */
 @import './styles/a11y.css';             /* focus rings, reduced-motion, export-button breakpoint */
