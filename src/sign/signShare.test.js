@@ -75,3 +75,18 @@ test('removing the token keeps the rest of the URL', () => {
   assert.equal(removeSignShareToken(`${EDITOR}#sign=abc`), EDITOR)
   assert.equal(removeSignShareToken(`${EDITOR}saved-signs/?x=1#sign=abc&y=2`), `${EDITOR}saved-signs/?x=1#y=2`)
 })
+
+test('roles survive a share link round trip', async () => {
+  const signData = {
+    ...sample,
+    roles: [
+      { title: 'Professor', unit: 'Faculty of Environment' },
+      { title: 'Director', unit: 'Northern Analytical Laboratory Services' }
+    ],
+    roleLayout: 'inline'
+  }
+  const decoded = await decodeSignToken(await encodeSignToken(signData))
+  assert.deepEqual(decoded.roles, signData.roles)
+  assert.deepEqual(decoded.roles2, [])
+  assert.equal(decoded.roleLayout, 'inline')
+})

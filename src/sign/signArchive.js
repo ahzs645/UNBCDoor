@@ -6,14 +6,25 @@ export const SIGN_ARCHIVE_VERSION = 1
 const SIGN_DATA_KEYS = new Set(Object.keys(INITIAL_SIGN_DATA))
 const SIGN_TYPES = new Set(['faculty', 'staff', 'student', 'lab', 'general-room', 'custodian-closet'])
 
+// A role is a position paired with the faculty or department it belongs to. Anything else in
+// the list is dropped; a missing half reads as blank.
+const normalizeRoles = (roles) => (Array.isArray(roles)
+  ? roles
+    .filter(role => role && typeof role === 'object' && !Array.isArray(role))
+    .map(role => ({
+      title: typeof role.title === 'string' ? role.title : '',
+      unit: typeof role.unit === 'string' ? role.unit : ''
+    }))
+  : [])
+
 export const normalizeSignData = (value = {}) => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error('Each sign must contain a signData object.')
   }
 
-  const normalized = { ...INITIAL_SIGN_DATA, designations: [] }
+  const normalized = { ...INITIAL_SIGN_DATA, designations: [], roles: [], roles2: [] }
   Object.entries(value).forEach(([key, fieldValue]) => {
-    if (!SIGN_DATA_KEYS.has(key) || key === 'designations') return
+    if (!SIGN_DATA_KEYS.has(key) || Array.isArray(INITIAL_SIGN_DATA[key])) return
 
     const defaultValue = INITIAL_SIGN_DATA[key]
     if (typeof defaultValue === 'boolean') {
@@ -26,6 +37,8 @@ export const normalizeSignData = (value = {}) => {
   normalized.designations = Array.isArray(value.designations)
     ? value.designations.filter(item => typeof item === 'string')
     : []
+  normalized.roles = normalizeRoles(value.roles)
+  normalized.roles2 = normalizeRoles(value.roles2)
 
   if (!SIGN_TYPES.has(normalized.signType)) normalized.signType = INITIAL_SIGN_DATA.signType
   if (!['regular', 'bold', 'black'].includes(normalized.headlineWeight)) {
@@ -36,6 +49,9 @@ export const normalizeSignData = (value = {}) => {
   }
   if (!['stacked', 'inline'].includes(normalized.positionLayout)) {
     normalized.positionLayout = INITIAL_SIGN_DATA.positionLayout
+  }
+  if (!['aligned', 'inline'].includes(normalized.roleLayout)) {
+    normalized.roleLayout = INITIAL_SIGN_DATA.roleLayout
   }
   if (!['logo', 'band'].includes(normalized.departmentWrap)) {
     normalized.departmentWrap = INITIAL_SIGN_DATA.departmentWrap

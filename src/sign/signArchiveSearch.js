@@ -29,7 +29,8 @@ const entryHaystack = (entry) => {
   return fold([
     entry.label,
     SIGN_TYPE_LABELS[signData.signType],
-    ...SEARCH_FIELDS.map(field => signData[field])
+    ...SEARCH_FIELDS.map(field => signData[field]),
+    ...[...(signData.roles || []), ...(signData.roles2 || [])].flatMap(role => [role.title, role.unit])
   ].filter(Boolean).join(' \n '))
 }
 

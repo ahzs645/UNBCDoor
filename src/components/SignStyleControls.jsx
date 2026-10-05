@@ -28,7 +28,8 @@ const describeSign = (content) => {
     : []
 
   const hasSecondPerson = !isRoom && Boolean(content.showSecondOccupant && content.name2)
-  const hasPosition = Boolean(content.position || (hasSecondPerson && content.position2))
+  const hasRoles = Boolean(content.roles?.length || (hasSecondPerson && content.roles2?.length))
+  const hasPosition = Boolean(content.position || (hasSecondPerson && content.position2) || hasRoles)
   const hasTagline = Boolean(content.tagline || (hasSecondPerson && content.tagline2))
   const secondRoomEntry = isRoom && Boolean(content.showSecondOccupant)
 
@@ -39,6 +40,7 @@ const describeSign = (content) => {
     hasDepartment: Boolean(content.departmentText),
     hasSecondPerson,
     hasPosition,
+    hasRoles,
     hasTagline,
     // Splitting a position on separators only changes the sign when there is one to split on.
     hasSplitPosition: POSITION_SEPARATOR.test(content.position || '')
@@ -146,8 +148,18 @@ const STYLE_CONTROLS = {
     label: 'Position layout',
     when: (sign) => !sign.isRoom && sign.hasSplitPosition,
     options: [
-      { value: 'stacked', label: 'Stacked' },
-      { value: 'inline', label: 'One line' }
+      // Starts a new line at every |, · or ; as well as at each Enter.
+      { value: 'stacked', label: 'Split at | · ;' },
+      // Prints the position exactly as typed: separators stay, only Enter breaks the line.
+      { value: 'inline', label: 'As typed' }
+    ]
+  },
+  roleLayout: {
+    label: 'Roles',
+    when: (sign) => !sign.isRoom && sign.hasRoles,
+    options: [
+      { value: 'aligned', label: 'Aligned |' },
+      { value: 'inline', label: 'Run-in' }
     ]
   },
   contactLayout: {
@@ -218,7 +230,7 @@ const STYLE_CONTROLS = {
 
 const GROUPS = [
   { id: 'type', label: 'Type & size', keys: ['headlineWeight', 'contentSize', 'roomNameStyle', 'positionSize', 'contactSize'] },
-  { id: 'layout', label: 'Layout & spacing', keys: ['departmentWrap', 'textAlignment', 'contentWidth', 'contentSpacing', 'positionLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
+  { id: 'layout', label: 'Layout & spacing', keys: ['departmentWrap', 'textAlignment', 'contentWidth', 'contentSpacing', 'positionLayout', 'roleLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
   { id: 'extras', label: 'Crest & logo', keys: ['alumniCrestSize', 'alumniCrestSpacing', 'organizationLogo'] }
 ]
 

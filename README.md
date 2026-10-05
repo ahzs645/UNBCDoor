@@ -14,6 +14,9 @@ A web-based tool for generating standardized door signs for the University of No
 
 - **Dynamic Content**
   - Name and position display
+  - Multiple roles per person, each a position and its faculty/department, printed as
+    "Position | Department" with the bars aligned (or run in on one line)
+  - Multi-line extra line, with Enter breaks kept on the sign
   - Department information in logo area
   - Contact information (email, phone)
   - Room name display
@@ -45,6 +48,7 @@ A web-based tool for generating standardized door signs for the University of No
 - **Department Management**
   - Hierarchical department structure
   - Search functionality for departments
+  - Clear the department to print the plain UNBC logo
   - Support for academic and administrative departments
   - Sub-departments and units
   - Department lines wrap by the UNBC logo kit's rule
