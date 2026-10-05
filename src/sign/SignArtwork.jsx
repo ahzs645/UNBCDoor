@@ -81,6 +81,36 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
   return lines.map(restoreSpaces)
 }
 
+// Roles print as "Position | Faculty or department". Aligned, the bars line up in one column
+// and a long department wraps under itself, as on the printed signs. Falls back to plain
+// "Position | Department" lines when the positions are too long to leave room for a column (or
+// there is nothing to align, or no canvas to measure with).
+const ROLE_SEPARATOR = '|'
+
+const layoutRoles = (roles, { aligned, ...font }) => {
+  const plain = (text, dx = 0) => wrapText(text, font).map(line => [{ text: line, dx }])
+  const inline = () => roles.flatMap(role => plain([role.title, role.unit].filter(Boolean).join(` ${ROLE_SEPARATOR} `)))
+
+  const ctx = getMeasureContext()
+  const paired = roles.filter(role => role.title && role.unit)
+  if (!aligned || !ctx || !paired.length) return inline()
+
+  ctx.font = `${font.style} ${font.weight} ${font.size}px ${font.family}`
+  const space = ctx.measureText(' ').width
+  const separatorX = Math.max(...paired.map(role => ctx.measureText(role.title).width)) + space
+  const unitX = separatorX + ctx.measureText(ROLE_SEPARATOR).width + space
+  if (unitX > font.maxWidth * 0.5) return inline()
+
+  return roles.flatMap((role) => {
+    if (!role.title || !role.unit) return plain(role.title || role.unit)
+    return wrapText(role.unit, { ...font, maxWidth: font.maxWidth - unitX }).map((line, index) => (
+      index === 0
+        ? [{ text: role.title, dx: 0 }, { text: ROLE_SEPARATOR, dx: separatorX }, { text: line, dx: unitX }]
+        : [{ text: line, dx: unitX }]
+    ))
+  })
+}
+
 // Block sizes are fractions of the viewable height, matched against the production
 // Illustrator files: names ≈ 10% H, positions ≈ 5% H, contact lines ≈ 4.6% H.
 const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
@@ -215,6 +245,17 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
         wrap: true
       })
     }
+    const positionStyle = {
+      occupant,
+      size: uniformBodyText
+        ? contactTextSize
+        : H * (compactTwoPerson ? 0.065 : content.positionSize === 'large' ? 0.065 : 0.05) * contentScale,
+      weight: 400,
+      style: 'normal',
+      fill: secondaryColor,
+      lineHeightRatio: uniformBodyText ? contactLineHeight : compactTwoPerson || compactContent ? 1.08 : 1.3
+    }
+    const positionGap = compactContent ? 0 : gap(H * (compactTwoPerson ? 0.01 : 0.03))
     if (group.position) {
       const positions = content.positionLayout === 'inline'
         ? [group.position]
@@ -222,18 +263,19 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
 
       positions.forEach((position, index) => {
         blocks.push({
-          occupant,
+          ...positionStyle,
           text: position,
-          size: uniformBodyText
-            ? contactTextSize
-            : H * (compactTwoPerson ? 0.065 : content.positionSize === 'large' ? 0.065 : 0.05) * contentScale,
-          weight: 400,
-          style: 'normal',
-          fill: secondaryColor,
-          lineHeightRatio: uniformBodyText ? contactLineHeight : compactTwoPerson || compactContent ? 1.08 : 1.3,
-          gapBefore: index === 0 ? (compactContent ? 0 : gap(H * (compactTwoPerson ? 0.01 : 0.03))) : 0,
+          gapBefore: index === 0 ? positionGap : 0,
           wrap: true
         })
+      })
+    }
+    if (group.roles?.length) {
+      blocks.push({
+        ...positionStyle,
+        kind: 'roles',
+        roles: group.roles,
+        gapBefore: group.position ? 0 : positionGap
       })
     }
     if (group.tagline) {
@@ -310,6 +352,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     name: content.name,
     credentials: content.credentials,
     position: content.position,
+    roles: content.roles,
     tagline: content.tagline,
     email: content.showEmail ? content.email : '',
     phone: content.showPhone ? content.phone : '',
@@ -319,6 +362,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     pushPersonGroup({
       name: content.name2,
       position: content.position2,
+      roles: content.roles2,
       tagline: content.tagline2,
       email: content.showEmail2 ? content.email2 : '',
       phone: content.showPhone2 ? content.phone2 : '',
@@ -417,6 +461,29 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
       })
       return
     }
+    if (block.kind === 'roles') {
+      const aligned = content.roleLayout !== 'inline' && content.textAlignment !== 'center'
+      layoutRoles(block.roles, {
+        aligned,
+        weight: block.weight,
+        style: block.style,
+        size: block.size,
+        family: fontFamily,
+        maxWidth: textMaxWidth
+      }).forEach((segments, index) => {
+        items.push({
+          occupant: block.occupant,
+          segments,
+          size: block.size,
+          weight: block.weight,
+          style: block.style,
+          fill: block.fill,
+          lineHeight: block.size * block.lineHeightRatio,
+          marginTop: index === 0 ? (block.gapBefore || 0) : 0
+        })
+      })
+      return
+    }
     const lines = block.wrap
       ? wrapText(block.text, { weight: block.weight, style: block.style, size: block.size, family: fontFamily, maxWidth: textMaxWidth })
       : [(block.text || '').toString()]
@@ -443,6 +510,7 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     items.forEach((item) => {
       if (item.size) item.size *= shrink
       if (item.height) item.height *= shrink
+      if (item.segments) item.segments = item.segments.map(segment => ({ ...segment, dx: segment.dx * shrink }))
       item.lineHeight *= shrink
       item.marginTop *= shrink
     })
@@ -519,6 +587,26 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
             height={item.height}
             preserveAspectRatio="xMidYMid meet"
           />
+        ) : item.segments ? (
+          // A role line: each column is its own <text> so the export's per-node font mapping
+          // still applies.
+          <React.Fragment key={index}>
+            {item.segments.map((segment, segmentIndex) => (
+              <text
+                key={segmentIndex}
+                x={content.textAlignment === 'center' && item.segments.length === 1 ? VW / 2 : PAD_X + segment.dx}
+                y={item.baseline}
+                textAnchor={content.textAlignment === 'center' && item.segments.length === 1 ? 'middle' : 'start'}
+                fontFamily={fontFamily}
+                fontSize={item.size}
+                fontWeight={item.weight}
+                fontStyle={item.style}
+                fill={item.fill}
+              >
+                {segment.text}
+              </text>
+            ))}
+          </React.Fragment>
         ) : (
           <text
             key={index}

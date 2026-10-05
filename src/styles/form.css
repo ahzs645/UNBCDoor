@@ -194,6 +194,26 @@ textarea::placeholder {
     font-size: 0.7rem;
 }
 
+.department-field .department-clear {
+    padding: 2px 9px;
+    border: 1px solid var(--ui-border-strong);
+    border-radius: 999px;
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-size: 0.72rem;
+    letter-spacing: 0;
+}
+
+.department-field .department-clear:hover {
+    border-color: var(--ui-text-muted);
+    background: var(--ui-surface-hover);
+}
+
+.department-field .department-clear:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-ring);
+}
+
 .department-field .department-path {
     flex-direction: row;
     flex-wrap: wrap;
@@ -332,4 +352,86 @@ textarea::placeholder {
     color: var(--ui-text);
     font-size: 0.9rem;
     font-weight: 600;
+}
+
+/* ---------- Roles (position | department pairs) ---------- */
+
+.roles-editor__list {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.roles-editor__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+    gap: 6px;
+    align-items: center;
+}
+
+.roles-editor__actions {
+    display: flex;
+    gap: 2px;
+}
+
+.roles-editor__actions button {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ui-radius-sm);
+    background: none;
+    color: var(--ui-text-muted);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.roles-editor__actions button:hover:not(:disabled) {
+    background: var(--ui-surface-hover);
+    color: var(--ui-text);
+}
+
+.roles-editor__actions button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.roles-editor__actions button:focus-visible,
+.roles-editor__add:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-ring);
+}
+
+.roles-editor__add {
+    padding: 7px 12px;
+    border: 1px dashed var(--ui-border-strong);
+    border-radius: var(--ui-radius-sm);
+    background: none;
+    color: var(--ui-text);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.roles-editor__add:hover {
+    border-color: var(--ui-text-muted);
+    background: var(--ui-surface-hover);
+}
+
+/* On a phone the two fields stack, with the buttons under them. */
+@media (max-width: 520px) {
+    .roles-editor__row {
+        grid-template-columns: minmax(0, 1fr);
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--ui-border);
+    }
+
+    .roles-editor__actions {
+        justify-content: flex-end;
+    }
 }

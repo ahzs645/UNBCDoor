@@ -4,6 +4,7 @@ import { CustomSelect } from './CustomSelect'
 import { FormSection } from './FormSection'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
+import { RolesEditor } from './RolesEditor'
 
 const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']
 
@@ -199,14 +200,22 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
             label="Position"
             multiline
             placeholder="e.g. Associate Professor"
-            hint="Press Enter for a line break you want kept on the sign."
+            hint="Press Enter for a line break you want kept on the sign. Add more jobs as roles below."
             value={signData.position}
             onChange={handleInputChange}
+          />
+          <RolesEditor
+            id="roles"
+            roles={signData.roles}
+            onChange={(roles) => onUpdate({ roles })}
           />
           <TextField
             id="tagline"
             label="Extra line"
+            multiline
+            rows={3}
             placeholder="Optional — e.g. Supporting the Spark Lab"
+            hint="Press Enter for a line break you want kept on the sign."
             value={signData.tagline}
             onChange={handleInputChange}
           />
@@ -291,9 +300,16 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
                   value={signData.position2}
                   onChange={handleInputChange}
                 />
+                <RolesEditor
+                  id="roles2"
+                  roles={signData.roles2}
+                  onChange={(roles2) => onUpdate({ roles2 })}
+                />
                 <TextField
                   id="tagline2"
                   label="Extra line"
+                  multiline
+                  rows={3}
                   placeholder="Optional — e.g. Supporting the Spark Lab"
                   value={signData.tagline2}
                   onChange={handleInputChange}

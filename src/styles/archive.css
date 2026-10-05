@@ -365,7 +365,6 @@
 
 .archive-list__item.selected {
     background: var(--ui-accent-soft-strong);
-    box-shadow: inset 3px 0 0 var(--ui-accent);
 }
 
 .archive-list__label,
@@ -635,10 +634,10 @@
 
 .archive-nav {
     padding: 12px;
-    border: 1px solid var(--ui-accent-soft-strong);
+    border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
     background: var(--ui-surface);
-    box-shadow: var(--ui-shadow-sm), inset 3px 0 0 var(--ui-accent);
+    box-shadow: var(--ui-shadow-sm);
 }
 
 .archive-nav__meta {

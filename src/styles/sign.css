@@ -255,8 +255,34 @@
     transition: background 0.15s ease;
 }
 
-.designation-tag button:hover {
+.designation-tag button:hover:not(:disabled) {
     background: var(--ui-accent-soft-strong);
+}
+
+.designation-tag button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.designation-tag button.designation-tag__move {
+    width: 20px;
+    font-size: 0.85rem;
+}
+
+.designation-tag[draggable="true"] {
+    cursor: grab;
+}
+
+.designation-tag:has(.designation-tag__move) {
+    padding-left: 4px;
+}
+
+.designation-tag.dragging {
+    opacity: 0.45;
+}
+
+.designation-tag.drop-target {
+    box-shadow: 0 0 0 2px var(--ui-accent);
 }
 
 /* ---------- Export buttons ---------- */

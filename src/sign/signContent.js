@@ -20,6 +20,7 @@ export const buildSignContent = (signData, { cardHolders = {}, bleed = BLEED_INC
       ? signData.designations.join(', ')
       : '',
     position: values.position,
+    roles: values.roles,
     tagline: values.tagline,
     email: values.email,
     emailLabel: signData.emailLabel,
@@ -36,6 +37,7 @@ export const buildSignContent = (signData, { cardHolders = {}, bleed = BLEED_INC
     secondaryEntryType: signData.secondaryEntryType,
     name2: values.name2,
     position2: values.position2,
+    roles2: values.roles2,
     tagline2: values.tagline2,
     email2: values.email2,
     phone2: values.phone2,
@@ -53,6 +55,7 @@ export const buildSignContent = (signData, { cardHolders = {}, bleed = BLEED_INC
     roomNameStyle: signData.roomNameStyle,
     positionLayout: signData.positionLayout,
     positionSize: signData.positionSize,
+    roleLayout: signData.roleLayout,
     designationLayout: signData.designationLayout,
     departmentWrap: signData.departmentWrap,
     twoPersonSpacing: signData.twoPersonSpacing,

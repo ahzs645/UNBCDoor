@@ -27,14 +27,22 @@ export const getDefaultValues = (signType) => {
   }
 }
 
+// Roles with nothing typed in either half don't print.
+const filledRoles = (roles) => (Array.isArray(roles) ? roles : [])
+  .map(role => ({ title: (role?.title || '').trim(), unit: (role?.unit || '').trim() }))
+  .filter(role => role.title || role.unit)
+
 // Resolves the text fields shown on the sign, falling back to the per-type placeholders.
-// Optional fields (tagline, contact line, cell, second occupant) have no placeholders —
-// they only appear on the sign when filled in.
+// Optional fields (tagline, roles, contact line, cell, second occupant) have no placeholders —
+// they only appear on the sign when filled in. A sign with roles needs no placeholder position.
 export const resolveSignValues = (signData) => {
   const defaults = getDefaultValues(signData.signType)
+  const roles = filledRoles(signData.roles)
   return {
     name: signData.name || defaults.name || '',
-    position: signData.position || defaults.position || '',
+    position: signData.position || (roles.length ? '' : defaults.position) || '',
+    roles,
+    roles2: filledRoles(signData.roles2),
     email: signData.email || defaults.email || '',
     phone: signData.phone || defaults.phone || '',
     roomName: signData.roomName || defaults.roomName || '',

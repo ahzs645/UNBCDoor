@@ -75,7 +75,10 @@ const SHORT_KEYS = {
   roomContactGrouping: 'rcg',
   organizationLogo: 'ol',
   showDesignations: 'sd',
-  designations: 'd'
+  designations: 'd',
+  roles: 'ro',
+  roles2: 'ro2',
+  roleLayout: 'rly'
 }
 
 // Encode order: drop every field still at its default (most of a sign), then shorten the keys.

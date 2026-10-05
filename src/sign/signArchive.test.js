@@ -32,3 +32,26 @@ test('keeps the designation layout options it knows', () => {
   assert.equal(normalizeSignData({ designationLayout: 'together' }).designationLayout, 'together')
   assert.equal(normalizeSignData({ designationLayout: 'sideways' }).designationLayout, 'inline')
 })
+
+test('keeps roles as position / department pairs and drops anything else', () => {
+  const sign = normalizeSignData({
+    roles: [
+      { title: 'Director', unit: 'Northern Analytical Laboratory Services' },
+      { title: 'Professor' },
+      'Dean',
+      null,
+      { title: 7, unit: 'Faculty of Environment' }
+    ],
+    roles2: 'Director',
+    roleLayout: 'sideways'
+  })
+
+  assert.deepEqual(sign.roles, [
+    { title: 'Director', unit: 'Northern Analytical Laboratory Services' },
+    { title: 'Professor', unit: '' },
+    { title: '', unit: 'Faculty of Environment' }
+  ])
+  assert.deepEqual(sign.roles2, [])
+  assert.equal(sign.roleLayout, 'aligned')
+  assert.equal(normalizeSignData({ roleLayout: 'inline' }).roleLayout, 'inline')
+})
