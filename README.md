@@ -28,7 +28,8 @@ A web-based tool for generating standardized door signs for the University of No
   - Import a single sign or a multi-sign JSON archive (or drop the file on the page)
   - Search the archive by name, room, department, email or holder, filter by sign type, and
     preview each sign before opening it
-  - Step through a loaded archive from the editor with a search box and Previous/Next buttons
+  - Load the production archive or import JSON straight from the editor, then switch signs there
+    with a search box and Previous/Next buttons (also in the preview's header)
   - Edits stay with each sign (marked **Edited**, with **Revert**) until you export
   - Export one sign or the whole archive, including edits, as versioned, re-importable JSON
 

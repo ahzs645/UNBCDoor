@@ -1,12 +1,12 @@
 import React from 'react'
 import { DepartmentSelector } from '@unbc/logo'
+import { CustomSelect } from './CustomSelect'
 import { FormSection } from './FormSection'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
 
 const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']
 
-// People first, rooms second: the picker lays them out as two rows of three.
 const SIGN_TYPE_OPTIONS = [
   { value: 'faculty', label: 'Faculty' },
   { value: 'staff', label: 'Staff' },
@@ -161,24 +161,26 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
   return (
     <>
       <FormSection title="Sign">
-        <div className="form-group">
-          <span className="field-label" id="signTypeLabel">Sign type</span>
-          <SegmentedControl
-            name="signType"
-            className="sign-type-picker"
-            options={SIGN_TYPE_OPTIONS}
-            value={signData.signType}
-            onChange={(value) => onUpdate({ signType: value })}
-            aria-labelledby="signTypeLabel"
-          />
-        </div>
+        {/* Type and department share a row wherever there's room for both. */}
+        <div className="sign-basics">
+          <div className="form-group sign-basics__type">
+            <label htmlFor="signType">Sign type</label>
+            <CustomSelect
+              id="signType"
+              name="signType"
+              options={SIGN_TYPE_OPTIONS}
+              value={signData.signType}
+              onChange={(value) => onUpdate({ signType: value })}
+            />
+          </div>
 
-        <div className="department-field">
-          <DepartmentSelector
-            departments={departments}
-            value={signData}
-            onChange={onUpdate}
-          />
+          <div className="department-field">
+            <DepartmentSelector
+              departments={departments}
+              value={signData}
+              onChange={onUpdate}
+            />
+          </div>
         </div>
       </FormSection>
 

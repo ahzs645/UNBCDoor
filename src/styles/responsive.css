@@ -328,8 +328,4 @@
     .contact-row__fields--labelled {
         grid-template-columns: 1fr;
     }
-
-    .sign-type-picker .segmented__option {
-        font-size: 0.8rem;
-    }
 }

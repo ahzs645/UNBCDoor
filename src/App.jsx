@@ -198,6 +198,7 @@ function App() {
             content={signContent}
             cardHolders={cardHolders}
             onUpdate={updateSignData}
+            archiveState={archiveState}
             measuringSheetsHref={MEASURING_SHEETS_PATH}
             onOpenMeasuringSheets={(event) => navigateTo('measuring-sheets', event)}
           />

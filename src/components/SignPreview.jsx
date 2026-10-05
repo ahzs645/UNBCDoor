@@ -6,6 +6,7 @@ import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { CardHolderSelector } from './CardHolderSelector'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
+import { ArchiveStepper } from './ArchiveNavigator'
 
 // Turns the print-fit result into a one-line caution shown above the export buttons. Returns
 // null when the insert + bleed + crop marks all fit the chosen sheet at the required 1:1 scale.
@@ -42,6 +43,7 @@ export const SignPreview = ({
   content,
   cardHolders,
   onUpdate,
+  archiveState,
   measuringSheetsHref,
   onOpenMeasuringSheets
 }) => {
@@ -76,6 +78,7 @@ export const SignPreview = ({
       <section className="output-card preview-card" aria-labelledby="preview-title">
         <header className="output-card__header">
           <h2 className="output-card__title" id="preview-title">Preview</h2>
+          {archiveState?.archive && <ArchiveStepper archiveState={archiveState} compact />}
           <Switch
             className="switch--compact"
             checked={showGuides}

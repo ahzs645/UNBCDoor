@@ -131,22 +131,32 @@ textarea::placeholder {
     opacity: 1;
 }
 
-/* ---------- Sign type picker: people on the first row, rooms on the second ---------- */
+/* ---------- Sign type + department ---------- */
 
-.segmented.sign-type-picker {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
-    padding: 4px;
+/* Side by side when the section is wide enough for both, stacked otherwise. The type keeps a
+   dropdown's natural width and the department search takes the rest. */
+.sign-basics {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0 12px;
 }
 
-.sign-type-picker .segmented__option {
-    min-height: 42px;
-    padding: 8px 6px;
-    font-size: 0.86rem;
-    white-space: normal;
-    text-align: center;
-    line-height: 1.2;
+.sign-basics__type {
+    flex: 1 1 180px;
+    margin-bottom: 0;
+}
+
+.sign-basics .department-field {
+    flex: 2 1 230px;
+    min-width: 0;
+}
+
+/* Stacked (phones), the two fields need the usual gap between them. */
+@media (max-width: 599px) {
+    .sign-basics__type {
+        margin-bottom: 16px;
+    }
 }
 
 /* ---------- Department (brand-kit selector) ---------- */
