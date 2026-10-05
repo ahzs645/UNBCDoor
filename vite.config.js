@@ -9,7 +9,12 @@ export default defineConfig({
     alias: {
       // The UNBC brand kit lives in its own repo (ahzs645/unbc-logo) and is vendored here as a
       // git submodule, consumed from source. Run `git submodule update --init` after cloning.
-      '@unbc/logo': fileURLToPath(new URL('./vendor/unbc-logo/src/index.js', import.meta.url))
+      '@unbc/logo': fileURLToPath(new URL('./vendor/unbc-logo/src/index.js', import.meta.url)),
+      // Share links use json-url (vendor/json-url) with stream + lz-string codecs only; stub the
+      // Node-only codec packages its engine references but never runs for that codec set.
+      lzma: fileURLToPath(new URL('./src/sign/emptyCodecStub.js', import.meta.url)),
+      'node-lzw': fileURLToPath(new URL('./src/sign/emptyCodecStub.js', import.meta.url)),
+      msgpack5: fileURLToPath(new URL('./src/sign/emptyCodecStub.js', import.meta.url))
     }
   },
   build: {

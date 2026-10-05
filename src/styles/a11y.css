@@ -9,7 +9,8 @@
 .mobile-dock__tab:focus-visible,
 .live-preview__sign:focus-visible,
 .live-preview__hide:focus-visible,
-.live-preview-show:focus-visible {
+.live-preview-show:focus-visible,
+.share-notice__dismiss:focus-visible {
     outline: none;
     box-shadow: var(--ui-focus-ring);
 }

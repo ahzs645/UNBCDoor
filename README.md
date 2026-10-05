@@ -248,7 +248,9 @@ under `tools/compare-viewer`; it is never included in the production website.
 - `src/sign/signContent.js` - Builds the artwork content from the editor's sign data
 - `src/sign/headerGeometry.js` - Header band, lockup position, and department-line width
 - `src/sign/pdfPrimitives.js` - Drawing helpers shared by the measuring sheets
+- `src/sign/signShare.js` - Share links: the sign compressed into the URL with json-url
 - `vendor/unbc-logo` - UNBC brand kit, as a git submodule (see below)
+- `vendor/json-url` - [ahzs645/json-url](https://github.com/ahzs645/json-url), as a git submodule (see below)
 - `data/door-sign-archive.json` - Re-importable production-sign archive
 
 ## The UNBC brand kit submodule
@@ -280,6 +282,27 @@ git submodule update --remote vendor/unbc-logo
 ```
 
 Then commit the updated submodule pointer.
+
+## Share links (json-url submodule)
+
+**Copy share link** (under Print & export) puts the whole sign into the URL, so a link like
+`https://ahzs645.github.io/UNBCDoor/#sign=1.gz.…` opens straight into the editor with that sign —
+no server or account involved. The token lives in the hash, so names and emails never reach a
+server log. On phones the button opens the system share sheet.
+
+Encoding uses [ahzs645/json-url](https://github.com/ahzs645/json-url) (`@firstform/json-url`),
+vendored at `vendor/json-url` the same way the Webforms app consumes it. Fields still at their
+default are dropped, the remaining keys are shortened through a frozen key map, the shortest of
+the browser-safe codecs wins, and a checksum makes a link that was cut off fail clearly instead
+of loading half a sign. Decoded links go through the same validation as imported JSON.
+
+The submodule's `dist/` isn't committed, so `scripts/build-vendor-json-url.mjs` builds it — it
+runs automatically before `npm run dev`, `npm run build` and `npm test` (and on `npm install`),
+and is a no-op when the build is current. To pull a newer json-url:
+
+```bash
+git submodule update --remote vendor/json-url
+```
 
 ## Dependencies
 

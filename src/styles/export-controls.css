@@ -511,3 +511,88 @@
     border-color: var(--ui-accent);
     color: var(--ui-accent-text);
 }
+
+/* ---------- Share link ---------- */
+
+.share-link {
+    margin-top: 10px;
+}
+
+.export-btn--ghost {
+    width: 100%;
+    min-height: 40px;
+    background: transparent;
+    border-color: transparent;
+    color: var(--ui-accent-text);
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.export-btn--ghost:hover {
+    background: var(--ui-accent-soft);
+    border-color: transparent;
+}
+
+.export-btn--ghost svg {
+    stroke-width: 2;
+}
+
+.share-link__url {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.share-link__status:empty {
+    display: none;
+}
+
+.share-link__status {
+    margin-top: 6px;
+    color: var(--ui-accent-text);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Shown at the top of the editor after a share link is opened. */
+.share-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 12px 12px 16px;
+    border: 1px solid var(--ui-accent-soft-strong);
+    border-radius: var(--ui-radius);
+    background: var(--ui-accent-soft);
+    color: var(--ui-text);
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.share-notice p {
+    flex: 1;
+    padding-top: 3px;
+}
+
+.share-notice--error {
+    border-color: var(--ui-warning-border);
+    background: var(--ui-warning-bg);
+    color: var(--ui-warning-text);
+}
+
+.share-notice__dismiss {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.share-notice__dismiss:hover {
+    background: var(--ui-accent-soft-strong);
+}

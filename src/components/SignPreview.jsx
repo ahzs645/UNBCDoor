@@ -7,6 +7,7 @@ import { CardHolderSelector } from './CardHolderSelector'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
 import { ArchiveStepper } from './ArchiveNavigator'
+import { ShareLinkButton } from './ShareLinkButton'
 
 // Turns the print-fit result into a one-line caution shown above the export buttons. Returns
 // null when the insert + bleed + crop marks all fit the chosen sheet at the required 1:1 scale.
@@ -44,6 +45,7 @@ export const SignPreview = ({
   cardHolders,
   onUpdate,
   archiveState,
+  editorHref,
   measuringSheetsHref,
   onOpenMeasuringSheets
 }) => {
@@ -179,6 +181,8 @@ export const SignPreview = ({
                 PNG image
               </button>
             </div>
+
+            <ShareLinkButton signData={signData} editorHref={editorHref} />
           </div>
         </div>
 

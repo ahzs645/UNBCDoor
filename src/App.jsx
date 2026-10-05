@@ -14,6 +14,7 @@ import { useSignArchive } from './hooks/useSignArchive'
 import { useTheme } from './hooks/useTheme'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { buildSignContent } from './sign/signContent'
+import { readSignFromUrl, removeSignShareToken } from './sign/signShare'
 import { departmentTypes } from '@unbc/logo'
 
 const EDITOR_PATH = import.meta.env.BASE_URL
@@ -83,6 +84,44 @@ function App() {
   const updateSignData = (updates) => {
     setSignData(prev => ({ ...prev, ...updates }))
   }
+
+  // Share links (#sign=…) open into the editor: on first load, and when a link is pasted into a
+  // tab that is already open. The token is then dropped from the address bar so it doesn't keep
+  // pointing at the original once the sign is edited.
+  const [shareNotice, setShareNotice] = useState(null)
+  const { deselect: deselectArchiveEntry } = archiveState
+
+  useEffect(() => {
+    let cancelled = false
+
+    const openSharedSign = async () => {
+      const href = window.location.href
+      const result = await readSignFromUrl(href)
+      if (!result || cancelled) return
+
+      if (result.signData) {
+        // A shared sign isn't one of the open archive's entries; keep it from overwriting one.
+        deselectArchiveEntry()
+        setSignData(result.signData)
+        setPage('editor')
+        window.history.replaceState(window.history.state, '', removeSignShareToken(new URL(EDITOR_PATH, href).href))
+        setShareNotice({ kind: 'success', text: 'Opened a shared sign. Your changes stay on this device until you export or share them.' })
+      } else {
+        window.history.replaceState(window.history.state, '', removeSignShareToken(href))
+        setShareNotice({
+          kind: 'error',
+          text: 'This share link couldn’t be opened — it may have been cut off when it was copied. Ask for the link again.'
+        })
+      }
+    }
+
+    openSharedSign()
+    window.addEventListener('hashchange', openSharedSign)
+    return () => {
+      cancelled = true
+      window.removeEventListener('hashchange', openSharedSign)
+    }
+  }, [])
 
   useEffect(() => {
     const handlePopState = () => setPage(pageFromPath())
@@ -168,6 +207,15 @@ function App() {
           role={isCompactLayout ? 'tabpanel' : undefined}
           aria-label="Sign details"
         >
+          {shareNotice && (
+            <div className={`share-notice share-notice--${shareNotice.kind}`} role="status">
+              <p>{shareNotice.text}</p>
+              <button type="button" className="share-notice__dismiss" onClick={() => setShareNotice(null)} aria-label="Dismiss">
+                ×
+              </button>
+            </div>
+          )}
+
           <ArchiveNavigator
             archiveState={archiveState}
             browseHref={SAVED_SIGNS_PATH}
@@ -199,6 +247,7 @@ function App() {
             cardHolders={cardHolders}
             onUpdate={updateSignData}
             archiveState={archiveState}
+            editorHref={EDITOR_PATH}
             measuringSheetsHref={MEASURING_SHEETS_PATH}
             onOpenMeasuringSheets={(event) => navigateTo('measuring-sheets', event)}
           />
