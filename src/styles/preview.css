@@ -1,44 +1,57 @@
-.preview {
-    margin-top: 20px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
+/* ---------- Output cards (preview, print & export) ---------- */
+
+.output-card {
+    padding: 18px 20px 20px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    box-shadow: var(--ui-shadow-sm);
 }
 
-.preview-toolbar {
-    width: 100%;
-    max-width: 600px;
+.output-card__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    margin-bottom: 14px;
 }
 
-.preview-toolbar__title {
-    font-weight: 700;
+.output-card__title {
     color: var(--ui-text);
-    font-size: 1.05rem;
+    font-size: 1rem;
+    font-weight: 700;
     letter-spacing: -0.01em;
 }
 
-.preview-guide-toggle {
-    margin-top: 0;
+/* The sign sits on a neutral stage, like a card on a desk, so its white reads as paper in
+   either theme. */
+.preview-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(16px, 4%, 36px);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-stage);
 }
 
 .preview-frame {
-    width: min(100%, 600px);
+    width: min(100%, 640px);
     aspect-ratio: var(--sign-aspect, 1.545);
     position: relative;
     display: flex;
     align-items: stretch;
     justify-content: stretch;
     box-sizing: border-box;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12), 0 10px 28px rgba(15, 23, 42, 0.14);
 }
 
-.preview-frame.without-holder {
-    width: min(100%, 560px);
+/* Desktop: never let the sign push the export card off a short window. */
+@media (min-width: 960px) {
+    .preview-frame {
+        width: min(100%, 640px, calc((100vh - 620px) * var(--sign-aspect, 1.545)));
+        min-width: min(100%, 360px);
+    }
 }
 
 /* Print guides: square-cornered overlays pinned to the trim and safe-area boxes.
@@ -124,10 +137,9 @@
 .preview-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 18px;
+    gap: 8px 18px;
     justify-content: center;
-    width: 100%;
-    max-width: 600px;
+    margin-top: 12px;
 }
 
 .preview-legend__item {
@@ -168,48 +180,59 @@
     box-shadow: inset 0 0 0 1px var(--ui-border-strong);
 }
 
-.preview-measurements {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+
+/* Ensure the sign maintains its aspect ratio during scaling */
+.door-sign {
+    box-sizing: border-box;
 }
 
-.preview-measurements__title {
-    font-weight: 600;
-    color: var(--ui-text);
-    font-size: 1rem;
-    text-align: center;
-}
-
-.preview-measurements__list {
-    width: 100%;
+/* Insert, window and print sizes for the chosen holder. */
+.print-specs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+    margin: -6px 0 18px;
 }
 
-.preview-measurements__item {
-    background: var(--ui-accent-soft-strong);
-    border-radius: 12px;
-    padding: 12px 16px;
+.print-specs__item {
     display: grid;
-    gap: 6px;
-    justify-items: center;
-    text-align: center;
+    gap: 2px;
+    padding: 9px 12px;
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
 }
 
-.preview-measurements__item span {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
+.print-specs__item dt {
     color: var(--ui-text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
 }
 
-.preview-measurements__item strong {
-    font-size: 1.1rem;
-    color: var(--ui-accent-text);
+.print-specs__item dd {
+    margin: 0;
+    color: var(--ui-text);
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
+/* Wide desktops: holder and sizes on the left, sheet and downloads on the right, so the whole
+   export card fits under the preview without scrolling the column. */
+@media (min-width: 1200px) {
+    .export-card__layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+    .export-card__holder .print-specs {
+        margin-bottom: 0;
+    }
+
+    .preview-frame {
+        width: min(100%, 640px, calc((100vh - 470px) * var(--sign-aspect, 1.545)));
+    }
+}

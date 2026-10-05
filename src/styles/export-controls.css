@@ -1,94 +1,77 @@
-/* Ensure the sign maintains its aspect ratio during scaling */
-.door-sign {
-    box-sizing: border-box;
-}
-
-/* Export section styling */
-.export-section {
-    margin-top: 30px;
-    width: 100%;
-}
-
 /* Print-fit caution shown when the insert + bleed + crop marks won't fit the chosen sheet. */
 .print-fit-warning {
-    margin: 0 auto 16px;
-    max-width: 600px;
-    padding: 12px 16px;
+    margin: 0 0 14px;
+    padding: 10px 14px;
     background: var(--ui-warning-bg);
     border: 1px solid var(--ui-warning-border);
     border-radius: var(--ui-radius-sm);
     color: var(--ui-warning-text);
-    font-size: 0.88rem;
+    font-size: 0.84rem;
     line-height: 1.45;
-    text-align: center;
 }
 
-/* Paper size and measuring-sheet mode use the same segmented control as the appearance panel
-   below them. */
-.paper-size-selector,
-.template-mode-selector {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.paper-size-selector > label,
-.template-mode-selector > label {
-    display: inline;
-    margin: 0;
+.export-card__footnote {
+    margin-top: 14px;
     color: var(--ui-text-muted);
+    font-size: 0.78rem;
+    line-height: 1.5;
 }
 
-.paper-size-options,
-.template-mode-options {
-    display: flex;
-    gap: 2px;
-    padding: 2px;
-    border: 1px solid var(--ui-border);
-    border-radius: 8px;
-    background: var(--ui-surface);
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.paper-option,
-.template-mode-option {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 12px;
-    border-radius: 6px;
-    color: var(--ui-text-muted);
-    font-size: 0.79rem;
-    font-weight: 500;
-    letter-spacing: normal;
-    text-transform: none;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-
-.paper-option:hover,
-.template-mode-option:hover {
-    background: var(--ui-surface-hover);
-    color: var(--ui-text);
-}
-
-.paper-option.active,
-.paper-option.active:hover,
-.template-mode-option.active,
-.template-mode-option.active:hover {
-    background: var(--ui-accent);
-    color: var(--ui-on-accent);
+.export-card__footnote a {
+    color: var(--ui-accent-text);
     font-weight: 600;
 }
 
-.paper-option input[type="radio"],
-.template-mode-option input[type="radio"] {
+/* ---------- Segmented control (components/SegmentedControl.jsx) ---------- */
+
+.segmented {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+/* Each segment is a <label>, so the global field-label styling has to be undone. */
+.segmented__option {
+    position: relative;
+    display: inline-flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    margin: 0;
+    padding: 6px 12px;
+    border-radius: 7px;
+    color: var(--ui-text-muted);
+    font-size: 0.84rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.segmented__option:hover {
+    color: var(--ui-text);
+}
+
+.segmented__option.active,
+.segmented__option.active:hover {
+    background: var(--ui-surface);
+    color: var(--ui-accent-text);
+    font-weight: 600;
+    box-shadow: 0 0 0 1.5px var(--ui-accent), 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+:root.dark-mode .segmented__option.active {
+    background: var(--ui-surface-hover);
+}
+
+/* The segment itself is the affordance, so the radio is hidden but left focusable —
+   arrow keys still move between options and :focus-within draws the ring. */
+.segmented__option input[type="radio"] {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -98,22 +81,22 @@
     pointer-events: none;
 }
 
+.segmented--fill .segmented__option {
+    flex: 1 1 0;
+}
+
 /* Sign appearance controls. There are up to sixteen of them, so they live in one collapsed
-   panel: the header states whether anything differs from the defaults, and opening it reveals
-   the controls grouped by what they affect, each as a compact segmented control. */
+   section: the header states whether anything differs from the defaults, and opening it
+   reveals the controls grouped by what they affect, each as a compact segmented control. */
 .sign-style-panel {
-    margin-top: 24px;
-    width: 100%;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius-sm);
-    background: var(--ui-surface-muted);
+    padding: 0;
 }
 
 .sign-style-panel__header {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 5px;
+    padding: 8px;
 }
 
 .sign-style-panel__toggle {
@@ -122,9 +105,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 10px;
+    min-height: 44px;
+    padding: 8px 12px;
     border: 0;
-    border-radius: 8px;
+    border-radius: var(--ui-radius-sm);
     background: none;
     color: var(--ui-text);
     font: inherit;
@@ -134,7 +118,7 @@
 }
 
 .sign-style-panel__toggle:hover {
-    background: var(--ui-accent-soft);
+    background: var(--ui-surface-muted);
 }
 
 .sign-style-panel__chevron {
@@ -150,11 +134,13 @@
 }
 
 .sign-style-panel__title {
-    font-size: 0.92rem;
+    font-size: 1rem;
     font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .sign-style-panel__summary {
+    margin-left: auto;
     color: var(--ui-text-muted);
     font-size: 0.8rem;
     overflow: hidden;
@@ -169,7 +155,8 @@
 
 .sign-style-panel__reset {
     flex: none;
-    padding: 7px 12px;
+    min-height: 36px;
+    padding: 0 12px;
     border: 1px solid var(--ui-border);
     border-radius: 8px;
     background: var(--ui-surface);
@@ -189,7 +176,9 @@
 .sign-style-panel__body {
     display: grid;
     gap: 20px;
-    padding: 6px 14px 16px;
+    padding: 8px 20px 20px;
+    border-top: 1px solid var(--ui-border);
+    padding-top: 18px;
 }
 
 .sign-style-panel__hint {
@@ -239,7 +228,7 @@
     padding: 2px;
     border: 1px solid var(--ui-border);
     border-radius: 8px;
-    background: var(--ui-surface);
+    background: var(--ui-surface-muted);
 }
 
 /* Each segment is a <label>, so the global uppercase field-label styling has to be undone. */
@@ -254,23 +243,25 @@
     color: var(--ui-text-muted);
     font-size: 0.79rem;
     font-weight: 500;
-    letter-spacing: normal;
-    text-transform: none;
     white-space: nowrap;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
 }
 
 .style-option:hover {
-    background: var(--ui-surface-hover);
     color: var(--ui-text);
 }
 
 .style-option.active,
 .style-option.active:hover {
-    background: var(--ui-accent);
-    color: var(--ui-on-accent);
+    background: var(--ui-surface);
+    color: var(--ui-accent-text);
     font-weight: 600;
+    box-shadow: 0 0 0 1.5px var(--ui-accent), 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+:root.dark-mode .style-option.active {
+    background: var(--ui-surface-hover);
 }
 
 /* The segment itself is the affordance, so the radio is hidden but left focusable —
@@ -305,18 +296,7 @@
     }
 }
 
-/* Measuring sheets page — configuration on the left, live PDF preview on the right. The card
-   runs wider than the saved-signs one so a landscape sheet is legible next to the form. */
-.measuring-sheets-page {
-    max-width: 1180px;
-}
-
-.measuring-sheets__intro {
-    margin: -10px 0 22px;
-    color: var(--ui-text-muted);
-    font-size: 0.88rem;
-    line-height: 1.55;
-}
+/* Measuring sheets page — configuration on the left, live PDF preview on the right. */
 
 .measuring-sheets {
     display: grid;
@@ -338,22 +318,13 @@
     gap: 10px;
 }
 
-.measuring-sheets__group > label {
+.measuring-sheets__group > label,
+.measuring-sheets__group > .field-label {
     margin: 0;
 }
 
-/* The segmented controls stack their options on this page rather than sitting inline with a
-   caption, so they fill the column instead of the row. */
-.measuring-sheets .template-mode-options {
-    justify-content: flex-start;
-}
-
-.measuring-sheets .template-mode-option {
-    flex: 1 1 auto;
-}
-
 /* Four long paper labels wrap three-and-one in the config column; a 2×2 grid reads cleaner. */
-.measuring-sheets .template-mode-options:has(> :nth-child(4)) {
+.measuring-sheets .segmented:has(> :nth-child(4)) {
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
@@ -522,17 +493,6 @@
     }
 }
 
-/* The editor's pointer to this page, under the export buttons. */
-.template-export__link {
-    margin: 18px auto 0;
-    max-width: 620px;
-    color: var(--ui-text-muted);
-    font-size: 0.8rem;
-    line-height: 1.55;
-    text-align: center;
-}
-
-.template-export__link a,
 .measuring-sheets a {
     color: var(--ui-accent-text);
     font-weight: 600;
@@ -550,4 +510,89 @@
     background: var(--ui-accent-soft);
     border-color: var(--ui-accent);
     color: var(--ui-accent-text);
+}
+
+/* ---------- Share link ---------- */
+
+.share-link {
+    margin-top: 10px;
+}
+
+.export-btn--ghost {
+    width: 100%;
+    min-height: 40px;
+    background: transparent;
+    border-color: transparent;
+    color: var(--ui-accent-text);
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.export-btn--ghost:hover {
+    background: var(--ui-accent-soft);
+    border-color: transparent;
+}
+
+.export-btn--ghost svg {
+    stroke-width: 2;
+}
+
+.share-link__url {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.share-link__status:empty {
+    display: none;
+}
+
+.share-link__status {
+    margin-top: 6px;
+    color: var(--ui-accent-text);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Shown at the top of the editor after a share link is opened. */
+.share-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 12px 12px 16px;
+    border: 1px solid var(--ui-accent-soft-strong);
+    border-radius: var(--ui-radius);
+    background: var(--ui-accent-soft);
+    color: var(--ui-text);
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.share-notice p {
+    flex: 1;
+    padding-top: 3px;
+}
+
+.share-notice--error {
+    border-color: var(--ui-warning-border);
+    background: var(--ui-warning-bg);
+    color: var(--ui-warning-text);
+}
+
+.share-notice__dismiss {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.share-notice__dismiss:hover {
+    background: var(--ui-accent-soft-strong);
 }

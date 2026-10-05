@@ -94,6 +94,12 @@ export const useSignArchive = (signData, setSignData) => {
     loadEntry(signs[selectedIndex + delta])
   }
 
+  // Stop syncing the editor into the selected entry (the archive stays open), e.g. when a shared
+  // link replaces the sign in the editor — that sign isn't one of the archive's.
+  const deselect = () => {
+    setSelectedId('')
+  }
+
   const revertSelected = () => {
     if (!selectedEntry || !originals[selectedEntry.id]) return
     setSignData(originals[selectedEntry.id])
@@ -135,6 +141,7 @@ export const useSignArchive = (signData, setSignData) => {
     importFile,
     select,
     step,
+    deselect,
     revertSelected,
     close,
     exportCurrent,

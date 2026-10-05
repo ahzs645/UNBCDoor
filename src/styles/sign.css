@@ -124,201 +124,193 @@
     margin-bottom: 0.25em;
 }
 
-#designationsContainer {
-    display: block;
-    margin-top: 15px;
-    padding: 20px;
-    background: var(--ui-surface-muted);
-    border-radius: var(--ui-radius-sm);
-    border: 1px solid var(--ui-border);
-}
+/* ---------- Designations picker ---------- */
 
-.section-label {
-    display: block;
-    margin-bottom: 15px;
-    font-weight: 600;
-    color: var(--ui-text-muted);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
+.designations {
+    display: grid;
+    gap: 14px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
 }
 
 .designation-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 8px;
-    margin-bottom: 15px;
-}
-
-.designation-option {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-    cursor: pointer;
-    background: var(--ui-surface);
-    border: 1px solid var(--ui-border);
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
-.designation-option:hover {
-    background-color: var(--ui-surface-hover);
+.designation-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    margin: 0;
+    padding: 0 13px;
+    border: 1px solid var(--ui-border-strong);
+    border-radius: 999px;
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.designation-chip:hover {
     border-color: var(--ui-accent);
 }
 
-.designation-option input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: var(--ui-accent);
-}
-
-.designation-option label {
-    cursor: pointer;
-    user-select: none;
-    transition: color 0.2s ease;
-    flex: 1;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--ui-text);
-    letter-spacing: normal;
-    text-transform: none;
-    margin: 0;
-}
-
-.designation-option input[type="checkbox"]:checked + label {
-    color: var(--ui-accent-text);
+.designation-chip.active {
+    border-color: var(--ui-accent);
+    background: var(--ui-accent);
+    color: var(--ui-on-accent);
     font-weight: 600;
 }
 
-.designation-checkbox {
-    display: inline-block;
-    margin: 4px 8px 4px 0;
-    padding: 4px 8px;
-    background: var(--ui-surface-muted);
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.designation-checkbox input {
-    margin-right: 4px;
+.designation-chip input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    appearance: none;
+    pointer-events: none;
 }
 
 .custom-designation {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 8px;
 }
 
 .custom-designation input {
     flex: 1;
-    padding: 10px 12px;
-    border: 1px solid var(--ui-border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    background: var(--ui-field);
-    color: var(--ui-text);
-}
-
-.custom-designation input:focus {
-    outline: none;
-    border-color: var(--ui-accent);
-    box-shadow: var(--ui-focus-ring);
+    min-width: 0;
 }
 
 .custom-designation button {
-    padding: 10px 20px;
+    flex: none;
+    padding: 0 18px;
+    border: 1px solid var(--ui-primary);
+    border-radius: var(--ui-radius-sm);
     background: var(--ui-primary);
     color: var(--ui-on-primary);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
     font-weight: 600;
-    transition: background 0.2s ease;
+    cursor: pointer;
+    transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-.custom-designation button:hover {
+.custom-designation button:hover:not(:disabled) {
     background: var(--ui-primary-hover);
 }
 
-.selected-designations {
-    margin-top: 15px;
-    padding: 12px;
-    background: var(--ui-primary);
-    border-radius: 8px;
-    font-size: 0.9em;
-    color: white;
+.custom-designation button:disabled {
+    opacity: 0.45;
+    cursor: default;
 }
 
-.selected-designations strong {
-    color: #fff;
+.selected-designations {
+    display: grid;
+    gap: 8px;
+}
+
+.selected-designations__label {
+    color: var(--ui-text-muted);
+    font-size: 0.76rem;
     font-weight: 600;
 }
 
+.selected-designations__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+}
+
 .designation-tag {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 4px 8px;
-    margin: 2px 4px 2px 0;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(4px);
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 4px 4px 11px;
+    border-radius: 999px;
+    background: var(--ui-accent-soft-strong);
+    color: var(--ui-accent-text);
+    font-size: 0.84rem;
+    font-weight: 600;
 }
 
 .designation-tag button {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.8);
-    margin-left: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    padding: 0 2px;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
     border-radius: 50%;
-    transition: all 0.2s ease;
+    background: none;
+    color: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease;
 }
 
 .designation-tag button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    background: var(--ui-accent-soft-strong);
 }
 
+/* ---------- Export buttons ---------- */
+
 .export-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 30px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 10px;
     width: 100%;
 }
 
 .export-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
     background: var(--ui-primary);
     color: var(--ui-on-primary);
-    border: none;
-    padding: 14px 28px;
+    border: 1px solid var(--ui-primary);
+    padding: 0 18px;
     border-radius: var(--ui-radius-sm);
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 0.92rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s ease;
-    flex: 1;
-    min-width: 200px;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.export-btn svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .export-btn:hover {
     background: var(--ui-primary-hover);
+    border-color: var(--ui-primary-hover);
 }
 
-.export-btn.pdf-export {
-    background: var(--ui-danger);
+.export-btn--secondary {
+    background: var(--ui-surface);
+    border-color: var(--ui-border-strong);
+    color: var(--ui-text);
 }
 
-.export-btn.pdf-export:hover {
-    background: var(--ui-danger-hover);
+.export-btn--secondary:hover {
+    background: var(--ui-accent-soft);
+    border-color: var(--ui-accent);
+    color: var(--ui-accent-text);
 }
 
 .export-btn:disabled {

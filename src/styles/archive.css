@@ -1,10 +1,6 @@
 /* Saved signs: the archive browser page, the searchable sign combobox, and the navigator that
    sits at the top of the editor while an archive is loaded. */
 
-.saved-signs-page--wide {
-    max-width: 1180px;
-}
-
 /* ---------- Shared buttons ---------- */
 
 .archive-btn {
@@ -74,26 +70,6 @@
     font-weight: 700;
     letter-spacing: 0.02em;
     vertical-align: 1px;
-}
-
-.app-page-link__badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    margin-left: 7px;
-    padding: 0 6px;
-    border-radius: 999px;
-    background: var(--ui-accent);
-    color: var(--ui-on-accent);
-    font-size: 0.7rem;
-    font-weight: 800;
-}
-
-.app-page-link:hover .app-page-link__badge {
-    background: var(--ui-on-accent);
-    color: var(--ui-accent);
 }
 
 /* ---------- Browser page ---------- */
@@ -573,12 +549,96 @@
 
 /* ---------- Editor navigator ---------- */
 
+/* Nothing loaded yet: one compact row offering the two ways to open an archive. */
+.archive-nav--empty {
+    border-color: var(--ui-border);
+    box-shadow: var(--ui-shadow-sm);
+}
+
+.archive-nav__empty {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 2px 4px;
+}
+
+.archive-nav__empty-text {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    font-size: 0.8rem;
+}
+
+.archive-nav__hint {
+    color: var(--ui-text-muted);
+    font-size: 0.78rem;
+}
+
+.archive-nav__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.archive-btn__count {
+    display: inline-flex;
+    min-width: 22px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.archive-nav__message {
+    margin: 10px 4px 0;
+    color: var(--ui-text-muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+/* Previous / next in the preview card's header. */
+.archive-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.archive-stepper--compact {
+    margin-left: auto;
+}
+
+.archive-stepper--compact .archive-nav__step {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+}
+
+.archive-stepper--compact .archive-nav__step svg {
+    width: 16px;
+    height: 16px;
+}
+
+.archive-stepper__position {
+    min-width: 4.5em;
+    color: var(--ui-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
 .archive-nav {
-    margin: -8px 0 28px;
     padding: 12px;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius-sm);
-    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-accent-soft-strong);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    box-shadow: var(--ui-shadow-sm), inset 3px 0 0 var(--ui-accent);
 }
 
 .archive-nav__meta {
@@ -751,13 +811,16 @@
     }
 
     .archive-nav {
-        margin-top: -4px;
-        margin-bottom: 20px;
         padding: 10px;
     }
 
     .archive-nav__row {
         gap: 6px;
+    }
+
+    .archive-nav__actions,
+    .archive-nav__actions .archive-btn {
+        flex: 1 1 auto;
     }
 
     .archive-nav__step {

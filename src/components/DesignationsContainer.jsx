@@ -5,6 +5,8 @@ const commonDesignations = [
   'P.Eng', 'CPA', 'RN', 'LPN', 'RPBio', 'RPF', 'MCIP'
 ]
 
+// Designations print in the order they were picked, so the chosen ones are listed separately
+// in that order — the chips above only toggle membership.
 export const DesignationsContainer = ({ selectedDesignations = [], onUpdate }) => {
   const [customDesignation, setCustomDesignation] = useState('')
 
@@ -27,27 +29,28 @@ export const DesignationsContainer = ({ selectedDesignations = [], onUpdate }) =
   }
 
   return (
-    <div id="designationsContainer">
-      <label className="section-label">Professional Designations</label>
-      
-      <div className="designation-options">
-        {commonDesignations.map(designation => (
-          <div key={designation} className="designation-option">
-            <input
-              type="checkbox"
-              id={`designation-${designation}`}
-              checked={selectedDesignations.includes(designation)}
-              onChange={() => handleDesignationToggle(designation)}
-            />
-            <label htmlFor={`designation-${designation}`}>{designation}</label>
-          </div>
-        ))}
+    <div id="designationsContainer" className="designations">
+      <div className="designation-options" role="group" aria-label="Common designations">
+        {commonDesignations.map(designation => {
+          const checked = selectedDesignations.includes(designation)
+          return (
+            <label key={designation} className={`designation-chip ${checked ? 'active' : ''}`}>
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => handleDesignationToggle(designation)}
+              />
+              {designation}
+            </label>
+          )
+        })}
       </div>
-      
+
       <div className="custom-designation">
         <input
           type="text"
-          placeholder="Add custom designation..."
+          aria-label="Custom designation"
+          placeholder="Another designation…"
           value={customDesignation}
           onChange={(e) => setCustomDesignation(e.target.value)}
           onKeyDown={(e) => {
@@ -57,18 +60,28 @@ export const DesignationsContainer = ({ selectedDesignations = [], onUpdate }) =
             }
           }}
         />
-        <button type="button" onClick={addCustomDesignation}>Add</button>
+        <button type="button" onClick={addCustomDesignation} disabled={!customDesignation.trim()}>
+          Add
+        </button>
       </div>
-      
+
       {selectedDesignations.length > 0 && (
         <div className="selected-designations">
-          <strong>Selected: </strong>
-          {selectedDesignations.map(designation => (
-            <span key={designation} className="designation-tag">
-              {designation}
-              <button type="button" onClick={() => removeDesignation(designation)}>×</button>
-            </span>
-          ))}
+          <span className="selected-designations__label">On the sign, in order</span>
+          <ul className="selected-designations__list">
+            {selectedDesignations.map(designation => (
+              <li key={designation} className="designation-tag">
+                {designation}
+                <button
+                  type="button"
+                  onClick={() => removeDesignation(designation)}
+                  aria-label={`Remove ${designation}`}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
