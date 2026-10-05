@@ -1,150 +1,115 @@
-@media (max-width: 1024px) {
-    body {
-        padding: 15px;
-    }
-    
-    .container {
-        grid-template-columns: 1fr !important;
-        gap: 20px;
-        padding: 0;
-        width: 100%;
-        max-width: 100%;
+/* ---------- Compact layout: tablets and phones (< 960px) ----------
+   One column. The form and the full preview become two views switched from a dock at the
+   bottom of the screen (within thumb reach), and a live copy of the sign stays pinned above
+   the form so every edit is visible without leaving it. */
+@media (max-width: 959px) {
+    :root {
+        --ui-dock-height: 64px;
     }
 
-    .saved-signs-page {
-        padding: 0;
+    .workspace {
+        display: block;
+        max-width: 720px;
+        padding: 0 16px calc(var(--ui-dock-height) + 24px + env(safe-area-inset-bottom));
     }
-    
-    .controls, .card-holder-selector-container {
-        width: 100%;
-        max-width: 100%;
+
+    .workspace__form {
+        padding-top: 16px;
+    }
+
+    .workspace__output {
+        position: static;
+        max-height: none;
+        overflow: visible;
         margin: 0;
-        box-sizing: border-box;
-    }
-    
-    .card-holder-selector-container {
-        position: relative !important;
-        top: 0 !important;
-        order: 2;
-    }
-    
-    .controls {
-        order: 1;
+        padding: 16px 0 0;
     }
 
-    /* Phones and tablets: editor and preview are tabs, with a live copy of the sign pinned
-       above the form so every edit is visible without switching tabs. */
-    .mobile-editor-bar {
-        position: sticky;
-        top: 8px;
-        z-index: 20;
-        order: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        padding: 4px;
-        background: var(--ui-surface);
-        border: 1px solid var(--ui-border);
-        border-radius: 22px;
-        box-shadow: var(--ui-shadow-md);
-    }
-
-    .mobile-editor-tabs {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-        width: 100%;
-    }
-
-    .mobile-editor-tab {
-        min-height: 42px;
-        border: 0;
-        border-radius: 999px;
-        background: transparent;
-        color: var(--ui-text-muted);
-        font: inherit;
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .mobile-editor-tab:hover {
-        color: var(--ui-text);
-    }
-
-    .mobile-editor-tab.active {
-        background: var(--ui-accent);
-        color: var(--ui-on-accent);
-    }
-
-    .mobile-editor-tab:focus-visible {
-        outline: none;
-        box-shadow: var(--ui-focus-ring);
-    }
-
-    .mobile-tab-panel {
+    .workspace--editor .workspace__output,
+    .workspace--preview .workspace__form {
         display: none;
     }
 
-    .mobile-tab-panel.active {
-        display: block;
+    /* Pinned live preview. It bleeds to the screen edges so it reads as part of the chrome,
+       not as another card in the form. */
+    .live-preview,
+    .live-preview-bar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        margin: 0 -16px;
+        padding: 10px 16px;
+        background: color-mix(in srgb, var(--ui-page-bg) 88%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--ui-border);
     }
 
     .live-preview {
-        position: relative;
         display: flex;
         justify-content: center;
-        padding: 2px 2px 4px;
     }
 
-    /* Sized by whichever runs out first: the width of the screen, or ~30% of its height (the
+    /* Sized by whichever runs out first: the width of the screen, or ~24% of its height (the
        dynamic unit shrinks with an on-screen keyboard where supported). */
     .live-preview__sign {
         display: block;
-        width: min(100%, calc(30vh * var(--live-preview-aspect)));
+        width: min(100%, calc(24vh * var(--live-preview-aspect)));
         aspect-ratio: var(--live-preview-aspect);
         padding: 0;
         border: 0;
-        border-radius: 4px;
+        border-radius: 3px;
         overflow: hidden;
         background: #ffffff;
         cursor: pointer;
-        box-shadow: 0 0 0 1px var(--ui-border);
+        box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 4px 14px rgba(15, 23, 42, 0.12);
     }
 
     @supports (height: 1dvh) {
         .live-preview__sign {
-            width: min(100%, calc(30dvh * var(--live-preview-aspect)));
+            width: min(100%, calc(24dvh * var(--live-preview-aspect)));
         }
     }
 
-    .live-preview__sign:focus-visible,
-    .live-preview__hide:focus-visible,
-    .live-preview-show:focus-visible {
-        outline: none;
-        box-shadow: var(--ui-focus-ring);
+    .live-preview__sign svg {
+        display: block;
+        width: 100%;
+        height: 100%;
     }
 
+    /* Over the top-right of the sign's green header band, which never carries content. */
     .live-preview__hide {
         position: absolute;
-        right: 10px;
-        bottom: 12px;
-        min-height: 32px;
-        padding: 0 12px;
-        border: 1px solid var(--ui-border-strong);
+        top: 16px;
+        right: max(22px, calc(50% - (24vh * var(--live-preview-aspect)) / 2 + 6px));
+        min-height: 28px;
+        padding: 0 10px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
         border-radius: 999px;
-        background: var(--ui-surface);
-        color: var(--ui-text);
-        box-shadow: var(--ui-shadow-sm);
+        background: rgba(0, 0, 0, 0.18);
+        color: #ffffff;
         font: inherit;
-        font-size: 0.78rem;
+        font-size: 0.72rem;
         font-weight: 600;
         cursor: pointer;
     }
 
+    @supports (height: 1dvh) {
+        .live-preview__hide {
+            right: max(22px, calc(50% - (24dvh * var(--live-preview-aspect)) / 2 + 6px));
+        }
+    }
+
+    .live-preview-bar {
+        display: flex;
+        justify-content: center;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
     .live-preview-show {
-        min-height: 34px;
+        min-height: 36px;
+        padding: 0 14px;
         border: 0;
         border-radius: 999px;
         background: transparent;
@@ -154,75 +119,178 @@
         font-weight: 600;
         cursor: pointer;
     }
-}
 
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
+    /* Bottom dock: Edit / Preview & export. */
+    .mobile-dock {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 30;
+        display: block;
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+        background: color-mix(in srgb, var(--ui-surface) 92%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid var(--ui-border);
+        box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.06);
     }
 
-    .container {
-        gap: 15px;
+    .mobile-dock__tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    .mobile-dock__tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 48px;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: var(--ui-text-muted);
+        font: inherit;
+        font-size: 0.92rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .mobile-dock__tab svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .mobile-dock__tab.active {
+        background: var(--ui-accent-soft-strong);
+        color: var(--ui-accent-text);
+    }
+
+    .page {
+        padding: 16px;
+    }
+}
+
+/* ---------- Phones (< 600px) ---------- */
+@media (max-width: 599px) {
+    :root {
+        --ui-appbar-height: auto;
+    }
+
+    /* App bar: brand and theme on the first row, page tabs on a scrollable second row. */
+    .app-header__inner {
+        flex-wrap: wrap;
+        gap: 0 12px;
+        padding: 0 8px 0 16px;
+    }
+
+    .app-header__brand {
+        flex: 1;
+        min-height: 52px;
+    }
+
+    .app-header__logo {
+        height: 24px;
+    }
+
+    .app-header__product {
+        font-size: 0.9rem;
+    }
+
+    .app-header__nav {
+        order: 3;
+        flex: 1 1 100%;
+        margin: 0 -8px 0 -16px;
+        padding: 0 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .app-header__nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .app-header__link {
+        min-height: 44px;
+        font-size: 0.85rem;
+    }
+
+    .workspace {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .live-preview,
+    .live-preview-bar {
+        margin: 0 -12px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .live-preview__hide {
+        right: max(18px, calc(50% - (24dvh * var(--live-preview-aspect)) / 2 + 6px));
+    }
+
+    .workspace__form {
+        gap: 12px;
+        padding-top: 12px;
+    }
+
+    .workspace__output {
+        gap: 12px;
+        padding-top: 12px;
+    }
+
+    .form-section {
+        padding: 16px;
+    }
+
+    .form-section__body {
+        margin-top: 14px;
+    }
+
+    .output-card {
+        padding: 14px 14px 16px;
+    }
+
+    .preview-stage {
+        padding: 14px;
+    }
+
+    .sign-style-panel {
         padding: 0;
     }
 
-    .controls, .card-holder-selector-container {
-        padding: 18px;
-        border-radius: 15px;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        box-sizing: border-box;
+    .sign-style-panel__header {
+        padding: 4px;
     }
 
-    .controls-header__actions {
-        flex-shrink: 0;
-    }
-
-    .app-page-link {
-        min-height: 40px;
-        padding: 0 11px;
-        font-size: 0.78rem;
-    }
-
-    .saved-signs-card {
-        padding: 18px;
-        border-radius: 15px;
-    }
-
-    /* Tighter vertical rhythm so more of the form fits on a phone screen. */
-    .form-group {
-        margin-bottom: 16px;
-    }
-
-    label {
-        margin-bottom: 6px;
-    }
-
-    .contact-info-group {
-        gap: 10px;
-        margin-bottom: 16px;
-    }
-
-    .toggle-buttons-container {
-        margin-top: 18px;
-        margin-bottom: 16px;
-    }
-
-    .card-holder-info {
-        padding: 12px;
-        gap: 10px;
+    .sign-style-panel__body {
+        padding: 14px 16px 16px;
     }
 
     /* 16px keeps iOS Safari from zooming the viewport when a field is focused. */
-    input, .custom-select__trigger {
+    input,
+    textarea,
+    .custom-select__trigger {
         font-size: 16px;
     }
 
-    /* Roomier touch targets for the custom dropdown on phones/tablets. */
+    /* Roomier touch targets for the custom dropdown on phones. */
     .custom-select__trigger {
-        padding-top: 14px;
-        padding-bottom: 14px;
+        padding-top: 13px;
+        padding-bottom: 13px;
     }
 
     .custom-select__option {
@@ -233,148 +301,35 @@
         max-height: 50vh;
     }
 
-    h1 {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-    }
-
-    .preview {
-        padding: 0;
-        gap: 16px;
-    }
-
-    .preview-frame {
-        width: 100%;
-    }
-
-    .door-sign {
-        font-size: clamp(11.5px, 2.6vw, 15px);
-    }
-
-    .preview-measurements__list {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-
-    .preview-measurements__item {
-        padding: 10px 12px;
-    }
-}
-
-/* Phones: one contact field per row, so addresses and numbers are readable while typing and
-   each "Show on sign" switch sits under its own field. */
-@media (max-width: 560px) {
-    .contact-info-group {
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .contact-label-group {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-        padding: 10px;
-    }
-
-    .paper-size-selector {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 6px;
-    }
-}
-
-@media (max-width: 480px) {
-    .toggle-buttons-container {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .toggle-button {
-        width: 100%;
-        text-align: center;
-    }
-
-    body {
-        padding: 5px;
-    }
-
-    .container {
-        padding: 0;
-    }
-
-    .controls, .card-holder-selector-container {
-        padding: 14px;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        box-sizing: border-box;
-    }
-
-    .form-group {
-        margin-bottom: 14px;
-    }
-
-    /* Keep font-size at 16px to avoid the iOS focus zoom; trim padding for compactness. */
-    input, .custom-select__trigger {
-        padding: 10px 12px;
-        font-size: 16px;
-    }
-
-    .custom-select__trigger {
-        padding-right: 42px;
-    }
-
-    .controls-header {
-        align-items: flex-start;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-    }
-
-    .controls-header__actions {
-        width: 100%;
-        gap: 6px;
-    }
-
-    .controls-header__actions .app-page-link {
-        flex: 1;
-    }
-
-    .saved-signs-card {
-        padding: 14px;
-        border-radius: 12px;
-    }
-
-    h1 {
-        font-size: 1.3rem;
-    }
-
-    .preview {
-        gap: 14px;
-    }
-
-    .door-sign {
-        font-size: clamp(11px, 3.4vw, 14px);
-    }
-
-    .preview-measurements__list {
+    .export-buttons {
         grid-template-columns: 1fr;
     }
 
-    .preview-measurements__item {
-        padding: 10px;
+    .export-btn {
+        min-height: 50px;
     }
 
-    .preview-toolbar,
-    .preview-legend,
-    .preview-measurements {
-        max-width: 100%;
+    .page {
+        padding: 12px;
     }
 
-    .preview-toolbar__title {
-        font-size: 1rem;
+    .page-card {
+        padding: 18px 16px;
+        border-radius: 12px;
     }
 
-    .preview-legend {
-        gap: 8px 14px;
-        font-size: 0.74rem;
+    h1 {
+        font-size: 1.35rem;
+    }
+}
+
+/* Very narrow phones: the contact label no longer fits beside the value. */
+@media (max-width: 359px) {
+    .contact-row__fields--labelled {
+        grid-template-columns: 1fr;
+    }
+
+    .sign-type-picker .segmented__option {
+        font-size: 0.8rem;
     }
 }

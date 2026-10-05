@@ -4,13 +4,13 @@
    reorder these imports. */
 
 @import './styles/fonts.css';            /* @font-face brand faces + Google Inter import */
-@import './styles/base.css';             /* light + dark design tokens, reset, app shell */
-@import './styles/preview.css';          /* preview frame, print guides, holder window, measurements */
-@import './styles/form.css';             /* headings, form fields, card-holder info, toggle buttons */
+@import './styles/base.css';             /* light + dark design tokens, reset, app bar, workspace, pages */
+@import './styles/preview.css';          /* output cards, preview stage, print guides, holder window, specs */
+@import './styles/form.css';             /* editor sections, fields, sign type, department, contact rows */
 @import './styles/select.css';           /* custom (non-native) dropdown trigger + listbox */
 @import './styles/sign.css';             /* rendered door-sign artwork, designations, export buttons */
 @import './styles/switch.css';           /* email/phone show-on-sign toggle switch */
-@import './styles/responsive.css';       /* 1024 / 768 / 480 breakpoints */
-@import './styles/export-controls.css';  /* export section, paper size, sign-style controls */
+@import './styles/responsive.css';       /* compact (<960px) editor tabs + dock, phone (<600px) tweaks */
+@import './styles/export-controls.css';  /* fit warning, segmented control, appearance panel, measuring sheets */
 @import './styles/archive.css';         /* saved-signs browser, sign search combobox, editor archive navigator */
 @import './styles/a11y.css';             /* focus rings, reduced-motion, export-button breakpoint */

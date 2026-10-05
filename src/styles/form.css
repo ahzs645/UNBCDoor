@@ -1,33 +1,94 @@
 h1 {
     color: var(--ui-heading);
-    font-size: 1.75rem;
+    font-size: 1.6rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    margin-bottom: 30px;
-    text-align: center;
+    line-height: 1.2;
 }
 
+/* ---------- Editor sections ---------- */
+
+.form-section {
+    min-width: 0;
+    padding: 20px 22px 22px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    box-shadow: var(--ui-shadow-sm);
+}
+
+.form-section__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.form-section__heading {
+    min-width: 0;
+}
+
+.form-section__title {
+    color: var(--ui-text);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+}
+
+.form-section__description {
+    margin-top: 4px;
+    color: var(--ui-text-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.form-section__action {
+    flex: none;
+}
+
+.form-section__action .switch {
+    margin: 0;
+}
+
+.form-section__body {
+    margin-top: 18px;
+}
+
+.form-section__body > .form-group:last-child,
+.form-section__body > :last-child > .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* ---------- Fields ---------- */
+
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 18px;
     position: relative;
 }
 
-label {
+label,
+.field-label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 7px;
     font-weight: 600;
+    color: var(--ui-text);
+    font-size: 0.84rem;
+    line-height: 1.3;
+}
+
+.field-hint {
+    margin-top: 6px;
     color: var(--ui-text-muted);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    transition: color 0.2s ease;
+    font-size: 0.78rem;
+    line-height: 1.45;
 }
 
 input,
 textarea {
     width: 100%;
-    padding: 12px 14px;
-    border: 1px solid var(--ui-border);
+    padding: 11px 13px;
+    border: 1px solid var(--ui-border-strong);
     border-radius: var(--ui-radius-sm);
     font-size: 0.95rem;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -36,8 +97,13 @@ textarea {
     font-family: 'Inter', sans-serif;
 }
 
+:root:not(.dark-mode) input,
+:root:not(.dark-mode) textarea {
+    border-color: #d5dce3;
+}
+
 textarea {
-    min-height: 72px;
+    min-height: 68px;
     resize: vertical;
     line-height: 1.4;
 }
@@ -46,12 +112,14 @@ textarea {
    custom <CustomSelect> control — see styles/select.css. */
 input:not([type="radio"]):not([type="checkbox"]):hover,
 textarea:hover {
-    border-color: var(--ui-border-strong);
+    border-color: var(--ui-text-muted);
 }
 
 input:focus,
 textarea:focus,
-.search-input:focus {
+.search-input:focus,
+:root:not(.dark-mode) input:focus,
+:root:not(.dark-mode) textarea:focus {
     outline: none;
     border-color: var(--ui-accent);
     box-shadow: var(--ui-focus-ring);
@@ -63,179 +131,195 @@ textarea::placeholder {
     opacity: 1;
 }
 
-.contact-info-group {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-}
+/* ---------- Sign type picker: people on the first row, rooms on the second ---------- */
 
-.contact-label-group {
+.segmented.sign-type-picker {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    margin: -6px 0 20px;
-    padding: 14px;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius-sm);
-    background: var(--ui-surface-muted);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
 }
 
-.contact-label-group .form-group {
+.sign-type-picker .segmented__option {
+    min-height: 42px;
+    padding: 8px 6px;
+    font-size: 0.86rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* ---------- Department (brand-kit selector) ---------- */
+
+/* The brand kit draws the chosen department as a tall green block; in a form card it reads
+   better as a quiet summary of the path. */
+.department-field .form-group {
+    margin-bottom: 0;
+}
+
+.department-field .department-selection-display {
+    margin: 10px 0 0;
+    padding: 12px 14px;
+    background: var(--ui-accent-soft);
+    border: 1px solid var(--ui-accent-soft-strong);
+    border-radius: var(--ui-radius-sm);
+}
+
+.department-field .department-header {
+    margin-bottom: 6px;
+    color: var(--ui-text-muted);
+}
+
+.department-field .department-title strong {
+    color: var(--ui-text-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+}
+
+.department-field .department-type-badge {
+    padding: 2px 9px;
+    border: 1px solid var(--ui-border-strong);
+    background: var(--ui-surface);
+    color: var(--ui-text-muted);
+    font-size: 0.7rem;
+}
+
+.department-field .department-path {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 6px;
+}
+
+.department-field .department-level,
+.department-field .department-level.main,
+.department-field .department-level.sub,
+.department-field .department-level.subsub {
+    width: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ui-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.department-field .department-level.sub,
+.department-field .department-level.subsub {
+    font-weight: 500;
+}
+
+.department-field .department-arrow {
+    margin: 0;
+    transform: none;
+    color: var(--ui-text-muted);
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+.department-field .search-results {
+    background: var(--ui-surface);
+    border-color: var(--ui-border);
+    box-shadow: var(--ui-shadow-popover);
+}
+
+.department-field .search-result-item {
+    border-bottom-color: var(--ui-border);
+}
+
+.department-field .search-result-item:hover {
+    background: var(--ui-accent-soft);
+    border-left-color: var(--ui-accent);
+}
+
+.department-field .search-result-path {
+    color: var(--ui-text);
+}
+
+.department-field .search-result-detail {
+    color: var(--ui-text-muted);
+}
+
+/* ---------- Contact rows ---------- */
+
+.contact-rows {
+    display: grid;
+    gap: 16px;
+}
+
+.contact-row__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+}
+
+.contact-row__head > label:first-child {
     margin: 0;
 }
 
-.contact-info-group .form-group {
-    flex: 1;
-    margin-bottom: 0;
-    display: flex;
-    flex-direction: column;
+.contact-row__head .switch {
+    margin: 0;
 }
 
-.contact-info-group .form-group label:first-child {
-    margin-bottom: 8px;
+.contact-row__fields {
+    display: grid;
+    gap: 8px;
 }
 
-.contact-info-group .form-group input[type="email"],
-.contact-info-group .form-group input[type="tel"] {
-    margin-bottom: 0;
+/* The printed label sits in front of the value, as it does on the sign. */
+.contact-row__fields--labelled {
+    grid-template-columns: minmax(84px, 7.5rem) minmax(0, 1fr);
 }
 
-.occupant-section {
-    min-width: 0;
-    margin: 4px 0 0;
-    padding: 18px;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius-sm);
+.contact-row__label-input {
     background: var(--ui-surface-muted);
-}
-
-.occupant-section legend {
-    padding: 0 8px;
-    color: var(--ui-text);
-    font-size: 0.9rem;
-    font-weight: 800;
-}
-
-.occupant-section__toggle {
-    margin-bottom: 0;
-}
-
-.occupant-section__toggle .switch {
-    margin-top: 0;
-}
-
-.occupant-section__hint {
-    margin: 8px 0 0 48px;
     color: var(--ui-text-muted);
-    font-size: 0.82rem;
-    line-height: 1.4;
+    font-weight: 500;
 }
+
+.contact-row--off .contact-row__fields {
+    opacity: 0.55;
+}
+
+.contact-row--off .contact-row__fields input:focus {
+    opacity: 1;
+}
+
+/* ---------- Second occupant ---------- */
 
 .occupant-section__fields {
-    margin-top: 20px;
-    padding-top: 20px;
+    padding-top: 2px;
+}
+
+.occupant-section__fields .contact-rows {
+    margin-top: 4px;
+    padding-top: 18px;
     border-top: 1px solid var(--ui-border);
 }
 
-@media (max-width: 600px) {
-    .occupant-section {
-        padding: 14px;
-    }
-}
+/* ---------- Switch lists (alumni crest, designations) ---------- */
 
-.card-holder-info {
-    margin-top: 12px;
-    background: var(--ui-surface-muted);
-    padding: 16px;
-    border-radius: var(--ui-radius-sm);
-    border: 1px solid var(--ui-border);
+.switch-list {
     display: grid;
     gap: 14px;
 }
 
-.card-holder-info__header {
+.switch-list .switch {
+    margin: 0;
+    align-items: flex-start;
+}
+
+.switch-list .switch__text {
     display: grid;
-    gap: 6px;
+    gap: 2px;
+    padding-top: 1px;
 }
 
-.card-holder-info__header strong {
+.switch-list .switch__text strong {
     color: var(--ui-text);
-    font-size: 1.05rem;
-}
-
-.card-holder-info__note {
     font-size: 0.9rem;
-    color: var(--ui-text-muted);
-    line-height: 1.4;
-}
-
-.card-holder-info__measurements {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
-
-.card-holder-info__measurement {
-    background: var(--ui-accent-soft);
-    border-radius: 10px;
-    padding: 12px;
-    display: grid;
-    gap: 4px;
-}
-
-.card-holder-info__measurement dt {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--ui-text-muted);
-}
-
-.card-holder-info__measurement dd {
-    margin: 0;
     font-weight: 600;
-    font-size: 1rem;
-    color: var(--ui-text);
-}
-
-.card-holder-info__notes {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--ui-text-muted);
-    line-height: 1.5;
-}
-
-.toggle-buttons-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    margin-top: 30px;
-    justify-content: center;
-}
-
-.toggle-button {
-    padding: 11px 22px;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius-sm);
-    background: var(--ui-surface);
-    color: var(--ui-text);
-    cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-    display: inline-block;
-    font-weight: 500;
-}
-
-.toggle-button.active {
-    background: var(--ui-primary);
-    color: var(--ui-on-primary);
-    border-color: var(--ui-primary);
-}
-
-.toggle-button:hover {
-    background: var(--ui-surface-hover);
-    border-color: var(--ui-border-strong);
-}
-
-.toggle-button.active:hover {
-    background: var(--ui-primary-hover);
-    border-color: var(--ui-primary-hover);
 }

@@ -292,7 +292,7 @@ export const SignStyleControls = ({ signData, content, onUpdate }) => {
   }
 
   return (
-    <section className="sign-style-panel">
+    <section className="form-section sign-style-panel" aria-label="Appearance">
       <div className="sign-style-panel__header">
         <button
           type="button"

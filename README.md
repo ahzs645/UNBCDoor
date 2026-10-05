@@ -66,6 +66,15 @@ A web-based tool for generating standardized door signs for the University of No
   - Place designations beside the name, below it, or beside it but kept together (if they
     don't fit, the whole designation moves to the next line instead of breaking inside it)
 
+## Layout
+
+- **App bar** on every page with the UNBC wordmark and Editor / Saved signs / Measuring sheets tabs
+- **Desktop (960px and wider):** the form is a column of sections (Sign, Person or Room, Contact
+  details, Second occupant, Alumni & designations, Appearance); the preview and the
+  **Print & export** card (holder, paper, PDF/PNG) stay pinned beside it
+- **Phones and tablets:** a bottom dock switches between **Edit** and **Preview & export**, and a
+  live copy of the sign stays pinned above the form while editing (it can be hidden)
+
 ## Usage
 
 1. **Select Sign Type**

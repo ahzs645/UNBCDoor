@@ -1,10 +1,6 @@
 /* Saved signs: the archive browser page, the searchable sign combobox, and the navigator that
    sits at the top of the editor while an archive is loaded. */
 
-.saved-signs-page--wide {
-    max-width: 1180px;
-}
-
 /* ---------- Shared buttons ---------- */
 
 .archive-btn {
@@ -74,26 +70,6 @@
     font-weight: 700;
     letter-spacing: 0.02em;
     vertical-align: 1px;
-}
-
-.app-page-link__badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    margin-left: 7px;
-    padding: 0 6px;
-    border-radius: 999px;
-    background: var(--ui-accent);
-    color: var(--ui-on-accent);
-    font-size: 0.7rem;
-    font-weight: 800;
-}
-
-.app-page-link:hover .app-page-link__badge {
-    background: var(--ui-on-accent);
-    color: var(--ui-accent);
 }
 
 /* ---------- Browser page ---------- */
@@ -574,11 +550,11 @@
 /* ---------- Editor navigator ---------- */
 
 .archive-nav {
-    margin: -8px 0 28px;
     padding: 12px;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius-sm);
-    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-accent-soft-strong);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    box-shadow: var(--ui-shadow-sm), inset 3px 0 0 var(--ui-accent);
 }
 
 .archive-nav__meta {
@@ -751,8 +727,6 @@
     }
 
     .archive-nav {
-        margin-top: -4px;
-        margin-bottom: 20px;
         padding: 10px;
     }
 

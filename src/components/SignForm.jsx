@@ -1,34 +1,107 @@
 import React from 'react'
 import { DepartmentSelector } from '@unbc/logo'
-import { CustomSelect } from './CustomSelect'
+import { FormSection } from './FormSection'
+import { SegmentedControl } from './SegmentedControl'
+import { Switch } from './Switch'
 
 const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']
 
+// People first, rooms second: the picker lays them out as two rows of three.
 const SIGN_TYPE_OPTIONS = [
   { value: 'faculty', label: 'Faculty' },
   { value: 'staff', label: 'Staff' },
   { value: 'student', label: 'Student' },
   { value: 'lab', label: 'Lab' },
-  { value: 'general-room', label: 'General Room' },
-  { value: 'custodian-closet', label: 'Custodian Closet' }
+  { value: 'general-room', label: 'General room' },
+  { value: 'custodian-closet', label: 'Custodian closet' }
 ]
 
 const SECONDARY_ROOM_ENTRY_OPTIONS = [
-  { value: 'contact', label: 'Another contact for this room' },
+  { value: 'contact', label: 'Another contact' },
   { value: 'room', label: 'Another room or lab' }
 ]
+
+const formatPhone = (value) => {
+  const cleaned = value.replace(/\D/g, '')
+  if (cleaned.length <= 3) return cleaned
+  if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`
+  return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`
+}
+
+const TextField = ({ id, label, hint, multiline, rows = 2, value, onChange, ...inputProps }) => (
+  <div className="form-group">
+    <label htmlFor={id}>{label}</label>
+    {multiline ? (
+      <textarea id={id} name={id} rows={rows} value={value} onChange={onChange} {...inputProps} />
+    ) : (
+      <input type="text" id={id} name={id} value={value} onChange={onChange} {...inputProps} />
+    )}
+    {hint && <p className="field-hint">{hint}</p>}
+  </div>
+)
+
+// One contact line: what prints (the value), whether it prints at all, and — for the first
+// occupant only, since the labels are shared — the label printed in front of it.
+const ContactRow = ({
+  id,
+  title,
+  type,
+  value,
+  placeholder,
+  onChange,
+  showName,
+  shown,
+  onToggleShown,
+  labelId,
+  labelValue,
+  labelPlaceholder,
+  onLabelChange
+}) => (
+  <div className={`contact-row ${shown ? '' : 'contact-row--off'}`}>
+    <div className="contact-row__head">
+      <label htmlFor={id}>{title}</label>
+      <Switch
+        id={showName}
+        name={showName}
+        checked={shown}
+        onChange={onToggleShown}
+        className="switch--compact"
+        aria-label={`Show ${title.toLowerCase()} on the sign`}
+      >
+        On sign
+      </Switch>
+    </div>
+    <div className={`contact-row__fields ${labelId ? 'contact-row__fields--labelled' : ''}`}>
+      {labelId && (
+        <input
+          type="text"
+          id={labelId}
+          name={labelId}
+          className="contact-row__label-input"
+          aria-label={`${title} label printed before the value`}
+          placeholder={labelPlaceholder}
+          value={labelValue}
+          onChange={onLabelChange}
+        />
+      )}
+      <input
+        type={type}
+        id={id}
+        name={id}
+        inputMode={type === 'tel' ? 'tel' : undefined}
+        autoComplete="off"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  </div>
+)
 
 export const SignForm = ({ signData, onUpdate, departments }) => {
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
     onUpdate({ [name]: type === 'checkbox' ? checked : value })
-  }
-
-  const formatPhone = (value) => {
-    const cleaned = value.replace(/\D/g, '')
-    if (cleaned.length <= 3) return cleaned
-    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`
   }
 
   const handlePhoneChange = (e) => {
@@ -38,393 +111,222 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
   const isRoom = ROOM_TYPES.includes(signData.signType)
   const isPerson = !isRoom
 
-  return (
-    <form id="signForm">
-      <div className="form-group">
-        <label htmlFor="signType">Sign Type</label>
-        <CustomSelect
-          id="signType"
-          name="signType"
-          options={SIGN_TYPE_OPTIONS}
-          value={signData.signType}
-          onChange={(value) => onUpdate({ signType: value })}
-        />
-      </div>
-
-      <DepartmentSelector
-        departments={departments}
-        value={signData}
-        onChange={onUpdate}
+  const contactRows = (suffix, withLabels) => [
+    {
+      id: `email${suffix}`,
+      title: 'Email',
+      type: 'email',
+      placeholder: 'name@unbc.ca',
+      onChange: handleInputChange,
+      labelId: withLabels ? 'emailLabel' : null,
+      labelPlaceholder: 'No label'
+    },
+    {
+      id: `phone${suffix}`,
+      title: 'Phone',
+      type: 'tel',
+      placeholder: '250-960-XXXX',
+      onChange: handlePhoneChange,
+      labelId: withLabels ? 'phoneLabel' : null,
+      labelPlaceholder: 'No label'
+    },
+    ...(isPerson ? [{
+      id: `cellPhone${suffix}`,
+      title: 'Cell',
+      type: 'tel',
+      placeholder: '778-XXX-XXXX',
+      onChange: handlePhoneChange,
+      labelId: withLabels ? 'cellPhoneLabel' : null,
+      labelPlaceholder: 'No label'
+    }] : [])
+  ].map(row => {
+    const base = row.id.replace(/2$/, '')
+    const showName = `show${base[0].toUpperCase()}${base.slice(1)}${suffix}`
+    return (
+      <ContactRow
+        key={row.id}
+        {...row}
+        value={signData[row.id]}
+        showName={showName}
+        shown={signData[showName]}
+        onToggleShown={handleInputChange}
+        labelValue={row.labelId ? signData[row.labelId] : undefined}
+        onLabelChange={handleInputChange}
       />
+    )
+  })
 
-      {isPerson && (
-        <>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              placeholder="Enter Name"
-              value={signData.name}
-              onChange={handleInputChange}
-            />
-          </div>
+  const secondTitle = isRoom ? 'Additional room content' : 'Second occupant'
 
-          <div className="form-group">
-            <label htmlFor="position">Position</label>
-            <textarea
-              id="position"
-              name="position"
-              rows="2"
-              placeholder="Enter position. Use Enter for a fixed line break; pipes are preserved in Inline / pipe mode."
-              value={signData.position}
-              onChange={handleInputChange}
-            />
-          </div>
+  return (
+    <>
+      <FormSection title="Sign">
+        <div className="form-group">
+          <span className="field-label" id="signTypeLabel">Sign type</span>
+          <SegmentedControl
+            name="signType"
+            className="sign-type-picker"
+            options={SIGN_TYPE_OPTIONS}
+            value={signData.signType}
+            onChange={(value) => onUpdate({ signType: value })}
+            aria-labelledby="signTypeLabel"
+          />
+        </div>
 
-          <div className="form-group">
-            <label htmlFor="tagline">Extra Line (optional)</label>
-            <input
-              type="text"
-              id="tagline"
-              name="tagline"
-              placeholder="e.g. Supporting the Spark Lab"
-              value={signData.tagline}
-              onChange={handleInputChange}
-            />
-          </div>
-        </>
+        <div className="department-field">
+          <DepartmentSelector
+            departments={departments}
+            value={signData}
+            onChange={onUpdate}
+          />
+        </div>
+      </FormSection>
+
+      {isPerson ? (
+        <FormSection title="Person">
+          <TextField
+            id="name"
+            label="Name"
+            placeholder="e.g. Dr. Jane Doe"
+            autoComplete="off"
+            value={signData.name}
+            onChange={handleInputChange}
+          />
+          <TextField
+            id="position"
+            label="Position"
+            multiline
+            placeholder="e.g. Associate Professor"
+            hint="Press Enter for a line break you want kept on the sign."
+            value={signData.position}
+            onChange={handleInputChange}
+          />
+          <TextField
+            id="tagline"
+            label="Extra line"
+            placeholder="Optional — e.g. Supporting the Spark Lab"
+            value={signData.tagline}
+            onChange={handleInputChange}
+          />
+        </FormSection>
+      ) : (
+        <FormSection title="Room">
+          <TextField
+            id="roomName"
+            label="Room name"
+            multiline
+            rows={3}
+            placeholder="e.g. Geographic Information Systems Lab"
+            hint="Press Enter to control where the name breaks."
+            value={signData.roomName}
+            onChange={handleInputChange}
+          />
+          <TextField
+            id="contactName"
+            label="Contact line"
+            placeholder="Optional — e.g. Contact: Dr. Jane Doe"
+            value={signData.contactName}
+            onChange={handleInputChange}
+          />
+        </FormSection>
       )}
 
-      {isRoom && (
-        <>
-          <div className="form-group">
-            <label htmlFor="roomName">Room Name</label>
-            <textarea
-              id="roomName"
-              name="roomName"
-              rows="3"
-              placeholder="Enter room name. Use Enter to control line breaks."
-              value={signData.roomName}
-              onChange={handleInputChange}
-            />
-          </div>
+      <FormSection
+        title="Contact details"
+        description="Each line prints as “Label: value”. Clear a label to print the value on its own."
+      >
+        <div className="contact-rows">{contactRows('', true)}</div>
+      </FormSection>
 
-          <div className="form-group">
-            <label htmlFor="contactName">Contact Line (optional)</label>
-            <input
-              type="text"
-              id="contactName"
-              name="contactName"
-              placeholder="e.g. Contact: Dr. Jane Doe — or just a name"
-              value={signData.contactName}
-              onChange={handleInputChange}
-            />
-          </div>
-        </>
-      )}
-
-      <div className="contact-info-group">
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="enter.email@unbc.ca"
-            value={signData.email}
-            onChange={handleInputChange}
-          />
-          <label className="switch">
-            <input
-              type="checkbox"
-              id="showEmail"
-              name="showEmail"
-              checked={signData.showEmail}
-              onChange={handleInputChange}
-            />
-            <span className="switch__track" aria-hidden="true" />
-            <span className="switch__text">Show on sign</span>
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="phone">Phone</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            placeholder="250-960-XXXX"
-            value={signData.phone}
-            onChange={handlePhoneChange}
-          />
-          <label className="switch">
-            <input
-              type="checkbox"
-              id="showPhone"
-              name="showPhone"
-              checked={signData.showPhone}
-              onChange={handleInputChange}
-            />
-            <span className="switch__track" aria-hidden="true" />
-            <span className="switch__text">Show on sign</span>
-          </label>
-        </div>
-
-        {isPerson && (
-          <div className="form-group">
-            <label htmlFor="cellPhone">Cell (optional)</label>
-            <input
-              type="tel"
-              id="cellPhone"
-              name="cellPhone"
-              placeholder="778-XXX-XXXX"
-              value={signData.cellPhone}
-              onChange={handlePhoneChange}
-            />
-            <label className="switch">
-              <input
-                type="checkbox"
-                id="showCellPhone"
-                name="showCellPhone"
-                checked={signData.showCellPhone}
-                onChange={handleInputChange}
-              />
-              <span className="switch__track" aria-hidden="true" />
-              <span className="switch__text">Show on sign</span>
-            </label>
-          </div>
-        )}
-      </div>
-
-      <div className="contact-label-group" aria-label="Contact line labels">
-        <div className="form-group">
-          <label htmlFor="emailLabel">Email label</label>
-          <input
-            type="text"
-            id="emailLabel"
-            name="emailLabel"
-            placeholder="Leave blank for no label"
-            value={signData.emailLabel}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="phoneLabel">Phone label</label>
-          <input
-            type="text"
-            id="phoneLabel"
-            name="phoneLabel"
-            placeholder="e.g. Phone Number"
-            value={signData.phoneLabel}
-            onChange={handleInputChange}
-          />
-        </div>
-        {isPerson && (
-          <div className="form-group">
-            <label htmlFor="cellPhoneLabel">Cell label</label>
-            <input
-              type="text"
-              id="cellPhoneLabel"
-              name="cellPhoneLabel"
-              placeholder="e.g. Cell Number"
-              value={signData.cellPhoneLabel}
-              onChange={handleInputChange}
-            />
-          </div>
-        )}
-      </div>
-
-      <fieldset className="occupant-section">
-        <legend>{isRoom ? 'Additional room content' : 'Second occupant'}</legend>
-        <div className="form-group occupant-section__toggle">
-          <label className="switch">
-          <input
-            type="checkbox"
+      <FormSection
+        title={secondTitle}
+        className="occupant-section"
+        description={signData.showSecondOccupant ? null : (isRoom
+          ? 'Add another contact, or a second room or lab, to this sign.'
+          : 'Add a second person who shares this door.')}
+        action={(
+          <Switch
             id="showSecondOccupant"
             name="showSecondOccupant"
             checked={signData.showSecondOccupant}
             onChange={handleInputChange}
+            aria-label={isRoom ? 'Add another contact, room, or lab to this sign' : 'Add a second occupant to this sign'}
             aria-controls="second-occupant-fields"
             aria-expanded={signData.showSecondOccupant}
           />
-          <span className="switch__track" aria-hidden="true" />
-          <span className="switch__text">
-            {isRoom ? 'Add another contact, room, or lab to this sign' : 'Add a second occupant to this sign'}
-          </span>
-          </label>
-          {!signData.showSecondOccupant && (
-            <p className="occupant-section__hint">
-              Turn this on to reveal the {isRoom ? 'additional contact or room' : 'second person'} fields.
-            </p>
-          )}
-        </div>
-
-      {signData.showSecondOccupant && (
-        <div id="second-occupant-fields" className="occupant-section__fields">
-          {isRoom && (
-            <div className="form-group">
-              <label htmlFor="secondaryEntryType">What are you adding?</label>
-              <CustomSelect
-                id="secondaryEntryType"
-                name="secondaryEntryType"
-                options={SECONDARY_ROOM_ENTRY_OPTIONS}
-                value={signData.secondaryEntryType}
-                onChange={(value) => onUpdate({ secondaryEntryType: value })}
-              />
-            </div>
-          )}
-
-          {isPerson && (
-            <>
+        )}
+      >
+        {signData.showSecondOccupant && (
+          <div id="second-occupant-fields" className="occupant-section__fields">
+            {isRoom && (
               <div className="form-group">
-                <label htmlFor="name2">Second Occupant Name</label>
-                <input
-                  type="text"
+                <span className="field-label" id="secondaryEntryTypeLabel">What are you adding?</span>
+                <SegmentedControl
+                  name="secondaryEntryType"
+                  options={SECONDARY_ROOM_ENTRY_OPTIONS}
+                  value={signData.secondaryEntryType}
+                  onChange={(value) => onUpdate({ secondaryEntryType: value })}
+                  aria-labelledby="secondaryEntryTypeLabel"
+                />
+              </div>
+            )}
+
+            {isPerson && (
+              <>
+                <TextField
                   id="name2"
-                  name="name2"
-                  placeholder="Enter Name"
+                  label="Name"
+                  placeholder="e.g. Dr. John Smith"
+                  autoComplete="off"
                   value={signData.name2}
                   onChange={handleInputChange}
                 />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="position2">Second Occupant Position</label>
-                <textarea
+                <TextField
                   id="position2"
-                  name="position2"
-                  rows="2"
-                  placeholder="Enter position. Use Enter for a fixed line break."
+                  label="Position"
+                  multiline
+                  placeholder="e.g. Research Associate"
                   value={signData.position2}
                   onChange={handleInputChange}
                 />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="tagline2">Second Occupant Extra Line (optional)</label>
-                <input
-                  type="text"
+                <TextField
                   id="tagline2"
-                  name="tagline2"
-                  placeholder="e.g. Supporting the Spark Lab"
+                  label="Extra line"
+                  placeholder="Optional — e.g. Supporting the Spark Lab"
                   value={signData.tagline2}
                   onChange={handleInputChange}
                 />
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {isRoom && signData.secondaryEntryType === 'room' && (
-            <>
-              <div className="form-group">
-                <label htmlFor="roomName2">Second Room Name</label>
-                <textarea
-                  id="roomName2"
-                  name="roomName2"
-                  rows="3"
-                  placeholder="Enter room name. Use Enter to control line breaks."
-                  value={signData.roomName2}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </>
-          )}
+            {isRoom && signData.secondaryEntryType === 'room' && (
+              <TextField
+                id="roomName2"
+                label="Second room name"
+                multiline
+                rows={3}
+                placeholder="e.g. Soil Science Lab"
+                value={signData.roomName2}
+                onChange={handleInputChange}
+              />
+            )}
 
-          {isRoom && (
-            <div className="form-group">
-              <label htmlFor="contactName2">
-                {signData.secondaryEntryType === 'contact' ? 'Additional Contact / Role' : 'Second Contact Line (optional)'}
-              </label>
-              <input
-                type="text"
+            {isRoom && (
+              <TextField
                 id="contactName2"
-                name="contactName2"
+                label={signData.secondaryEntryType === 'contact' ? 'Contact / role' : 'Second contact line'}
                 placeholder={signData.secondaryEntryType === 'contact'
                   ? 'e.g. Research Manager: Shayna Dolan'
-                  : 'e.g. Contact: Dr. Jane Doe — or just a name'}
+                  : 'Optional — e.g. Contact: Dr. Jane Doe'}
                 value={signData.contactName2}
                 onChange={handleInputChange}
               />
-            </div>
-          )}
-
-          <div className="contact-info-group">
-            <div className="form-group">
-              <label htmlFor="email2">Email (optional)</label>
-              <input
-                type="email"
-                id="email2"
-                name="email2"
-                placeholder="enter.email@unbc.ca"
-                value={signData.email2}
-                onChange={handleInputChange}
-              />
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  id="showEmail2"
-                  name="showEmail2"
-                  checked={signData.showEmail2}
-                  onChange={handleInputChange}
-                />
-                <span className="switch__track" aria-hidden="true" />
-                <span className="switch__text">Show on sign</span>
-              </label>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="phone2">Phone (optional)</label>
-              <input
-                type="tel"
-                id="phone2"
-                name="phone2"
-                placeholder="250-960-XXXX"
-                value={signData.phone2}
-                onChange={handlePhoneChange}
-              />
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  id="showPhone2"
-                  name="showPhone2"
-                  checked={signData.showPhone2}
-                  onChange={handleInputChange}
-                />
-                <span className="switch__track" aria-hidden="true" />
-                <span className="switch__text">Show on sign</span>
-              </label>
-            </div>
-
-            {isPerson && (
-              <div className="form-group">
-                <label htmlFor="cellPhone2">Cell (optional)</label>
-                <input
-                  type="tel"
-                  id="cellPhone2"
-                  name="cellPhone2"
-                  placeholder="778-XXX-XXXX"
-                  value={signData.cellPhone2}
-                  onChange={handlePhoneChange}
-                />
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    id="showCellPhone2"
-                    name="showCellPhone2"
-                    checked={signData.showCellPhone2}
-                    onChange={handleInputChange}
-                  />
-                  <span className="switch__track" aria-hidden="true" />
-                  <span className="switch__text">Show on sign</span>
-                </label>
-              </div>
             )}
+
+            <div className="contact-rows">{contactRows('2', false)}</div>
           </div>
-        </div>
-      )}
-      </fieldset>
-    </form>
+        )}
+      </FormSection>
+    </>
   )
 }

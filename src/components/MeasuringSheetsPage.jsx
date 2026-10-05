@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CustomSelect } from './CustomSelect'
+import { SegmentedControl } from './SegmentedControl'
+import { Switch } from './Switch'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { resolveCardHolderGeometry } from '../sign/signGeometry'
 import { MM_PER_INCH, formatDualSize } from '../sign/templateGeometry'
@@ -40,25 +42,8 @@ const fromDisplay = (value, units) => {
   return units === 'mm' ? parsed / MM_PER_INCH : parsed
 }
 
-const Segmented = ({ name, options, value, onChange }) => (
-  <div className="template-mode-options">
-    {options.map((option) => (
-      <label
-        key={option.value}
-        className={`template-mode-option ${value === option.value ? 'active' : ''}`}
-      >
-        <input
-          type="radio"
-          name={name}
-          value={option.value}
-          checked={value === option.value}
-          onChange={() => onChange(option.value)}
-        />
-        {option.label}
-      </label>
-    ))}
-  </div>
-)
+// Every option list on this page stacks under its caption, filling the config column.
+const Segmented = (props) => <SegmentedControl className="segmented--fill" {...props} />
 
 const NumberField = ({ id, label, inches, units, onChange }) => (
   <div className="measuring-sheets__field">
@@ -186,8 +171,9 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
     <div className="measuring-sheets">
       <div className="measuring-sheets__config">
         <div className="measuring-sheets__group">
-          <label id="sheet-mode-label">Sheet</label>
+          <span className="field-label" id="sheet-mode-label">Sheet</span>
           <Segmented
+            aria-labelledby="sheet-mode-label"
             name="sheetMode"
             options={SHEET_MODES}
             value={mode}
@@ -211,8 +197,9 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
             {isCustom && (
               <>
                 <div className="measuring-sheets__units">
-                  <span>Enter measurements in</span>
+                  <span id="sheet-units-label">Enter measurements in</span>
                   <Segmented
+                    aria-labelledby="sheet-units-label"
                     name="sheetUnits"
                     options={[{ value: 'in', label: 'Inches' }, { value: 'mm', label: 'Millimetres' }]}
                     value={units}
@@ -274,8 +261,9 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
         )}
 
         <div className="measuring-sheets__group">
-          <label htmlFor="sheetPaper">Paper size</label>
+          <span className="field-label" id="sheet-paper-label">Paper size</span>
           <Segmented
+            aria-labelledby="sheet-paper-label"
             name="sheetPaper"
             options={PAPER_ORDER.map((key) => ({ value: key, label: PAPER_DIMENSIONS[key].label }))}
             value={paperSize}
@@ -285,34 +273,31 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
 
         {sheetMode.usesGrid && (
           <div className="measuring-sheets__group">
-            <label>Grid</label>
+            <span className="field-label" id="sheet-grid-label">Grid</span>
             <Segmented
+              aria-labelledby="sheet-grid-label"
               name="sheetGrid"
               options={GRID_DETAIL_OPTIONS}
               value={subdivisions}
               onChange={setSubdivisions}
             />
 
-            <label className="switch measuring-sheets__switch">
-              <input
-                type="checkbox"
-                checked={showCoordinates}
-                onChange={(event) => setShowCoordinates(event.target.checked)}
-              />
-              <span className="switch__track" aria-hidden="true" />
-              <span className="switch__text">Repeat coordinates across the grid</span>
-            </label>
+            <Switch
+              className="measuring-sheets__switch"
+              checked={showCoordinates}
+              onChange={(event) => setShowCoordinates(event.target.checked)}
+            >
+              Repeat coordinates across the grid
+            </Switch>
 
             {mode === 'grid' && (
-              <label className="switch measuring-sheets__switch">
-                <input
-                  type="checkbox"
-                  checked={showPresetOutlines}
-                  onChange={(event) => setShowPresetOutlines(event.target.checked)}
-                />
-                <span className="switch__track" aria-hidden="true" />
-                <span className="switch__text">Draw the known holder sizes as outlines</span>
-              </label>
+              <Switch
+                className="measuring-sheets__switch"
+                checked={showPresetOutlines}
+                onChange={(event) => setShowPresetOutlines(event.target.checked)}
+              >
+                Draw the known holder sizes as outlines
+              </Switch>
             )}
           </div>
         )}

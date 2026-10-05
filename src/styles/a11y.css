@@ -1,35 +1,15 @@
-/* Make sure the export buttons are properly positioned */
-@media (max-width: 768px) {
-    .export-buttons {
-        flex-direction: column;
-    }
-    .export-btn {
-        width: 100%;
-    }
-    /* Four sheet sizes as a 2×2 grid: roomy tap targets without a tall single column. */
-    .paper-size-options {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        width: 100%;
-    }
-    .paper-option {
-        width: 100%;
-        padding: 9px 6px;
-        justify-content: center;
-        text-align: center;
-    }
-}
-
 /* Accessibility: keyboard focus rings for interactive controls.
    Mouse clicks won't trigger these (focus-visible), so the visuals stay clean. */
-.theme-toggle-button:focus-visible,
-.toggle-button:focus-visible,
 .export-btn:focus-visible,
 .archive-btn:focus-visible,
 .sign-style-panel__toggle:focus-visible,
 .sign-style-panel__reset:focus-visible,
 .custom-designation button:focus-visible,
-.designation-tag button:focus-visible {
+.designation-tag button:focus-visible,
+.mobile-dock__tab:focus-visible,
+.live-preview__sign:focus-visible,
+.live-preview__hide:focus-visible,
+.live-preview-show:focus-visible {
     outline: none;
     box-shadow: var(--ui-focus-ring);
 }
@@ -46,21 +26,20 @@
     border: 0 !important;
 }
 
-.designation-option:focus-within {
-    border-color: var(--ui-accent);
+.designation-chip:focus-within {
     box-shadow: var(--ui-focus-ring);
 }
 
 /* The segmented options sit flush inside their track, so the ring is drawn inset to keep
    it from spilling over the neighbouring segments. */
 .style-option:focus-within,
-.paper-option:focus-within {
+.segmented__option:focus-within {
     box-shadow: inset 0 0 0 2px var(--ui-accent);
 }
 
 .style-option.active:focus-within,
-.paper-option.active:focus-within {
-    box-shadow: inset 0 0 0 2px var(--ui-accent), inset 0 0 0 4px var(--ui-on-accent);
+.segmented__option.active:focus-within {
+    box-shadow: 0 0 0 1.5px var(--ui-accent), var(--ui-focus-ring);
 }
 
 /* Respect users who prefer reduced motion. */
