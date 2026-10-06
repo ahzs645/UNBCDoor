@@ -206,6 +206,13 @@
     fill: #141414;
 }
 
+/* The card's edge showing at the plate's sides, where it is pulled in and out. */
+.holder-mockup__card-edge {
+    stroke: rgba(255, 255, 255, 0.75);
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+}
+
 /* The frame's edge throws a little shadow onto the insert. */
 .holder-mockup__window {
     position: absolute;

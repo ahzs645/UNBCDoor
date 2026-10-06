@@ -6,11 +6,14 @@ import { BLEED_INCHES } from '../sign/signConstants'
 // shows the insert, so anything the holder frame covers is hidden here exactly as it will be on
 // the wall.
 //
-// The plate is sized from the holder window and proportioned after the plates on campus: about
-// half an inch of frame at the sides and bottom, and a room-number panel above.
+// The card slides in from the side and runs the full width of the plate, so it sits flush with
+// the plate's left and right edges (that is where it is pulled out): the side frame is exactly
+// the holder's left/right cover. Above and below, the plate is proportioned after the plates on
+// campus: a room-number panel on top and about half an inch of frame under the window.
 
 const PLATE = {
-  side: 0.45,
+  // Where the room number and braille strip start in from the plate's edges.
+  inset: 0.45,
   bottom: 0.5
 }
 
@@ -89,23 +92,25 @@ const BrailleStrip = ({ text, x, y, width, height }) => {
 
 const formatInches = (value) => `${Number(value.toFixed(3))}"`
 
-// One label per frame edge, sitting on the plate just outside the cut edge.
+// One label per frame edge. Top and bottom sit on the plate just outside the cut edge; the card
+// runs to the plate's sides, so the left and right labels go inside the hidden strip itself.
 const HiddenLabels = ({ trim, offset, size }) => {
+  const sideSize = (edge) => Math.min(size, offset[edge] * 0.7)
   const labels = [
-    { edge: 'top', x: trim.x + trim.width / 2, y: trim.y - size * 0.45, angle: 0 },
-    { edge: 'bottom', x: trim.x + trim.width / 2, y: trim.y + trim.height + size * 1.15, angle: 0 },
-    { edge: 'left', x: trim.x - size * 0.45, y: trim.y + trim.height / 2, angle: -90 },
-    { edge: 'right', x: trim.x + trim.width + size * 0.45, y: trim.y + trim.height / 2, angle: 90 }
+    { edge: 'top', x: trim.x + trim.width / 2, y: trim.y - size * 0.45, angle: 0, fontSize: size },
+    { edge: 'bottom', x: trim.x + trim.width / 2, y: trim.y + trim.height + size * 1.15, angle: 0, fontSize: size },
+    { edge: 'left', x: trim.x + offset.left / 2 + sideSize('left') * 0.35, y: trim.y + trim.height / 2, angle: -90, fontSize: sideSize('left') },
+    { edge: 'right', x: trim.x + trim.width - offset.right / 2 - sideSize('right') * 0.35, y: trim.y + trim.height / 2, angle: 90, fontSize: sideSize('right') }
   ]
   return labels
-    .filter(({ edge }) => offset[edge] > 0)
-    .map(({ edge, x, y, angle }) => (
+    .filter(({ edge, fontSize }) => offset[edge] > 0 && fontSize >= 0.06)
+    .map(({ edge, x, y, angle, fontSize }) => (
       <text
         key={edge}
         className="holder-mockup__hidden-label"
         x={x}
         y={y}
-        fontSize={size}
+        fontSize={fontSize}
         textAnchor="middle"
         transform={angle ? `rotate(${angle} ${x} ${y})` : undefined}
       >
@@ -129,15 +134,14 @@ export const HolderMockup = ({
   const windowWidth = insertSize.width - offset.left - offset.right
   const windowHeight = insertSize.height - offset.top - offset.bottom
 
-  // The insert slides in behind the frame, so the plate always reaches a little past the cut card,
-  // even on a holder whose frame covers more than the usual border.
+  // The plate is exactly as wide as the card. Above and below, it always reaches a little past
+  // the cut card, even on a holder whose frame covers more than the usual border.
   const clearance = 0.12
-  const side = Math.max(PLATE.side, offset.left + clearance, offset.right + clearance)
   const bottom = Math.max(PLATE.bottom, offset.bottom + clearance)
   const aboveWindow = Math.max(plate.aboveWindow, offset.top + clearance)
 
   const windowRect = {
-    x: side,
+    x: offset.left,
     y: plate.numberPanel + plate.rule + aboveWindow,
     width: windowWidth,
     height: windowHeight
@@ -148,7 +152,7 @@ export const HolderMockup = ({
     width: insertSize.width,
     height: insertSize.height
   }
-  const plateWidth = windowWidth + side * 2
+  const plateWidth = insertSize.width
   const plateHeight = windowRect.y + windowHeight + bottom
 
   const percentOfPlate = (rect) => ({
@@ -199,7 +203,7 @@ export const HolderMockup = ({
         <rect className="holder-mockup__body" x="0" y="0" width={plateWidth} height={plateHeight} rx="0.05" />
         <text
           className={`holder-mockup__number ${label ? '' : 'is-placeholder'}`}
-          x={side * 0.9}
+          x={PLATE.inset * 0.9}
           y={numberBaseline}
           fontSize={numberSize}
         >
@@ -208,7 +212,7 @@ export const HolderMockup = ({
         {plate.braille && (
           <BrailleStrip
             text={label || '0-000'}
-            x={plateWidth - side - brailleWidth}
+            x={plateWidth - PLATE.inset - brailleWidth}
             y={numberBaseline - brailleHeight - 0.08}
             width={brailleWidth}
             height={brailleHeight}
@@ -248,6 +252,15 @@ export const HolderMockup = ({
           </defs>
         )}
         {hidesAnything && <path className="holder-mockup__frame-fill" d={framePath} fillRule="evenodd" />}
+        {/* The card's edge, flush with the plate's sides where it slides in and out. */}
+        <line className="holder-mockup__card-edge" x1="0" y1={trim.y} x2="0" y2={trim.y + trim.height} />
+        <line
+          className="holder-mockup__card-edge"
+          x1={plateWidth}
+          y1={trim.y}
+          x2={plateWidth}
+          y2={trim.y + trim.height}
+        />
         {seeThrough && hidesAnything && (
           <path d={framePath} fillRule="evenodd" fill="url(#holder-mockup-hatch)" />
         )}
