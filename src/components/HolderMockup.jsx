@@ -1,19 +1,25 @@
 import React from 'react'
 import { BLEED_INCHES } from '../sign/signConstants'
 
-// The sign as it hangs on the door: the black room plate (room number, braille strip, grey rule)
-// with the printed insert behind its window. Only the window shows the insert, so anything the
-// holder frame covers is hidden here exactly as it will be on the wall.
+// The sign as it hangs on the door: the black room plate (room number, and on older plates a
+// coloured rule and a braille strip) with the printed insert behind its window. Only the window
+// shows the insert, so anything the holder frame covers is hidden here exactly as it will be on
+// the wall.
 //
-// The plate is sized from the holder window and proportioned after the plates in Building 4:
-// about half an inch of frame at the sides and bottom, and a room-number panel above.
+// The plate is sized from the holder window and proportioned after the plates on campus: about
+// half an inch of frame at the sides and bottom, and a room-number panel above.
 
 const PLATE = {
   side: 0.45,
-  bottom: 0.5,
-  aboveWindow: 0.38,
-  rule: 0.16,
-  numberPanel: 1.85
+  bottom: 0.5
+}
+
+// The plates in use. Newer ones are plain black: just the number, then the window. Older ones
+// add a rule under the number (grey in Building 4, green in Building 7) and a braille strip.
+export const PLATE_STYLES = {
+  plain: { label: 'Number only', numberPanel: 1.95, rule: 0, aboveWindow: 0.4, braille: false },
+  grey: { label: 'Grey line + braille', numberPanel: 1.85, rule: 0.16, aboveWindow: 0.38, braille: true, ruleColors: ['#c9ccd1', '#9a9ea5', '#7d8189'] },
+  green: { label: 'Green line + braille', numberPanel: 1.85, rule: 0.13, aboveWindow: 0.38, braille: true, ruleColors: ['#2f7d63', '#1d6650', '#145442'] }
 }
 
 // Six-dot braille cells (dots 1–3 down the left, 4–6 down the right) for what a room number
@@ -81,13 +87,14 @@ const BrailleStrip = ({ text, x, y, width, height }) => {
   )
 }
 
-export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, children }) => {
+export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, plateStyle = 'plain', children }) => {
+  const plate = PLATE_STYLES[plateStyle] || PLATE_STYLES.plain
   const offset = viewableOffset || { top: 0, right: 0, bottom: 0, left: 0 }
   const windowWidth = insertSize.width - offset.left - offset.right
   const windowHeight = insertSize.height - offset.top - offset.bottom
 
   const windowX = PLATE.side
-  const windowY = PLATE.numberPanel + PLATE.rule + PLATE.aboveWindow
+  const windowY = plate.numberPanel + plate.rule + plate.aboveWindow
   const plateWidth = windowWidth + PLATE.side * 2
   const plateHeight = windowY + windowHeight + PLATE.bottom
 
@@ -109,8 +116,8 @@ export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, children 
   }
 
   const label = (roomNumber || '').trim()
-  const numberSize = PLATE.numberPanel * 0.62
-  const numberBaseline = PLATE.numberPanel * 0.74
+  const numberSize = plate.numberPanel * 0.62
+  const numberBaseline = plate.numberPanel * 0.74
   const brailleWidth = Math.min(1.9, plateWidth * 0.26)
   const brailleHeight = 0.36
 
@@ -122,13 +129,15 @@ export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, children 
         preserveAspectRatio="xMidYMid meet"
         aria-hidden="true"
       >
-        <defs>
-          <linearGradient id="holder-mockup-rule" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#c9ccd1" />
-            <stop offset="0.5" stopColor="#9a9ea5" />
-            <stop offset="1" stopColor="#7d8189" />
-          </linearGradient>
-        </defs>
+        {plate.rule > 0 && (
+          <defs>
+            <linearGradient id={`holder-mockup-rule-${plateStyle}`} x1="0" y1="0" x2="0" y2="1">
+              {plate.ruleColors.map((color, index) => (
+                <stop key={color} offset={index / (plate.ruleColors.length - 1)} stopColor={color} />
+              ))}
+            </linearGradient>
+          </defs>
+        )}
         <rect className="holder-mockup__body" x="0" y="0" width={plateWidth} height={plateHeight} rx="0.05" />
         <text
           className={`holder-mockup__number ${label ? '' : 'is-placeholder'}`}
@@ -138,14 +147,24 @@ export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, children 
         >
           {label || '0-000'}
         </text>
-        <BrailleStrip
-          text={label || '0-000'}
-          x={plateWidth - PLATE.side - brailleWidth}
-          y={numberBaseline - brailleHeight - 0.08}
-          width={brailleWidth}
-          height={brailleHeight}
-        />
-        <rect x="0" y={PLATE.numberPanel} width={plateWidth} height={PLATE.rule} fill="url(#holder-mockup-rule)" />
+        {plate.braille && (
+          <BrailleStrip
+            text={label || '0-000'}
+            x={plateWidth - PLATE.side - brailleWidth}
+            y={numberBaseline - brailleHeight - 0.08}
+            width={brailleWidth}
+            height={brailleHeight}
+          />
+        )}
+        {plate.rule > 0 && (
+          <rect
+            x="0"
+            y={plate.numberPanel}
+            width={plateWidth}
+            height={plate.rule}
+            fill={`url(#holder-mockup-rule-${plateStyle})`}
+          />
+        )}
       </svg>
 
       <div className="holder-mockup__window" style={windowStyle}>

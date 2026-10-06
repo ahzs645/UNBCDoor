@@ -218,6 +218,13 @@
     font-size: 0.78rem;
 }
 
+.door-preview-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+}
+
 .door-preview-room {
     display: inline-flex;
     align-items: center;

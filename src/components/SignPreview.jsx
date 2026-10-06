@@ -6,7 +6,7 @@ import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { CardHolderSelector } from './CardHolderSelector'
 import { SegmentedControl } from './SegmentedControl'
 import { SignGuides } from './SignGuides'
-import { HolderMockup } from './HolderMockup'
+import { HolderMockup, PLATE_STYLES } from './HolderMockup'
 import { ArchiveStepper } from './ArchiveNavigator'
 import { ShareLinkButton } from './ShareLinkButton'
 
@@ -46,6 +46,8 @@ const VIEW_OPTIONS = [
   { value: 'plain', label: 'Plain' }
 ]
 
+const PLATE_OPTIONS = Object.entries(PLATE_STYLES).map(([value, { label }]) => ({ value, label }))
+
 // The preview card (artwork, print guides, legend) and the print & export card (holder, sheet,
 // downloads). They share the rendered artwork node, which both exporters read from.
 export const SignPreview = ({
@@ -62,6 +64,7 @@ export const SignPreview = ({
   const [paperSize, setPaperSize] = useState('letter')
   const [view, setView] = useState('guides')
   const [roomNumber, setRoomNumber] = useState('')
+  const [plateStyle, setPlateStyle] = useState('plain')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
   const {
@@ -114,6 +117,7 @@ export const SignPreview = ({
               insertSize={insertSize}
               viewableOffset={selectedCardHolder ? viewableOffset : null}
               roomNumber={roomNumber}
+              plateStyle={plateStyle}
             >
               <SignArtwork ref={signRef} content={content} />
             </HolderMockup>
@@ -152,16 +156,26 @@ export const SignPreview = ({
                 ? `Only the ${viewableSize.width}" × ${viewableSize.height}" window shows; the frame hides the rest of the insert.`
                 : 'No holder selected, so the whole insert shows. Pick a holder under Print & export to see what its frame hides.'}
             </p>
-            <label className="door-preview-room">
-              <span>Room no.</span>
-              <input
-                type="text"
-                value={roomNumber}
-                onChange={(e) => setRoomNumber(e.target.value)}
-                placeholder="4-257"
-                maxLength={8}
+            <div className="door-preview-controls">
+              <SegmentedControl
+                name="plateStyle"
+                className="segmented--compact"
+                options={PLATE_OPTIONS}
+                value={plateStyle}
+                onChange={setPlateStyle}
+                aria-label="Room plate"
               />
-            </label>
+              <label className="door-preview-room">
+                <span>Room no.</span>
+                <input
+                  type="text"
+                  value={roomNumber}
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                  placeholder="4-257"
+                  maxLength={8}
+                />
+              </label>
+            </div>
           </div>
         )}
       </section>
