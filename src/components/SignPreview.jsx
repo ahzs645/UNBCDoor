@@ -6,7 +6,8 @@ import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { CardHolderSelector } from './CardHolderSelector'
 import { SegmentedControl } from './SegmentedControl'
 import { SignGuides } from './SignGuides'
-import { HolderMockup, PLATE_STYLES } from './HolderMockup'
+import { DEFAULT_LINE_COLOR, HolderMockup, PLATE_STYLES, resolveHolderPlate } from './HolderMockup'
+import { LineColorPicker } from './LineColorPicker'
 import { ArchiveStepper } from './ArchiveNavigator'
 import { ShareLinkButton } from './ShareLinkButton'
 
@@ -61,6 +62,9 @@ export const SignPreview = ({
   signData,
   content,
   cardHolders,
+  builtInHolderNames,
+  onSaveCustomHolder,
+  onDeleteCustomHolder,
   onUpdate,
   archiveState,
   editorHref,
@@ -71,8 +75,9 @@ export const SignPreview = ({
   const [paperSize, setPaperSize] = useState('letter')
   const [view, setView] = useState('guides')
   const [roomNumber, setRoomNumber] = useState('')
-  // The plate follows the holder preset; a pick in the door view holds until the holder changes.
-  const [plateChoice, setPlateChoice] = useState({ holder: null, style: null })
+  // The plate (and its line colour) follows the holder preset; a pick in the door view holds
+  // until the holder changes.
+  const [plateChoice, setPlateChoice] = useState({ holder: null, style: null, lineColor: null })
   const [doorView, setDoorView] = useState('mounted')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
@@ -85,13 +90,18 @@ export const SignPreview = ({
   } = resolveCardHolderGeometry(selectedCardHolder)
   const showGuides = view === 'guides'
 
-  const holderPlate = PLATE_STYLES[selectedCardHolder?.plateStyle] ? selectedCardHolder.plateStyle : 'plain'
-  const plateStyle = plateChoice.holder === (signData.cardHolderType || '') && plateChoice.style
-    ? plateChoice.style
-    : holderPlate
-  const setPlateStyle = (style) => setPlateChoice({ holder: signData.cardHolderType || '', style })
+  const holderKey = signData.cardHolderType || ''
+  const holderPlate = resolveHolderPlate(selectedCardHolder)
+  const choice = plateChoice.holder === holderKey ? plateChoice : {}
+  const plateStyle = choice.style || holderPlate.style
+  const lineColor = choice.lineColor || holderPlate.lineColor || DEFAULT_LINE_COLOR
+  const choosePlate = (change) => setPlateChoice(prev => ({
+    ...(prev.holder === holderKey ? prev : { style: null, lineColor: null }),
+    ...change,
+    holder: holderKey
+  }))
   const plateOptions = PLATE_OPTIONS.map(option => (
-    selectedCardHolder && option.value === holderPlate
+    selectedCardHolder && option.value === holderPlate.style
       ? { ...option, label: <span title="This holder's plate">{option.label} ★</span> }
       : option
   ))
@@ -149,6 +159,7 @@ export const SignPreview = ({
               viewableOffset={selectedCardHolder ? viewableOffset : null}
               roomNumber={roomNumber}
               plateStyle={plateStyle}
+              lineColor={lineColor}
               seeThrough={doorView === 'see-through'}
             >
               <SignArtwork ref={signRef} content={content} />
@@ -198,9 +209,16 @@ export const SignPreview = ({
                 className="segmented--compact"
                 options={plateOptions}
                 value={plateStyle}
-                onChange={setPlateStyle}
+                onChange={(style) => choosePlate({ style })}
                 aria-label="Room plate"
               />
+              {plateStyle === 'line' && (
+                <LineColorPicker
+                  name="doorLineColor"
+                  value={lineColor}
+                  onChange={(color) => choosePlate({ lineColor: color })}
+                />
+              )}
               <label className="door-preview-room">
                 <span>Room no.</span>
                 <input
@@ -225,7 +243,10 @@ export const SignPreview = ({
           <div className="export-card__holder">
             <CardHolderSelector
               cardHolders={cardHolders}
+              builtInHolderNames={builtInHolderNames}
               selectedType={signData.cardHolderType}
+              onSaveCustom={onSaveCustomHolder}
+              onDeleteCustom={onDeleteCustomHolder}
               onUpdate={(cardHolderType) => onUpdate({ cardHolderType })}
             />
 

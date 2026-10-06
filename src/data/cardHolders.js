@@ -5,8 +5,9 @@
 //
 // The card slides in from the side and runs the full width of the plate, so the insert width is
 // also the plate width. `plateStyle` is the room plate the holder is built into (see
-// PLATE_STYLES in components/HolderMockup.jsx): 'plain' (number only), 'grey' or 'green' (a rule
-// under the number and a braille strip). The on-the-door preview draws that plate.
+// PLATE_STYLES in components/HolderMockup.jsx): 'plain' (number only), or a line under the number
+// and a braille strip — 'line' (with an optional `plateLineColor`), or the shorthands 'grey' and
+// 'green'. Left out, the on-the-door preview starts on the default line + braille plate.
 export const cardHolders = {
   'Building 10': {
     name: 'Building 10 Acrylic Holder',
@@ -25,7 +26,6 @@ export const cardHolders = {
       left: 0.15,
       right: 0.15
     },
-    plateStyle: 'plain',
     notes: 'Matches the "Building 10 / Main" artboards (6.97" × 4.17"). Frame coverage is estimated — measure the holder window before printing critical edge content.'
   },
   'Non-Building 10': {
@@ -85,7 +85,6 @@ export const cardHolders = {
       left: 0.15,
       right: 0.15
     },
-    plateStyle: 'plain',
     notes: 'Matches the NUGSS "Final V1" artboards (6.93" × 4.42").'
   },
   'Legacy Letter-Half': {
@@ -105,7 +104,6 @@ export const cardHolders = {
       left: 0.1875,
       right: 0.1875
     },
-    plateStyle: 'plain',
     notes: 'Half a letter sheet. Kept for reprinting archived signs; new signs should use a current holder preset.'
   }
 }

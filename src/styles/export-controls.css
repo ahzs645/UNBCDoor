@@ -608,3 +608,260 @@
 .share-notice__dismiss:hover {
     background: var(--ui-accent-soft-strong);
 }
+
+/* ---------- Custom holders (CardHolderSelector / CustomHolderEditor) ---------- */
+
+.text-btn {
+    padding: 2px 0;
+    border: 0;
+    background: none;
+    color: var(--ui-accent-text);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.text-btn:hover {
+    text-decoration-color: currentColor;
+}
+
+.text-btn--danger {
+    color: var(--ui-danger-text);
+}
+
+.card-holder-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-top: 8px;
+}
+
+.holder-editor {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+.holder-editor__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.holder-editor__head h3 {
+    margin: 0;
+    color: var(--ui-text);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.holder-editor__intro {
+    margin: -6px 0 0;
+    color: var(--ui-text-muted);
+    font-size: 0.76rem;
+    line-height: 1.45;
+}
+
+.holder-editor__group {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.holder-editor__group legend,
+.holder-editor__field label {
+    margin-bottom: 4px;
+    padding: 0;
+    color: var(--ui-text);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.holder-editor__group .holder-editor__field label {
+    color: var(--ui-text-muted);
+    font-weight: 500;
+}
+
+.holder-editor__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.holder-editor__field input {
+    padding: 8px 10px;
+    font-size: 0.88rem;
+}
+
+.holder-editor__number {
+    position: relative;
+}
+
+.holder-editor__number input {
+    padding-right: 34px;
+    font-variant-numeric: tabular-nums;
+}
+
+.holder-editor__number span {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: var(--ui-text-muted);
+    font-size: 0.74rem;
+    pointer-events: none;
+}
+
+.holder-editor__problems {
+    margin: 0;
+    padding: 8px 12px 8px 28px;
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-warning-bg);
+    color: var(--ui-warning-text);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.holder-editor__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.holder-editor__actions .export-btn {
+    min-height: 40px;
+}
+
+/* ---------- Line colour (LineColorPicker) ---------- */
+
+.line-color-picker {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.line-color-picker__label {
+    margin-right: 4px;
+    color: var(--ui-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.line-color-picker__swatch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    margin: 0;
+    padding: 3px 9px 3px 5px;
+    border: 1px solid var(--ui-border);
+    border-radius: 999px;
+    color: var(--ui-text-muted);
+    font-size: 0.76rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.line-color-picker__swatch.is-active {
+    border-color: var(--ui-accent);
+    box-shadow: 0 0 0 1px var(--ui-accent);
+    color: var(--ui-accent-text);
+    font-weight: 600;
+}
+
+.line-color-picker__swatch:focus-within {
+    box-shadow: var(--ui-focus-ring);
+}
+
+.line-color-picker__swatch input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.line-color-picker__chip {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.line-color-picker__swatch input[type="color"] {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.line-color-picker__swatch input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.line-color-picker__swatch input[type="color"]::-webkit-color-swatch {
+    border: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.line-color-picker__swatch input[type="color"]::-moz-color-swatch {
+    border: 0;
+    border-radius: 50%;
+}
+
+.holder-editor .line-color-picker {
+    margin-top: 4px;
+}
+
+/* ---------- Measuring sheets: save a holder to this browser ---------- */
+
+.measuring-sheets__save {
+    display: grid;
+    gap: 6px;
+    margin: 10px 0 12px;
+}
+
+.measuring-sheets__save label {
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.measuring-sheets__save-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.measuring-sheets__save-row input {
+    padding: 9px 11px;
+    font-size: 0.9rem;
+}
+
+.measuring-sheets__save-row .export-btn {
+    min-height: 0;
+    padding: 0 18px;
+}
+
+.measuring-sheets__message.is-ok {
+    background: var(--ui-accent-soft);
+    color: var(--ui-accent-text);
+}

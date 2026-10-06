@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useId } from 'react'
 import { BLEED_INCHES } from '../sign/signConstants'
 
 // The sign as it hangs on the door: the black room plate (room number, and on older plates a
@@ -8,7 +8,7 @@ import { BLEED_INCHES } from '../sign/signConstants'
 //
 // The card slides in from the side and runs the full width of the plate, so it sits flush with
 // the plate's left and right edges (that is where it is pulled out): the side frame is exactly
-// the holder's left/right cover. Above and below, the plate is proportioned after the plates on
+// the holder's left/right cover, and the plate reads as one piece from top to bottom. Above and below, the plate is proportioned after the plates on
 // campus: a room-number panel on top and about half an inch of frame under the window.
 
 const PLATE = {
@@ -18,11 +18,46 @@ const PLATE = {
 }
 
 // The plates in use. Newer ones are plain black: just the number, then the window. Older ones
-// add a rule under the number (grey in Building 4, green in Building 7) and a braille strip.
+// add a coloured rule under the number (grey in Building 4, green in Building 7) and a braille
+// strip; the rule's colour is picked separately (LINE_COLORS, or any colour).
 export const PLATE_STYLES = {
-  plain: { label: 'Number only', numberPanel: 1.95, rule: 0, aboveWindow: 0.4, braille: false },
-  grey: { label: 'Grey line + braille', numberPanel: 1.85, rule: 0.16, aboveWindow: 0.38, braille: true, ruleColors: ['#c9ccd1', '#9a9ea5', '#7d8189'] },
-  green: { label: 'Green line + braille', numberPanel: 1.85, rule: 0.13, aboveWindow: 0.38, braille: true, ruleColors: ['#2f7d63', '#1d6650', '#145442'] }
+  line: { label: 'Line + braille', numberPanel: 1.85, rule: 0.14, aboveWindow: 0.38, braille: true },
+  plain: { label: 'Number only', numberPanel: 1.95, rule: 0, aboveWindow: 0.4, braille: false }
+}
+
+export const DEFAULT_PLATE_STYLE = 'line'
+
+export const LINE_COLORS = [
+  { value: '#9a9ea5', label: 'Grey' },
+  { value: '#1d6650', label: 'Green' }
+]
+
+export const DEFAULT_LINE_COLOR = LINE_COLORS[0].value
+
+// Holder presets name their plate as 'plain', 'line', or (older entries) the line's colour:
+// 'grey' / 'green'. Anything else falls back to the default line + braille plate.
+export const resolveHolderPlate = (holder) => {
+  const style = holder?.plateStyle
+  if (style === 'plain') return { style: 'plain', lineColor: null }
+  const named = LINE_COLORS.find(color => color.label.toLowerCase() === style)
+  return {
+    style: 'line',
+    lineColor: holder?.plateLineColor || named?.value || null
+  }
+}
+
+const HEX = /^#([0-9a-f]{6})$/i
+
+// Mixes a #rrggbb colour toward white (amount > 0) or black (amount < 0).
+const shade = (hex, amount) => {
+  const match = HEX.exec(hex || '')
+  if (!match) return hex
+  const target = amount > 0 ? 255 : 0
+  const channels = [0, 2, 4].map(index => parseInt(match[1].slice(index, index + 2), 16))
+  return `#${channels
+    .map(channel => Math.round(channel + (target - channel) * Math.abs(amount)))
+    .map(channel => channel.toString(16).padStart(2, '0'))
+    .join('')}`
 }
 
 // Six-dot braille cells (dots 1–3 down the left, 4–6 down the right) for what a room number
@@ -125,11 +160,14 @@ export const HolderMockup = ({
   insertSize,
   viewableOffset,
   roomNumber,
-  plateStyle = 'plain',
+  plateStyle = DEFAULT_PLATE_STYLE,
+  lineColor = DEFAULT_LINE_COLOR,
   seeThrough = false,
   children
 }) => {
-  const plate = PLATE_STYLES[plateStyle] || PLATE_STYLES.plain
+  const plate = PLATE_STYLES[plateStyle] || PLATE_STYLES[DEFAULT_PLATE_STYLE]
+  const ruleColor = HEX.test(lineColor || '') ? lineColor : DEFAULT_LINE_COLOR
+  const ruleGradientId = `holder-mockup-rule-${useId().replace(/[^a-z0-9]/gi, '')}`
   const offset = viewableOffset || { top: 0, right: 0, bottom: 0, left: 0 }
   const windowWidth = insertSize.width - offset.left - offset.right
   const windowHeight = insertSize.height - offset.top - offset.bottom
@@ -171,8 +209,18 @@ export const HolderMockup = ({
   }
 
   const rectPath = ({ x, y, width, height }) => `M${x} ${y}h${width}v${height}h${-width}Z`
-  const framePath = `${rectPath(trim)} ${rectPath(windowRect)}`
+  // The frame reaches a hair past the cut card (same black as the plate), so anti-aliasing never
+  // leaves a sliver of the card's edge showing along the seam; past the plate's sides it is cut
+  // off by the plate's own edge, flush with the black above and below.
+  const seam = 0.03
+  const frameOuter = { x: -seam, y: trim.y - seam, width: plateWidth + seam * 2, height: trim.height + seam * 2 }
+  const framePath = `${rectPath(frameOuter)} ${rectPath(windowRect)}`
   const hidesAnything = offset.top + offset.right + offset.bottom + offset.left > 0
+
+  // Mounted, only the window shows the card: clip it there so none of it can peek out around
+  // the frame's edges.
+  const cardClip = seeThrough ? undefined : `inset(${[offset.top / insertSize.height, offset.right / insertSize.width, offset.bottom / insertSize.height, offset.left / insertSize.width]
+    .map(fraction => `${fraction * 100}%`).join(' ')})`
 
   const label = (roomNumber || '').trim()
   const numberSize = plate.numberPanel * 0.62
@@ -193,14 +241,15 @@ export const HolderMockup = ({
       >
         {plate.rule > 0 && (
           <defs>
-            <linearGradient id={`holder-mockup-rule-${plateStyle}`} x1="0" y1="0" x2="0" y2="1">
-              {plate.ruleColors.map((color, index) => (
-                <stop key={color} offset={index / (plate.ruleColors.length - 1)} stopColor={color} />
-              ))}
+            <linearGradient id={ruleGradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor={shade(ruleColor, 0.35)} />
+              <stop offset="0.5" stopColor={ruleColor} />
+              <stop offset="1" stopColor={shade(ruleColor, -0.2)} />
             </linearGradient>
           </defs>
         )}
-        <rect className="holder-mockup__body" x="0" y="0" width={plateWidth} height={plateHeight} rx="0.05" />
+        {/* Past the edges like the frame, so the container cuts both at exactly the same pixel. */}
+        <rect className="holder-mockup__body" x={-seam} y={-seam} width={plateWidth + seam * 2} height={plateHeight + seam * 2} />
         <text
           className={`holder-mockup__number ${label ? '' : 'is-placeholder'}`}
           x={PLATE.inset * 0.9}
@@ -219,18 +268,22 @@ export const HolderMockup = ({
           />
         )}
         {plate.rule > 0 && (
+          // The inlaid line, edged top and bottom in a darker shade of its own colour (it runs
+          // off both sides of the plate, so the sides carry no border).
           <rect
-            x="0"
+            className="holder-mockup__rule"
+            x={-seam}
             y={plate.numberPanel}
-            width={plateWidth}
+            width={plateWidth + seam * 2}
             height={plate.rule}
-            fill={`url(#holder-mockup-rule-${plateStyle})`}
+            fill={`url(#${ruleGradientId})`}
+            stroke={shade(ruleColor, -0.45)}
           />
         )}
       </svg>
 
       {/* The whole cut card, at its real place behind the frame. */}
-      <div className="holder-mockup__card" style={percentOfPlate(trim)}>
+      <div className="holder-mockup__card" style={{ ...percentOfPlate(trim), clipPath: cardClip }}>
         <div className="holder-mockup__insert" style={insertStyle}>
           {children}
         </div>
@@ -252,15 +305,6 @@ export const HolderMockup = ({
           </defs>
         )}
         {hidesAnything && <path className="holder-mockup__frame-fill" d={framePath} fillRule="evenodd" />}
-        {/* The card's edge, flush with the plate's sides where it slides in and out. */}
-        <line className="holder-mockup__card-edge" x1="0" y1={trim.y} x2="0" y2={trim.y + trim.height} />
-        <line
-          className="holder-mockup__card-edge"
-          x1={plateWidth}
-          y1={trim.y}
-          x2={plateWidth}
-          y2={trim.y + trim.height}
-        />
         {seeThrough && hidesAnything && (
           <path d={framePath} fillRule="evenodd" fill="url(#holder-mockup-hatch)" />
         )}

@@ -55,15 +55,21 @@ A web-based tool for generating standardized door signs for the University of No
 
 - **Card Holder Support**
   - Multiple card holder type options
-  - Each holder preset names the room plate it is built into (number only, or a grey or green
-    line with braille); the on-the-door preview draws that plate, and the card runs to the
-    plate's side edges, where it slides in and out. **Number-Only Plate** is the newer plain
+  - Each holder preset can name the room plate it is built into (number only, or a line with
+    braille — grey, green or any colour); the on-the-door preview draws that plate, starting on
+    line + braille when the preset doesn't say. The card runs to the plate's side edges, where it
+    slides in and out, so the plate reads as one piece. **Number-Only Plate** is the newer plain
     plate, with its side frame estimated from a photo until it is measured
+  - **Custom holders** saved in the browser (localStorage): pick **+ New custom holder…** or
+    **Save a custom copy of this holder…** under Card holder, or **Save to this browser** on the
+    measuring sheets page. They appear in every holder picker on that browser; they don't travel
+    with share links
   - Preview modes: **Print guides** (the bleed that gets cut away is hatched, the cut line is
     dashed, the strip the holder frame hides is shaded, and the header and body margins are
     measured), **On the door** (the sign behind a room plate's window, with an optional room
     number), and **Plain**. The door view offers the plates in use (the newer number-only
-    plates, and the older ones with a grey or green line and a braille strip) and a
+    plates, and the older ones with a line — grey, green or a custom colour — and a braille
+    strip) and a
     **See-through** mode that shows the whole cut card behind a translucent frame, with the cut
     edge dashed and how much each edge hides
   - Automatic scaling based on card holder dimensions
@@ -76,8 +82,8 @@ A web-based tool for generating standardized door signs for the University of No
     plate and window edges and numbered height lines (trim the top until it fits for the card
     height). Page two is a survey table, and the page turns the strip readings into the holder's
     sizes and a preset
-  - Custom holder sizes entered in inches or millimetres, with a preset snippet to copy back
-    into the code
+  - Custom holder sizes entered in inches or millimetres, saved to the browser or copied back
+    into the code as a preset snippet
 
 - **Designation System**
   - Pre-defined professional designations
@@ -89,8 +95,8 @@ A web-based tool for generating standardized door signs for the University of No
 ## Layout
 
 - **App bar** on every page with the UNBC wordmark and Editor / Saved signs / Measuring sheets tabs
-- **Desktop (960px and wider):** the form is a column of sections (Sign, Person or Room, Contact
-  details, Second occupant, Alumni & designations, Appearance); the preview and the
+- **Desktop (960px and wider):** the form is a column of sections (Sign, Person or Room with its
+  contact details, Designations, Appearance); the preview and the
   **Print & export** card (holder, paper, PDF/PNG) stay pinned beside it
 - **Phones and tablets:** a bottom dock switches between **Edit** and **Preview & export**, and a
   live copy of the sign stays pinned above the form while editing (it can be hidden)
@@ -112,10 +118,12 @@ A web-based tool for generating standardized door signs for the University of No
    - Toggle visibility of email and phone using checkboxes
    - Phone numbers are automatically formatted as you type
    - Enter room name for lab/general room/custodian closet signs
-   - Turn on the clearly labelled second occupant section when a holder is shared
+   - **+ Add person** (or **+ Add contact or room** on room signs) opens the second entry as a
+     tab beside the first, named after each person's first name, with its own alumni crest and
+     contact details
 
 4. **Customize Display**
-   - Toggle alumni badge for faculty/staff
+   - Toggle each person's alumni crest (faculty/staff) in their tab
    - Choose the Alumni crest size and text-to-crest spacing
    - Enable and select designations
    - Add custom designations if needed
