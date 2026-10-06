@@ -70,8 +70,12 @@ A web-based tool for generating standardized door signs for the University of No
   - Detailed specifications display
   - Dedicated `/measuring-sheets/` page with a live preview: configure a sheet, then print
     or download it
-  - Three sheets — a 1:1 holder template, the same template with a 1" grid inside it, and a
-    full-sheet cutting grid for a holder that has no preset yet
+  - Four sheets — a 1:1 holder template, the same template with a 1" grid inside it, a
+    full-sheet cutting grid for a holder that has no preset yet, and a **measuring strip** for
+    surveying many holders: a 10" strip that slides through the side slot, with a ruler for the
+    plate and window edges and numbered height lines (trim the top until it fits for the card
+    height). Page two is a survey table, and the page turns the strip readings into the holder's
+    sizes and a preset
   - Custom holder sizes entered in inches or millimetres, with a preset snippet to copy back
     into the code
 
