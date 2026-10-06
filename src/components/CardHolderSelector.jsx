@@ -1,5 +1,6 @@
 import React from 'react'
 import { CustomSelect } from './CustomSelect'
+import { PLATE_STYLES } from './HolderMockup'
 
 // Picks the physical holder the insert goes into. Its sizes are listed by the export panel
 // (alongside the print size), so this only adds the holder's own description and notes.
@@ -27,6 +28,12 @@ export const CardHolderSelector = ({ cardHolders, selectedType, onUpdate }) => {
       {selectedHolder && (selectedHolder.description || selectedHolder.notes) && (
         <p className="field-hint">
           {[selectedHolder.description, selectedHolder.notes].filter(Boolean).join(' ')}
+        </p>
+      )}
+      {PLATE_STYLES[selectedHolder?.plateStyle] && (
+        <p className="field-hint">
+          Room plate: <strong>{PLATE_STYLES[selectedHolder.plateStyle].label.toLowerCase()}</strong> (see
+          Preview → On the door).
         </p>
       )}
     </div>

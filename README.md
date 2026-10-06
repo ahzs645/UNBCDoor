@@ -55,6 +55,10 @@ A web-based tool for generating standardized door signs for the University of No
 
 - **Card Holder Support**
   - Multiple card holder type options
+  - Each holder preset names the room plate it is built into (number only, or a grey or green
+    line with braille); the on-the-door preview draws that plate, and the card runs to the
+    plate's side edges, where it slides in and out. **Number-Only Plate** is the newer plain
+    plate, with its side frame estimated from a photo until it is measured
   - Preview modes: **Print guides** (the bleed that gets cut away is hatched, the cut line is
     dashed, the strip the holder frame hides is shaded, and the header and body margins are
     measured), **On the door** (the sign behind a room plate's window, with an optional room

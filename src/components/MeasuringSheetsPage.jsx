@@ -164,6 +164,7 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
   insertSize: { width: ${geometry.insertSize.width.toFixed(2)}, height: ${geometry.insertSize.height.toFixed(2)} },
   viewableSize: { width: ${geometry.viewableSize.width.toFixed(2)}, height: ${geometry.viewableSize.height.toFixed(2)} },
   viewableOffset: { top: ${geometry.viewableOffset.top}, bottom: ${geometry.viewableOffset.bottom}, left: ${geometry.viewableOffset.left}, right: ${geometry.viewableOffset.right} },
+  plateStyle: 'plain', // or 'grey' / 'green': a line under the number and a braille strip
   notes: 'Measured by hand.'
 }`
 

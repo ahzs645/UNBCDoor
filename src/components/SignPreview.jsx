@@ -71,7 +71,8 @@ export const SignPreview = ({
   const [paperSize, setPaperSize] = useState('letter')
   const [view, setView] = useState('guides')
   const [roomNumber, setRoomNumber] = useState('')
-  const [plateStyle, setPlateStyle] = useState('plain')
+  // The plate follows the holder preset; a pick in the door view holds until the holder changes.
+  const [plateChoice, setPlateChoice] = useState({ holder: null, style: null })
   const [doorView, setDoorView] = useState('mounted')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
@@ -83,6 +84,17 @@ export const SignPreview = ({
     measurementSummary
   } = resolveCardHolderGeometry(selectedCardHolder)
   const showGuides = view === 'guides'
+
+  const holderPlate = PLATE_STYLES[selectedCardHolder?.plateStyle] ? selectedCardHolder.plateStyle : 'plain'
+  const plateStyle = plateChoice.holder === (signData.cardHolderType || '') && plateChoice.style
+    ? plateChoice.style
+    : holderPlate
+  const setPlateStyle = (style) => setPlateChoice({ holder: signData.cardHolderType || '', style })
+  const plateOptions = PLATE_OPTIONS.map(option => (
+    selectedCardHolder && option.value === holderPlate
+      ? { ...option, label: <span title="This holder's plate">{option.label} ★</span> }
+      : option
+  ))
 
   const doorNote = !selectedCardHolder
     ? 'No holder selected, so the whole insert shows. Pick a holder under Print & export to see what its frame hides.'
@@ -184,7 +196,7 @@ export const SignPreview = ({
               <SegmentedControl
                 name="plateStyle"
                 className="segmented--compact"
-                options={PLATE_OPTIONS}
+                options={plateOptions}
                 value={plateStyle}
                 onChange={setPlateStyle}
                 aria-label="Room plate"
