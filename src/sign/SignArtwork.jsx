@@ -373,7 +373,26 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   return blocks
 }
 
-export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, ref) => {
+// Ink extent of a laid-out line, for centring the body on what is actually printed rather than on
+// line boxes (which carry extra leading under the last line). Falls back to typical Helvetica
+// proportions when there is no canvas to measure with.
+const measureInk = (item, fontFamily) => {
+  const text = item.segments ? item.segments.map(segment => segment.text).join(' ') : item.text
+  const ctx = getMeasureContext()
+  if (ctx && text) {
+    ctx.font = `${item.style} ${item.weight} ${item.size}px ${fontFamily}`
+    const metrics = ctx.measureText(text)
+    if (Number.isFinite(metrics.actualBoundingBoxAscent) && Number.isFinite(metrics.actualBoundingBoxDescent)) {
+      return { ascent: metrics.actualBoundingBoxAscent, descent: metrics.actualBoundingBoxDescent }
+    }
+  }
+  return { ascent: item.size * 0.72, descent: item.size * 0.2 }
+}
+
+// Resolves where everything on the sign goes, in the artwork's canvas points. <SignArtwork> draws
+// from it, and the preview's guide overlay reads the same numbers to mark the cut line, the
+// holder window and the margins, so the guides can never drift from the artwork.
+export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
   const insert = content.insert || DEFAULT_INSERT_SIZE
   const W = insert.width * PT_PER_INCH
   const H = insert.height * PT_PER_INCH
@@ -516,8 +535,20 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     })
   }
 
+  // Centre the body's ink (cap top of the first line to the bottom of the last) between the
+  // header band and the bottom of the window, so the white above and below it match.
   const totalHeight = rawHeight * shrink
-  let cursorY = HEADER_H + Math.max(((VH - HEADER_H) - totalHeight) / 2, VH * 0.02)
+  const first = items[0]
+  const last = items[items.length - 1]
+  const inkTop = first && first.kind !== 'logo'
+    ? first.marginTop + first.size * 0.8 - measureInk(first, fontFamily).ascent
+    : (first?.marginTop || 0)
+  const inkBottom = last && last.kind !== 'logo'
+    ? totalHeight - last.lineHeight + last.size * 0.8 + measureInk(last, fontFamily).descent
+    : totalHeight
+  const centredStart = HEADER_H + ((VH - HEADER_H) - (inkBottom - inkTop)) / 2 - inkTop
+  let cursorY = Math.max(centredStart, HEADER_H + VH * 0.02)
+  const bodyStart = cursorY
 
   const texts = items.map((item) => {
     cursorY += item.marginTop
@@ -549,6 +580,42 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   // The green header bleeds off the top and side canvas edges and runs down to the bottom of
   // the header band inside the viewable window, so the frame-covered margin reads as green.
   const headerBottom = originY + HEADER_H
+
+  return {
+    W, H, BLEED, CW, CH,
+    VL, VR, VT, VB, VW, VH,
+    PAD_X,
+    header,
+    HEADER_H,
+    logoX,
+    logoY,
+    headerColor,
+    texts,
+    isRoom,
+    showPrimaryAlumni,
+    showSecondaryAlumni,
+    badgeX,
+    badgeScale,
+    primaryBadgeY,
+    secondaryBadgeY,
+    originX,
+    originY,
+    headerBottom,
+    // Design-space (window-relative) ink bounds of the body, for the margin guides.
+    body: texts.length
+      ? { inkTop: bodyStart + inkTop, inkBottom: bodyStart + inkBottom }
+      : null
+  }
+}
+
+export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, ref) => {
+  const {
+    W, H, BLEED, CW, CH, VW,
+    header, logoX, logoY, headerColor, PAD_X,
+    texts, showPrimaryAlumni, showSecondaryAlumni,
+    badgeX, badgeScale, primaryBadgeY, secondaryBadgeY,
+    originX, originY, headerBottom
+  } = layoutSignArtwork(content, fontFamily)
 
   return (
     <svg

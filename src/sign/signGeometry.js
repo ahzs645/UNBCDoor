@@ -1,6 +1,5 @@
 import {
   BLEED_INCHES,
-  SAFE_INCHES,
   DEFAULT_INSERT_SIZE,
   MARK_INCHES,
   PT_PER_INCH,
@@ -18,7 +17,7 @@ export const formatInches = (value) => {
 
 // Derives every measurement the preview needs from the selected card holder (or the default
 // insert when none is chosen): the trim/viewable sizes, the CSS custom properties that drive
-// the bleed/safe/holder guide overlays, and the human-readable measurement summary.
+// the preview frame's aspect ratio, and the human-readable measurement summary.
 export const resolveCardHolderGeometry = (selectedCardHolder) => {
   const insertSize = selectedCardHolder?.insertSize || DEFAULT_INSERT_SIZE
   const viewableSize = selectedCardHolder?.viewableSize || insertSize
@@ -33,28 +32,13 @@ export const resolveCardHolderGeometry = (selectedCardHolder) => {
     right: horizontalDifference / 2
   }
 
-  // Canvas = trim insert + bleed on every edge. The preview frame matches this canvas, and
-  // the trim / safe / holder guides are inset back in as a fraction of the canvas.
+  // Canvas = trim insert + bleed on every edge. The preview frame matches this canvas; the guides
+  // over it are drawn in the artwork's own coordinates (SignGuides).
   const canvasWidth = insertSize.width + BLEED_INCHES * 2
   const canvasHeight = insertSize.height + BLEED_INCHES * 2
-  const aspectRatio = canvasWidth / canvasHeight
-
-  const bleedFracX = (BLEED_INCHES / canvasWidth) * 100
-  const bleedFracY = (BLEED_INCHES / canvasHeight) * 100
-  const safeFracX = (SAFE_INCHES / canvasWidth) * 100
-  const safeFracY = (SAFE_INCHES / canvasHeight) * 100
 
   const previewFrameStyle = {
-    '--sign-aspect': aspectRatio,
-    '--bleed-x': `${bleedFracX}%`,
-    '--bleed-y': `${bleedFracY}%`,
-    '--safe-x': `${safeFracX}%`,
-    '--safe-y': `${safeFracY}%`,
-    // Holder bars are measured against the trim insert, so they live inside the trim box.
-    '--holder-bar-top': `${(Math.max(viewableOffset.top, 0) / insertSize.height) * 100}%`,
-    '--holder-bar-bottom': `${(Math.max(viewableOffset.bottom, 0) / insertSize.height) * 100}%`,
-    '--holder-bar-left': `${(Math.max(viewableOffset.left, 0) / insertSize.width) * 100}%`,
-    '--holder-bar-right': `${(Math.max(viewableOffset.right, 0) / insertSize.width) * 100}%`
+    '--sign-aspect': canvasWidth / canvasHeight
   }
 
   const measurementSummary = [

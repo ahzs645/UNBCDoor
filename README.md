@@ -55,6 +55,10 @@ A web-based tool for generating standardized door signs for the University of No
 
 - **Card Holder Support**
   - Multiple card holder type options
+  - Preview modes: **Print guides** (the bleed that gets cut away is hatched, the cut line is
+    dashed, the strip the holder frame hides is shaded, and the header and body margins are
+    measured), **On the door** (the sign behind a room plate's window, with an optional room
+    number and its braille), and **Plain**
   - Automatic scaling based on card holder dimensions
   - Detailed specifications display
   - Dedicated `/measuring-sheets/` page with a live preview: configure a sheet, then print
@@ -230,11 +234,15 @@ under `tools/compare-viewer`; it is never included in the production website.
 - SVG-based logo and badge elements
 - Dynamic content updates
 - Real-time preview
-- Header band and logo lockup placed as in the production Illustrator files: a band 20.5% of the
-  card height and the lockup at its native size (`src/sign/headerGeometry.js`)
+- Header band and logo lockup sized as in the production Illustrator files (the lockup at its
+  native size), but measured from the holder window: the visible band is 20.5% of the window
+  height, and the green above the logo always matches the green below it
+  (`src/sign/headerGeometry.js`). With no holder this is the production band exactly
+- The body text is centred on its ink, so the white above the first line matches the white below
+  the last
 - Department names wrap by the UNBC logo kit's rule (`splitDepartmentText` from the
   `vendor/unbc-logo` submodule), so "Northern Analytical Laboratory Services" takes two lines
-  and the band grows to fit. **Appearance → Department line → Full width** instead runs a long
+  and the band grows to fit, keeping the same margin under the last line. **Appearance → Department line → Full width** instead runs a long
   name across the band on one line, to match older printed signs
 - Enhanced form validation and formatting
 - Modern UI with smooth transitions and animations

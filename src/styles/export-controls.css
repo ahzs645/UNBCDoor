@@ -85,6 +85,18 @@
     flex: 1 1 0;
 }
 
+/* A smaller segmented control for card headers. */
+.segmented--compact {
+    padding: 2px;
+}
+
+.segmented--compact .segmented__option {
+    min-height: 28px;
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
 /* Sign appearance controls. There are up to sixteen of them, so they live in one collapsed
    section: the header states whether anything differs from the defaults, and opening it
    reveals the controls grouped by what they affect, each as a compact segmented control. */

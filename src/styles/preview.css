@@ -11,6 +11,7 @@
 
 .output-card__header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
@@ -54,84 +55,188 @@
     }
 }
 
-/* Print guides: square-cornered overlays pinned to the trim and safe-area boxes.
-   The sign artwork already fills the frame to the bleed edge, so these just mark
-   where the piece is cut (trim) and where content must stay clear (safe). */
-.print-guide {
-    position: absolute;
-    pointer-events: none;
-    z-index: 3;
-}
-
-.print-trim {
-    inset: var(--bleed-y, 0) var(--bleed-x, 0);
-    border: 1px dashed var(--ui-guide-trim);
-}
-
-.print-safe {
-    inset: calc(var(--bleed-y, 0) + var(--safe-y, 0)) calc(var(--bleed-x, 0) + var(--safe-x, 0));
-    border: 1px dashed var(--ui-guide-safe);
-}
-
-/* With a holder selected, the viewable-window outline is the real safe area, so the generic
-   uniform safe guide would just be a misleading second rectangle — hide it. */
-.preview-frame.with-holder .print-safe {
-    display: none;
-}
-
-/* Holder window: the acrylic frame covers part of the trimmed insert, so it lives inside
-   the trim box (inset by the bleed). Bars are measured against the trim insert. */
-.card-holder-frame {
-    position: absolute;
-    inset: var(--bleed-y, 0) var(--bleed-x, 0);
-    z-index: 2;
-    pointer-events: none;
-}
-
-.card-holder-frame::after {
-    content: '';
-    position: absolute;
-    inset: var(--holder-bar-top, 0) var(--holder-bar-right, 0) var(--holder-bar-bottom, 0) var(--holder-bar-left, 0);
-    border: 1px dashed rgba(255, 255, 255, 0.85);
-    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.3);
-}
-
-.card-holder-overlay {
+/* Print guides: an SVG laid over the artwork in the artwork's own coordinates (SignGuides). */
+.sign-guides {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    overflow: visible;
 }
 
-.card-holder-bar {
+/* Bleed: washed out and hatched, because it is cut away. */
+.sign-guides__bleed {
+    fill: rgba(255, 255, 255, 0.62);
+}
+
+.sign-guides__hatch-line {
+    stroke: rgba(15, 23, 42, 0.28);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+/* The strip of the trimmed card the holder frame covers: dark, like the frame itself. */
+.sign-guides__frame {
+    fill: var(--ui-holder-mask);
+}
+
+.sign-guides__window {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.7);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+.sign-guides__safe {
+    fill: none;
+    stroke: var(--ui-guide-safe);
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+    vector-effect: non-scaling-stroke;
+}
+
+/* The cut line: a dark dash over a white line, so it reads on the green, the white and the
+   holder shading alike. */
+.sign-guides__cut-underlay,
+.sign-guides__cut {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+}
+
+.sign-guides__cut-underlay {
+    stroke: #ffffff;
+    stroke-width: 3;
+}
+
+.sign-guides__cut {
+    stroke: var(--ui-guide-trim);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+}
+
+.sign-guides__dimension line {
+    stroke: var(--ui-guide-margin);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+}
+
+.sign-guides__dimension rect {
+    fill: var(--ui-guide-margin);
+}
+
+.sign-guides__dimension text {
+    fill: #ffffff;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* On the door: the room plate with the insert behind its window. */
+.preview-stage--door {
+    padding: clamp(18px, 5%, 40px);
+}
+
+.holder-mockup {
+    position: relative;
+    width: min(100%, 520px);
+    aspect-ratio: var(--plate-aspect, 1.12);
+    filter: drop-shadow(0 2px 2px rgba(15, 23, 42, 0.25)) drop-shadow(0 14px 28px rgba(15, 23, 42, 0.22));
+}
+
+@media (min-width: 960px) {
+    .holder-mockup {
+        width: min(100%, 520px, calc((100vh - 560px) * var(--plate-aspect, 1.12)));
+        min-width: min(100%, 320px);
+    }
+}
+
+.holder-mockup__plate {
     position: absolute;
-    background: var(--ui-holder-mask);
+    inset: 0;
+    width: 100%;
+    height: 100%;
 }
 
-.card-holder-bar.top {
-    top: 0;
-    left: 0;
-    right: 0;
-    height: var(--holder-bar-top, 0%);
+.holder-mockup__body {
+    fill: #141414;
 }
 
-.card-holder-bar.bottom {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--holder-bar-bottom, 0%);
+.holder-mockup__number {
+    fill: #f4f4ee;
+    font-family: 'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700;
 }
 
-.card-holder-bar.left {
-    left: 0;
-    top: var(--holder-bar-top, 0);
-    bottom: var(--holder-bar-bottom, 0);
-    width: var(--holder-bar-left, 0%);
+.holder-mockup__number.is-placeholder {
+    fill: rgba(244, 244, 238, 0.35);
 }
 
-.card-holder-bar.right {
-    right: 0;
-    top: var(--holder-bar-top, 0);
-    bottom: var(--holder-bar-bottom, 0);
-    width: var(--holder-bar-right, 0%);
+.holder-mockup__braille {
+    fill: #0b0b0b;
+    stroke: #2c2c2c;
+    stroke-width: 0.02;
+}
+
+.holder-mockup__dot {
+    fill: #3a3a3a;
+}
+
+.holder-mockup__window {
+    position: absolute;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* The frame's edge throws a little shadow onto the insert. */
+.holder-mockup__window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45), inset 0 0 1px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+
+.holder-mockup__insert {
+    position: absolute;
+}
+
+.door-preview-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    margin-top: 12px;
+}
+
+.door-preview-note {
+    flex: 1 1 260px;
+    margin: 0;
+    color: var(--ui-text-muted);
+    font-size: 0.78rem;
+}
+
+.door-preview-room {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--ui-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.door-preview-room input {
+    width: 7.5em;
+    padding: 5px 9px;
+    border: 1px solid var(--ui-border-strong);
+    border-radius: 7px;
+    background: var(--ui-field);
+    color: var(--ui-text);
+    font: inherit;
+    font-weight: 500;
 }
 
 .preview-legend {
@@ -165,11 +270,21 @@
 .preview-legend__item--safe { color: var(--ui-accent-text); }
 .preview-legend__item--holder { color: var(--ui-text); }
 
+.preview-legend__item--margin { color: var(--ui-text); }
+
 .preview-legend__item--bleed::before {
     border-top: none;
     height: 11px;
-    background: var(--brand-header);
     border-radius: 2px;
+    background: repeating-linear-gradient(-45deg, rgba(15, 23, 42, 0.3) 0 1px, #f4f6f5 1px 4px);
+    box-shadow: inset 0 0 0 1px var(--ui-border-strong);
+}
+
+.preview-legend__item--margin::before {
+    border-top: none;
+    height: 11px;
+    border-radius: 6px;
+    background: var(--ui-guide-margin);
 }
 
 .preview-legend__item--holder::before {

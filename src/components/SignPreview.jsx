@@ -5,7 +5,8 @@ import { exportSignPNG, exportSignPDF } from '../sign/signExport'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { CardHolderSelector } from './CardHolderSelector'
 import { SegmentedControl } from './SegmentedControl'
-import { Switch } from './Switch'
+import { SignGuides } from './SignGuides'
+import { HolderMockup } from './HolderMockup'
 import { ArchiveStepper } from './ArchiveNavigator'
 import { ShareLinkButton } from './ShareLinkButton'
 
@@ -37,6 +38,14 @@ const PAPER_OPTIONS = PAPER_ORDER.map((key) => ({
   label: <span title={PAPER_DIMENSIONS[key].label}>{PAPER_DIMENSIONS[key].label.replace(/\s*\(.*\)$/, '')}</span>
 }))
 
+// What the preview shows: the artwork with print guides over it, the sign hanging in its holder,
+// or the plain artwork.
+const VIEW_OPTIONS = [
+  { value: 'guides', label: 'Print guides' },
+  { value: 'door', label: 'On the door' },
+  { value: 'plain', label: 'Plain' }
+]
+
 // The preview card (artwork, print guides, legend) and the print & export card (holder, sheet,
 // downloads). They share the rendered artwork node, which both exporters read from.
 export const SignPreview = ({
@@ -51,10 +60,18 @@ export const SignPreview = ({
 }) => {
   const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
-  const [showGuides, setShowGuides] = useState(true)
+  const [view, setView] = useState('guides')
+  const [roomNumber, setRoomNumber] = useState('')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
-  const { insertSize, previewFrameStyle, measurementSummary } = resolveCardHolderGeometry(selectedCardHolder)
+  const {
+    insertSize,
+    viewableSize,
+    viewableOffset,
+    previewFrameStyle,
+    measurementSummary
+  } = resolveCardHolderGeometry(selectedCardHolder)
+  const showGuides = view === 'guides'
 
   const doorSignClass = [
     'door-sign',
@@ -81,53 +98,70 @@ export const SignPreview = ({
         <header className="output-card__header">
           <h2 className="output-card__title" id="preview-title">Preview</h2>
           {archiveState?.archive && <ArchiveStepper archiveState={archiveState} compact />}
-          <Switch
-            className="switch--compact"
-            checked={showGuides}
-            onChange={(e) => setShowGuides(e.target.checked)}
-          >
-            Print guides
-          </Switch>
+          <SegmentedControl
+            name="previewView"
+            className="segmented--compact"
+            options={VIEW_OPTIONS}
+            value={view}
+            onChange={setView}
+            aria-label="Preview"
+          />
         </header>
 
-        <div className="preview-stage">
-          <div
-            className={`preview-frame ${selectedCardHolder ? 'with-holder' : 'without-holder'} ${showGuides ? 'show-guides' : ''}`}
-            style={previewFrameStyle}
-          >
-            <div className={doorSignClass}>
+        {view === 'door' ? (
+          <div className="preview-stage preview-stage--door">
+            <HolderMockup
+              insertSize={insertSize}
+              viewableOffset={selectedCardHolder ? viewableOffset : null}
+              roomNumber={roomNumber}
+            >
               <SignArtwork ref={signRef} content={content} />
-            </div>
-
-            {showGuides && (
-              <>
-                <span className="print-guide print-trim" aria-hidden="true" />
-                <span className="print-guide print-safe" aria-hidden="true" />
-              </>
-            )}
-
-            {selectedCardHolder && (
-              <div className="card-holder-frame" aria-hidden="true">
-                <div className="card-holder-overlay">
-                  <span className="card-holder-bar top" />
-                  <span className="card-holder-bar bottom" />
-                  <span className="card-holder-bar left" />
-                  <span className="card-holder-bar right" />
-                </div>
-              </div>
-            )}
+            </HolderMockup>
           </div>
-        </div>
+        ) : (
+          <div className="preview-stage">
+            <div
+              className={`preview-frame ${selectedCardHolder ? 'with-holder' : 'without-holder'}`}
+              style={previewFrameStyle}
+            >
+              <div className={doorSignClass}>
+                <SignArtwork ref={signRef} content={content} />
+              </div>
+              {showGuides && <SignGuides content={content} hasHolder={Boolean(selectedCardHolder)} />}
+            </div>
+          </div>
+        )}
 
         {showGuides && (
           <div className="preview-legend" aria-hidden="true">
-            <span className="preview-legend__item preview-legend__item--bleed">Bleed</span>
+            <span className="preview-legend__item preview-legend__item--bleed">Bleed (trimmed off)</span>
             <span className="preview-legend__item preview-legend__item--trim">Cut line</span>
             {selectedCardHolder ? (
-              <span className="preview-legend__item preview-legend__item--holder">Holder window</span>
+              <span className="preview-legend__item preview-legend__item--holder">Hidden by holder</span>
             ) : (
               <span className="preview-legend__item preview-legend__item--safe">Safe area</span>
             )}
+            <span className="preview-legend__item preview-legend__item--margin">Margins</span>
+          </div>
+        )}
+
+        {view === 'door' && (
+          <div className="door-preview-footer">
+            <p className="door-preview-note">
+              {selectedCardHolder
+                ? `Only the ${viewableSize.width}" × ${viewableSize.height}" window shows; the frame hides the rest of the insert.`
+                : 'No holder selected, so the whole insert shows. Pick a holder under Print & export to see what its frame hides.'}
+            </p>
+            <label className="door-preview-room">
+              <span>Room no.</span>
+              <input
+                type="text"
+                value={roomNumber}
+                onChange={(e) => setRoomNumber(e.target.value)}
+                placeholder="4-257"
+                maxLength={8}
+              />
+            </label>
           </div>
         )}
       </section>
