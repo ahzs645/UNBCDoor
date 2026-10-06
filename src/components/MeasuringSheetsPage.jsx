@@ -5,6 +5,8 @@ import { Switch } from './Switch'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { resolveCardHolderGeometry } from '../sign/signGeometry'
 import { MM_PER_INCH, formatDualSize } from '../sign/templateGeometry'
+import { holderFromStripReadings, stripReadingsForHolder } from '../sign/stripGeometry'
+import { PLATE_STYLES } from './HolderMockup'
 import {
   GRID_DETAIL_OPTIONS,
   SHEET_MODES,
@@ -29,6 +31,36 @@ const EDGES = [
   { key: 'left', label: 'Left' },
   { key: 'right', label: 'Right' }
 ]
+
+// What the measuring strip gives you, in the order you read it.
+const ACROSS_READINGS = [
+  { key: 'plateLeft', label: 'Plate left edge' },
+  { key: 'plateRight', label: 'Plate right edge' },
+  { key: 'windowLeft', label: 'Window left edge' },
+  { key: 'windowRight', label: 'Window right edge' }
+]
+const UP_READINGS = [
+  { key: 'cardHeight', label: 'Card height (last trim line)' },
+  { key: 'windowBottom', label: 'Window bottom line' },
+  { key: 'windowTop', label: 'Window top line' }
+]
+
+const STRIP_EXAMPLE = stripReadingsForHolder({
+  insertSize: { width: 6.85, height: 3.95 },
+  viewableOffset: { top: 0.2, bottom: 0.1, left: 0.55, right: 0.55 }
+})
+
+const PLATE_OPTIONS = Object.entries(PLATE_STYLES).map(([value, { label }]) => ({ value, label }))
+
+const buildPresetSnippet = ({ insertSize, viewableSize, viewableOffset }, { plateStyle = 'plain', notes = 'Measured by hand.' } = {}) => `'My Holder': {
+  name: 'My Holder',
+  description: 'Measured on <date> in <building>.',
+  insertSize: { width: ${insertSize.width.toFixed(2)}, height: ${insertSize.height.toFixed(2)} },
+  viewableSize: { width: ${viewableSize.width.toFixed(2)}, height: ${viewableSize.height.toFixed(2)} },
+  viewableOffset: { top: ${viewableOffset.top}, bottom: ${viewableOffset.bottom}, left: ${viewableOffset.left}, right: ${viewableOffset.right} },
+  plateStyle: '${plateStyle}',
+  notes: '${notes}'
+}`
 
 // Values are held in inches; the unit switch only changes how they're typed and shown.
 const toDisplay = (inches, units) => {
@@ -73,6 +105,8 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
   const [subdivisions, setSubdivisions] = useState(4)
   const [showCoordinates, setShowCoordinates] = useState(true)
   const [showPresetOutlines, setShowPresetOutlines] = useState(true)
+  const [readings, setReadings] = useState(STRIP_EXAMPLE)
+  const [readingsPlate, setReadingsPlate] = useState('plain')
   const [previewUrl, setPreviewUrl] = useState('')
   const [message, setMessage] = useState('')
   const previewUrlRef = useRef('')
@@ -158,14 +192,20 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
       : 'Your browser blocked the print tab, so the PDF was downloaded instead — print it at 100%.')
   }
 
-  const presetSnippet = `'My Holder': {
-  name: 'My Holder',
-  description: 'Measured on <date> in <building>.',
-  insertSize: { width: ${geometry.insertSize.width.toFixed(2)}, height: ${geometry.insertSize.height.toFixed(2)} },
-  viewableSize: { width: ${geometry.viewableSize.width.toFixed(2)}, height: ${geometry.viewableSize.height.toFixed(2)} },
-  viewableOffset: { top: ${geometry.viewableOffset.top}, bottom: ${geometry.viewableOffset.bottom}, left: ${geometry.viewableOffset.left}, right: ${geometry.viewableOffset.right} },
-  notes: 'Measured by hand.'
-}`
+  const presetSnippet = buildPresetSnippet(geometry, { plateStyle: 'plain' })
+
+  const fromStrip = holderFromStripReadings(readings)
+  const stripSnippet = buildPresetSnippet(fromStrip, {
+    plateStyle: readingsPlate,
+    notes: 'Measured with the measuring strip.'
+  })
+
+  // Carry the strip's result over to the holder template, to print it and check it in the holder.
+  const openStripAsTemplate = () => {
+    setCustom({ insert: { ...fromStrip.insertSize }, overlap: { ...fromStrip.viewableOffset } })
+    setHolderKey(CUSTOM_HOLDER)
+    setMode('template')
+  }
 
   return (
     <div className="measuring-sheets">
@@ -181,6 +221,90 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
           />
           <p className="measuring-sheets__hint">{sheetMode.summary}</p>
         </div>
+
+        {sheetMode.usesReadings && (
+          <div className="measuring-sheets__group">
+            <span className="field-label">Readings off the strip</span>
+            <div className="measuring-sheets__units">
+              <span id="strip-units-label">Read in</span>
+              <Segmented
+                aria-labelledby="strip-units-label"
+                name="stripUnits"
+                options={[{ value: 'in', label: 'Inches' }, { value: 'mm', label: 'Millimetres' }]}
+                value={units}
+                onChange={setUnits}
+              />
+            </div>
+
+            <p className="measuring-sheets__hint">Across ruler — numbered from the strip's left end.</p>
+            <div className="measuring-sheets__fields">
+              {ACROSS_READINGS.map(({ key, label }) => (
+                <NumberField
+                  key={key}
+                  id={`strip-${key}`}
+                  label={label}
+                  inches={readings[key]}
+                  units={units}
+                  onChange={(value) => setReadings((prev) => ({ ...prev, [key]: value }))}
+                />
+              ))}
+            </div>
+
+            <p className="measuring-sheets__hint">Height lines — numbered up from the strip's bottom edge.</p>
+            <div className="measuring-sheets__fields">
+              {UP_READINGS.map(({ key, label }) => (
+                <NumberField
+                  key={key}
+                  id={`strip-${key}`}
+                  label={label}
+                  inches={readings[key]}
+                  units={units}
+                  onChange={(value) => setReadings((prev) => ({ ...prev, [key]: value }))}
+                />
+              ))}
+            </div>
+
+            <span className="field-label" id="strip-plate-label">Room plate</span>
+            <Segmented
+              aria-labelledby="strip-plate-label"
+              name="stripPlate"
+              options={PLATE_OPTIONS}
+              value={readingsPlate}
+              onChange={setReadingsPlate}
+            />
+
+            {fromStrip.problems.map((problem) => (
+              <p key={problem} className="measuring-sheets__message" role="alert">{problem}</p>
+            ))}
+
+            <dl className="measuring-sheets__summary">
+              <div>
+                <dt>Card / cut size</dt>
+                <dd>{formatDualSize(fromStrip.insertSize)}</dd>
+              </div>
+              <div>
+                <dt>Window</dt>
+                <dd>{formatDualSize(fromStrip.viewableSize)}</dd>
+              </div>
+              <div>
+                <dt>Hidden by the frame</dt>
+                <dd>
+                  {EDGES.map(({ key, label }) => `${label.toLowerCase()} ${toDisplay(fromStrip.viewableOffset[key], units)}${units === 'mm' ? ' mm' : '"'}`).join(' · ')}
+                </dd>
+              </div>
+            </dl>
+
+            <button type="button" className="export-btn template-export__btn" onClick={openStripAsTemplate}>
+              Check it with a holder template
+            </button>
+
+            <details className="measuring-sheets__preset" open>
+              <summary>Save these readings as a preset</summary>
+              <p>Add this entry to <code>src/data/cardHolders.js</code>, renamed for the holder.</p>
+              <pre>{stripSnippet}</pre>
+            </details>
+          </div>
+        )}
 
         {sheetMode.usesHolder && (
           <div className="measuring-sheets__group">

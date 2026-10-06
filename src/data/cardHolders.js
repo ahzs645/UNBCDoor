@@ -2,6 +2,11 @@
 // ("Door Sign" folder). Insert sizes are metric designs — the inch values are exact
 // conversions of the millimetre artboards. Viewable offsets are conservative estimates of
 // typical acrylic-holder frame coverage; verify against the physical holder and refine.
+//
+// The card slides in from the side and runs the full width of the plate, so the insert width is
+// also the plate width. `plateStyle` is the room plate the holder is built into (see
+// PLATE_STYLES in components/HolderMockup.jsx): 'plain' (number only), 'grey' or 'green' (a rule
+// under the number and a braille strip). The on-the-door preview draws that plate.
 export const cardHolders = {
   'Building 10': {
     name: 'Building 10 Acrylic Holder',
@@ -20,6 +25,7 @@ export const cardHolders = {
       left: 0.15,
       right: 0.15
     },
+    plateStyle: 'plain',
     notes: 'Matches the "Building 10 / Main" artboards (6.97" × 4.17"). Frame coverage is estimated — measure the holder window before printing critical edge content.'
   },
   'Non-Building 10': {
@@ -39,7 +45,28 @@ export const cardHolders = {
       left: 0.15,
       right: 0.15
     },
+    plateStyle: 'grey',
     notes: 'Matches the "NON-Building 10" template (6.85" × 3.94"). Later Building 4 revisions used slightly taller inserts (up to 4.16") — confirm against the specific holder.'
+  },
+  'Number-Only Plate': {
+    name: 'Plain Black Plate (estimated from photos)',
+    description: 'The newer plain black plates with just the room number (Buildings 7 and 9), on the standard 174mm × 100mm insert.',
+    insertSize: {
+      width: 6.85,
+      height: 3.94
+    },
+    viewableSize: {
+      width: 5.75,
+      height: 3.64
+    },
+    viewableOffset: {
+      top: 0.2,
+      bottom: 0.1,
+      left: 0.55,
+      right: 0.55
+    },
+    plateStyle: 'plain',
+    notes: 'The side frame is estimated from a photo of 9-240 (the window is about 84% of the plate width); the top and bottom are the usual estimates. Measure a plate and update these numbers.'
   },
   'NUGSS': {
     name: 'NUGSS Holder (Student Union Building)',
@@ -58,6 +85,7 @@ export const cardHolders = {
       left: 0.15,
       right: 0.15
     },
+    plateStyle: 'plain',
     notes: 'Matches the NUGSS "Final V1" artboards (6.93" × 4.42").'
   },
   'Legacy Letter-Half': {
@@ -77,6 +105,7 @@ export const cardHolders = {
       left: 0.1875,
       right: 0.1875
     },
+    plateStyle: 'plain',
     notes: 'Half a letter sheet. Kept for reprinting archived signs; new signs should use a current holder preset.'
   }
 }

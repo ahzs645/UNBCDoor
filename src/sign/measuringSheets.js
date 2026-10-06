@@ -1,8 +1,9 @@
 import { buildHolderTemplateDocument } from './signTemplate.js'
 import { buildMeasuringGridDocument } from './signGrid.js'
+import { buildMeasuringStripDocument } from './signStrip.js'
 import { fileSlug } from './pdfPrimitives.js'
 
-// One entry point for the three printable measuring sheets, so the configure-and-print page
+// One entry point for the four printable measuring sheets, so the configure-and-print page
 // (and anything else that wants one) works from a single config object instead of knowing
 // which module draws what.
 
@@ -27,6 +28,14 @@ export const SHEET_MODES = [
     summary: 'A full sheet of grid for a holder nobody has measured yet: trim it with scissors until it slides in, then read the size off the numbers.',
     usesHolder: false,
     usesGrid: true
+  },
+  {
+    value: 'strip',
+    label: 'Measuring strip',
+    summary: 'For surveying many holders: a 10" strip that slides through the side slot. Read the plate and window edges on its ruler, trim its top until it fits for the card height — no tracing. Page 2 is a survey table.',
+    usesHolder: false,
+    usesGrid: false,
+    usesReadings: true
   }
 ]
 
@@ -43,6 +52,10 @@ export const GRID_DETAIL_OPTIONS = [
 
 export const buildMeasuringSheet = (config) => {
   const { mode = 'template' } = config
+
+  if (mode === 'strip') {
+    return buildMeasuringStripDocument({ paperSize: config.paperSize })
+  }
 
   if (mode === 'grid') {
     return buildMeasuringGridDocument({
@@ -70,6 +83,7 @@ export const buildMeasuringSheet = (config) => {
 
 export const measuringSheetFilename = ({ mode = 'template', holderKey }) => {
   if (mode === 'grid') return 'unbc-door-sign-measuring-grid.pdf'
+  if (mode === 'strip') return 'unbc-door-sign-measuring-strip.pdf'
   const suffix = mode === 'template-grid' ? '-grid' : ''
   return `unbc-door-sign-template-${fileSlug(holderKey)}${suffix}.pdf`
 }

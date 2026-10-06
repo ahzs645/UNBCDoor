@@ -55,12 +55,27 @@ A web-based tool for generating standardized door signs for the University of No
 
 - **Card Holder Support**
   - Multiple card holder type options
+  - Each holder preset names the room plate it is built into (number only, or a grey or green
+    line with braille); the on-the-door preview draws that plate, and the card runs to the
+    plate's side edges, where it slides in and out. **Number-Only Plate** is the newer plain
+    plate, with its side frame estimated from a photo until it is measured
+  - Preview modes: **Print guides** (the bleed that gets cut away is hatched, the cut line is
+    dashed, the strip the holder frame hides is shaded, and the header and body margins are
+    measured), **On the door** (the sign behind a room plate's window, with an optional room
+    number), and **Plain**. The door view offers the plates in use (the newer number-only
+    plates, and the older ones with a grey or green line and a braille strip) and a
+    **See-through** mode that shows the whole cut card behind a translucent frame, with the cut
+    edge dashed and how much each edge hides
   - Automatic scaling based on card holder dimensions
   - Detailed specifications display
   - Dedicated `/measuring-sheets/` page with a live preview: configure a sheet, then print
     or download it
-  - Three sheets — a 1:1 holder template, the same template with a 1" grid inside it, and a
-    full-sheet cutting grid for a holder that has no preset yet
+  - Four sheets — a 1:1 holder template, the same template with a 1" grid inside it, a
+    full-sheet cutting grid for a holder that has no preset yet, and a **measuring strip** for
+    surveying many holders: a 10" strip that slides through the side slot, with a ruler for the
+    plate and window edges and numbered height lines (trim the top until it fits for the card
+    height). Page two is a survey table, and the page turns the strip readings into the holder's
+    sizes and a preset
   - Custom holder sizes entered in inches or millimetres, with a preset snippet to copy back
     into the code
 
@@ -230,11 +245,15 @@ under `tools/compare-viewer`; it is never included in the production website.
 - SVG-based logo and badge elements
 - Dynamic content updates
 - Real-time preview
-- Header band and logo lockup placed as in the production Illustrator files: a band 20.5% of the
-  card height and the lockup at its native size (`src/sign/headerGeometry.js`)
+- Header band and logo lockup sized as in the production Illustrator files (the lockup at its
+  native size), but measured from the holder window: the visible band is 20.5% of the window
+  height, and the green above the logo always matches the green below it
+  (`src/sign/headerGeometry.js`). With no holder this is the production band exactly
+- The body text is centred on its ink, so the white above the first line matches the white below
+  the last
 - Department names wrap by the UNBC logo kit's rule (`splitDepartmentText` from the
   `vendor/unbc-logo` submodule), so "Northern Analytical Laboratory Services" takes two lines
-  and the band grows to fit. **Appearance → Department line → Full width** instead runs a long
+  and the band grows to fit, keeping the same margin under the last line. **Appearance → Department line → Full width** instead runs a long
   name across the band on one line, to match older printed signs
 - Enhanced form validation and formatting
 - Modern UI with smooth transitions and animations
