@@ -62,10 +62,8 @@
 }
 
 .custom-select__panel {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
+    /* Portalled to <body>; CustomSelect sets the fixed position, width and max-height. */
+    box-sizing: border-box;
     margin: 0;
     padding: 4px;
     list-style: none;

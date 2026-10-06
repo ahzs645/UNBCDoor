@@ -297,10 +297,6 @@
         padding: 14px 12px;
     }
 
-    .custom-select__panel {
-        max-height: 50vh;
-    }
-
     .export-buttons {
         grid-template-columns: 1fr;
     }

@@ -1,9 +1,14 @@
-import React, { useEffect, useId, useRef, useState } from 'react'
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 /**
  * Fully styled (non-native) dropdown. Renders a button trigger and our own
  * listbox panel instead of an OS-drawn <select> popup, so the open menu matches
  * the branded form on every platform (and in dark mode).
+ *
+ * The open menu is portalled to <body> and positioned against the viewport, so it never grows a
+ * scrolling ancestor (the desktop preview column would otherwise sprout a scrollbar, narrow, and
+ * clip the menu). It opens upward when there isn't room below.
  *
  * Props:
  *   - options: array of { value, label }
@@ -25,6 +30,8 @@ export const CustomSelect = ({
   const [activeIndex, setActiveIndex] = useState(-1)
   const rootRef = useRef(null)
   const listRef = useRef(null)
+  const triggerRef = useRef(null)
+  const [panelStyle, setPanelStyle] = useState(null)
   const reactId = useId()
   const baseId = id || `custom-select-${reactId}`
 
@@ -53,7 +60,8 @@ export const CustomSelect = ({
     if (!open) return undefined
 
     const handlePointerDown = (e) => {
-      if (rootRef.current && !rootRef.current.contains(e.target)) {
+      const inside = rootRef.current?.contains(e.target) || listRef.current?.contains(e.target)
+      if (!inside) {
         closeMenu()
       }
     }
@@ -63,6 +71,45 @@ export const CustomSelect = ({
     return () => {
       document.removeEventListener('mousedown', handlePointerDown)
       document.removeEventListener('touchstart', handlePointerDown)
+    }
+  }, [open])
+
+  // Place the menu under the trigger (or above it, when the viewport runs out below) and keep it
+  // there while anything scrolls or the window resizes.
+  useLayoutEffect(() => {
+    if (!open) {
+      setPanelStyle(null)
+      return undefined
+    }
+
+    const place = () => {
+      const trigger = triggerRef.current
+      if (!trigger) return
+      const rect = trigger.getBoundingClientRect()
+      const gap = 4
+      const margin = 12
+      const wanted = Math.min(300, listRef.current?.scrollHeight || 300)
+      const below = window.innerHeight - rect.bottom - gap - margin
+      const above = rect.top - gap - margin
+      const openUp = below < Math.min(wanted, 180) && above > below
+      const maxHeight = Math.max(120, Math.min(300, window.innerHeight * 0.5, openUp ? above : below))
+      setPanelStyle({
+        position: 'fixed',
+        left: rect.left,
+        width: rect.width,
+        maxHeight,
+        ...(openUp
+          ? { bottom: window.innerHeight - rect.top + gap }
+          : { top: rect.bottom + gap })
+      })
+    }
+
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
     }
   }, [open])
 
@@ -134,6 +181,7 @@ export const CustomSelect = ({
       <button
         type="button"
         id={baseId}
+        ref={triggerRef}
         className="custom-select__trigger"
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -155,7 +203,7 @@ export const CustomSelect = ({
       {/* Hidden field keeps the value available to plain form serialization. */}
       <input type="hidden" name={name} value={value ?? ''} />
 
-      {open && (
+      {open && createPortal(
         <ul
           className="custom-select__panel"
           id={`${baseId}-listbox`}
@@ -163,6 +211,7 @@ export const CustomSelect = ({
           ref={listRef}
           aria-labelledby={baseId}
           tabIndex={-1}
+          style={panelStyle || { position: 'fixed', visibility: 'hidden' }}
         >
           {options.map((option, index) => {
             const isSelected = option.value === value
@@ -185,7 +234,8 @@ export const CustomSelect = ({
               </li>
             )
           })}
-        </ul>
+        </ul>,
+        document.body
       )}
     </div>
   )

@@ -66,7 +66,7 @@ const PreviewIcon = () => (
 
 function App() {
   const [signData, setSignData] = useSignState()
-  const { cardHolders } = useCardHolders()
+  const { cardHolders, builtInHolderNames, saveCustomHolder, deleteCustomHolder } = useCardHolders()
   const { isDarkMode, toggleTheme } = useTheme()
   const [activeMobileTab, setActiveMobileTab] = useState('editor')
   const [livePreviewHidden, setLivePreviewHidden] = useState(readLivePreviewHidden)
@@ -245,6 +245,9 @@ function App() {
             signData={signData}
             content={signContent}
             cardHolders={cardHolders}
+            builtInHolderNames={builtInHolderNames}
+            onSaveCustomHolder={saveCustomHolder}
+            onDeleteCustomHolder={deleteCustomHolder}
             onUpdate={updateSignData}
             archiveState={archiveState}
             editorHref={EDITOR_PATH}
@@ -297,7 +300,11 @@ function App() {
           {/* Mounted only while the page is open so the preview isn't rebuilding a PDF in the
               background the whole time the editor is in use. */}
           {page === 'measuring-sheets' && (
-            <MeasuringSheetsPage cardHolders={cardHolders} initialHolderKey={signData.cardHolderType || ''} />
+            <MeasuringSheetsPage
+              cardHolders={cardHolders}
+              initialHolderKey={signData.cardHolderType || ''}
+              onSaveCustomHolder={saveCustomHolder}
+            />
           )}
         </section>
       </main>

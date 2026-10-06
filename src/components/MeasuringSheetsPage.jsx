@@ -6,7 +6,8 @@ import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { resolveCardHolderGeometry } from '../sign/signGeometry'
 import { MM_PER_INCH, formatDualSize } from '../sign/templateGeometry'
 import { holderFromStripReadings, stripReadingsForHolder } from '../sign/stripGeometry'
-import { PLATE_STYLES } from './HolderMockup'
+import { DEFAULT_PLATE_STYLE, PLATE_STYLES } from './HolderMockup'
+import { MAX_HOLDER_NAME, validateCustomHolder } from '../sign/customHolders'
 import {
   GRID_DETAIL_OPTIONS,
   SHEET_MODES,
@@ -52,7 +53,7 @@ const STRIP_EXAMPLE = stripReadingsForHolder({
 
 const PLATE_OPTIONS = Object.entries(PLATE_STYLES).map(([value, { label }]) => ({ value, label }))
 
-const buildPresetSnippet = ({ insertSize, viewableSize, viewableOffset }, { plateStyle = 'plain', notes = 'Measured by hand.' } = {}) => `'My Holder': {
+const buildPresetSnippet = ({ insertSize, viewableSize, viewableOffset }, { plateStyle = DEFAULT_PLATE_STYLE, notes = 'Measured by hand.' } = {}) => `'My Holder': {
   name: 'My Holder',
   description: 'Measured on <date> in <building>.',
   insertSize: { width: ${insertSize.width.toFixed(2)}, height: ${insertSize.height.toFixed(2)} },
@@ -72,6 +73,45 @@ const fromDisplay = (value, units) => {
   const parsed = Number.parseFloat(value)
   if (!Number.isFinite(parsed) || parsed < 0) return null
   return units === 'mm' ? parsed / MM_PER_INCH : parsed
+}
+
+// Saves the measured holder as a custom preset in this browser, so it shows up in the editor's
+// holder picker straight away.
+const SaveHolderToBrowser = ({ id, holder, takenNames, onSave }) => {
+  const [name, setName] = useState('')
+  const [status, setStatus] = useState(null)
+  const problems = validateCustomHolder({ name, ...holder }, takenNames)
+
+  const save = () => {
+    if (problems.length) {
+      setStatus({ kind: 'error', text: problems[0] })
+      return
+    }
+    onSave(name.trim(), holder)
+    setStatus({ kind: 'ok', text: `Saved “${name.trim()}” — pick it under Card holder in the editor.` })
+    setName('')
+  }
+
+  return (
+    <div className="measuring-sheets__save">
+      <label htmlFor={id}>Save to this browser</label>
+      <div className="measuring-sheets__save-row">
+        <input
+          id={id}
+          type="text"
+          value={name}
+          maxLength={MAX_HOLDER_NAME}
+          placeholder="Holder name"
+          onChange={(event) => { setName(event.target.value); setStatus(null) }}
+          onKeyDown={(event) => { if (event.key === 'Enter') save() }}
+        />
+        <button type="button" className="export-btn" onClick={save}>Save</button>
+      </div>
+      {status && (
+        <p className={`measuring-sheets__message ${status.kind === 'ok' ? 'is-ok' : ''}`} role="status">{status.text}</p>
+      )}
+    </div>
+  )
 }
 
 // Every option list on this page stacks under its caption, filling the config column.
@@ -96,7 +136,7 @@ const NumberField = ({ id, label, inches, units, onChange }) => (
 
 // The configure-and-print page for the measuring sheets: pick a sheet, a holder (preset or
 // measured by hand), a paper size and the grid options, watch the sheet redraw, then print it.
-export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
+export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '', onSaveCustomHolder }) => {
   const [mode, setMode] = useState('template')
   const [paperSize, setPaperSize] = useState('letter')
   const [holderKey, setHolderKey] = useState(initialHolderKey)
@@ -106,7 +146,7 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
   const [showCoordinates, setShowCoordinates] = useState(true)
   const [showPresetOutlines, setShowPresetOutlines] = useState(true)
   const [readings, setReadings] = useState(STRIP_EXAMPLE)
-  const [readingsPlate, setReadingsPlate] = useState('plain')
+  const [readingsPlate, setReadingsPlate] = useState(DEFAULT_PLATE_STYLE)
   const [previewUrl, setPreviewUrl] = useState('')
   const [message, setMessage] = useState('')
   const previewUrlRef = useRef('')
@@ -192,7 +232,7 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
       : 'Your browser blocked the print tab, so the PDF was downloaded instead — print it at 100%.')
   }
 
-  const presetSnippet = buildPresetSnippet(geometry, { plateStyle: 'plain' })
+  const presetSnippet = buildPresetSnippet(geometry, { plateStyle: DEFAULT_PLATE_STYLE })
 
   const fromStrip = holderFromStripReadings(readings)
   const stripSnippet = buildPresetSnippet(fromStrip, {
@@ -300,7 +340,15 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
 
             <details className="measuring-sheets__preset" open>
               <summary>Save these readings as a preset</summary>
-              <p>Add this entry to <code>src/data/cardHolders.js</code>, renamed for the holder.</p>
+              {onSaveCustomHolder && fromStrip.problems.length === 0 && (
+                <SaveHolderToBrowser
+                  id="strip-save-name"
+                  holder={{ ...fromStrip, plateStyle: readingsPlate }}
+                  takenNames={Object.keys(cardHolders)}
+                  onSave={onSaveCustomHolder}
+                />
+              )}
+              <p>To share it with everyone, add this entry to <code>src/data/cardHolders.js</code>, renamed for the holder.</p>
               <pre>{stripSnippet}</pre>
             </details>
           </div>
@@ -445,7 +493,15 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '' }) => {
         {isCustom && (
           <details className="measuring-sheets__preset">
             <summary>Save these measurements as a preset</summary>
-            <p>Add this entry to <code>src/data/cardHolders.js</code> so the holder is one click away next time.</p>
+            {onSaveCustomHolder && (
+              <SaveHolderToBrowser
+                id="custom-save-name"
+                holder={{ insertSize: geometry.insertSize, viewableOffset: geometry.viewableOffset }}
+                takenNames={Object.keys(cardHolders)}
+                onSave={onSaveCustomHolder}
+              />
+            )}
+            <p>To share it with everyone, add this entry to <code>src/data/cardHolders.js</code> so the holder is one click away next time.</p>
             <pre>{presetSnippet}</pre>
           </details>
         )}
