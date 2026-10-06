@@ -58,8 +58,10 @@ A web-based tool for generating standardized door signs for the University of No
   - Preview modes: **Print guides** (the bleed that gets cut away is hatched, the cut line is
     dashed, the strip the holder frame hides is shaded, and the header and body margins are
     measured), **On the door** (the sign behind a room plate's window, with an optional room
-    number), and **Plain**. The door view offers the plates in use: the newer number-only
-    plates, and the older ones with a grey or green line and a braille strip
+    number), and **Plain**. The door view offers the plates in use (the newer number-only
+    plates, and the older ones with a grey or green line and a braille strip) and a
+    **See-through** mode that shows the whole cut card behind a translucent frame, with the cut
+    edge dashed and how much each edge hides
   - Automatic scaling based on card holder dimensions
   - Detailed specifications display
   - Dedicated `/measuring-sheets/` page with a live preview: configure a sheet, then print

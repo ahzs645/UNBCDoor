@@ -87,33 +87,88 @@ const BrailleStrip = ({ text, x, y, width, height }) => {
   )
 }
 
-export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, plateStyle = 'plain', children }) => {
+const formatInches = (value) => `${Number(value.toFixed(3))}"`
+
+// One label per frame edge, sitting on the plate just outside the cut edge.
+const HiddenLabels = ({ trim, offset, size }) => {
+  const labels = [
+    { edge: 'top', x: trim.x + trim.width / 2, y: trim.y - size * 0.45, angle: 0 },
+    { edge: 'bottom', x: trim.x + trim.width / 2, y: trim.y + trim.height + size * 1.15, angle: 0 },
+    { edge: 'left', x: trim.x - size * 0.45, y: trim.y + trim.height / 2, angle: -90 },
+    { edge: 'right', x: trim.x + trim.width + size * 0.45, y: trim.y + trim.height / 2, angle: 90 }
+  ]
+  return labels
+    .filter(({ edge }) => offset[edge] > 0)
+    .map(({ edge, x, y, angle }) => (
+      <text
+        key={edge}
+        className="holder-mockup__hidden-label"
+        x={x}
+        y={y}
+        fontSize={size}
+        textAnchor="middle"
+        transform={angle ? `rotate(${angle} ${x} ${y})` : undefined}
+      >
+        {`${formatInches(offset[edge])} hidden`}
+      </text>
+    ))
+}
+
+// `seeThrough` turns the frame translucent so the whole cut insert shows, with the cut edge
+// dashed and each edge labelled with how much of the card the frame covers there.
+export const HolderMockup = ({
+  insertSize,
+  viewableOffset,
+  roomNumber,
+  plateStyle = 'plain',
+  seeThrough = false,
+  children
+}) => {
   const plate = PLATE_STYLES[plateStyle] || PLATE_STYLES.plain
   const offset = viewableOffset || { top: 0, right: 0, bottom: 0, left: 0 }
   const windowWidth = insertSize.width - offset.left - offset.right
   const windowHeight = insertSize.height - offset.top - offset.bottom
 
-  const windowX = PLATE.side
-  const windowY = plate.numberPanel + plate.rule + plate.aboveWindow
-  const plateWidth = windowWidth + PLATE.side * 2
-  const plateHeight = windowY + windowHeight + PLATE.bottom
+  // The insert slides in behind the frame, so the plate always reaches a little past the cut card,
+  // even on a holder whose frame covers more than the usual border.
+  const clearance = 0.12
+  const side = Math.max(PLATE.side, offset.left + clearance, offset.right + clearance)
+  const bottom = Math.max(PLATE.bottom, offset.bottom + clearance)
+  const aboveWindow = Math.max(plate.aboveWindow, offset.top + clearance)
 
-  // The artwork canvas includes the bleed, so it is shifted out past the window by the frame
-  // inset plus the bleed and clipped by the window.
-  const canvasWidth = insertSize.width + BLEED_INCHES * 2
-  const canvasHeight = insertSize.height + BLEED_INCHES * 2
+  const windowRect = {
+    x: side,
+    y: plate.numberPanel + plate.rule + aboveWindow,
+    width: windowWidth,
+    height: windowHeight
+  }
+  const trim = {
+    x: windowRect.x - offset.left,
+    y: windowRect.y - offset.top,
+    width: insertSize.width,
+    height: insertSize.height
+  }
+  const plateWidth = windowWidth + side * 2
+  const plateHeight = windowRect.y + windowHeight + bottom
+
+  const percentOfPlate = (rect) => ({
+    left: `${(rect.x / plateWidth) * 100}%`,
+    top: `${(rect.y / plateHeight) * 100}%`,
+    width: `${(rect.width / plateWidth) * 100}%`,
+    height: `${(rect.height / plateHeight) * 100}%`
+  })
+
+  // The artwork canvas includes the bleed; the cut card crops it off.
   const insertStyle = {
-    left: `${(-(offset.left + BLEED_INCHES) / windowWidth) * 100}%`,
-    top: `${(-(offset.top + BLEED_INCHES) / windowHeight) * 100}%`,
-    width: `${(canvasWidth / windowWidth) * 100}%`,
-    height: `${(canvasHeight / windowHeight) * 100}%`
+    left: `${(-BLEED_INCHES / insertSize.width) * 100}%`,
+    top: `${(-BLEED_INCHES / insertSize.height) * 100}%`,
+    width: `${((insertSize.width + BLEED_INCHES * 2) / insertSize.width) * 100}%`,
+    height: `${((insertSize.height + BLEED_INCHES * 2) / insertSize.height) * 100}%`
   }
-  const windowStyle = {
-    left: `${(windowX / plateWidth) * 100}%`,
-    top: `${(windowY / plateHeight) * 100}%`,
-    width: `${(windowWidth / plateWidth) * 100}%`,
-    height: `${(windowHeight / plateHeight) * 100}%`
-  }
+
+  const rectPath = ({ x, y, width, height }) => `M${x} ${y}h${width}v${height}h${-width}Z`
+  const framePath = `${rectPath(trim)} ${rectPath(windowRect)}`
+  const hidesAnything = offset.top + offset.right + offset.bottom + offset.left > 0
 
   const label = (roomNumber || '').trim()
   const numberSize = plate.numberPanel * 0.62
@@ -122,7 +177,10 @@ export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, plateStyl
   const brailleHeight = 0.36
 
   return (
-    <div className="holder-mockup" style={{ '--plate-aspect': plateWidth / plateHeight }}>
+    <div
+      className={`holder-mockup ${seeThrough ? 'is-see-through' : ''}`}
+      style={{ '--plate-aspect': plateWidth / plateHeight }}
+    >
       <svg
         className="holder-mockup__plate"
         viewBox={`0 0 ${plateWidth} ${plateHeight}`}
@@ -141,7 +199,7 @@ export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, plateStyl
         <rect className="holder-mockup__body" x="0" y="0" width={plateWidth} height={plateHeight} rx="0.05" />
         <text
           className={`holder-mockup__number ${label ? '' : 'is-placeholder'}`}
-          x={PLATE.side * 0.9}
+          x={side * 0.9}
           y={numberBaseline}
           fontSize={numberSize}
         >
@@ -150,7 +208,7 @@ export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, plateStyl
         {plate.braille && (
           <BrailleStrip
             text={label || '0-000'}
-            x={plateWidth - PLATE.side - brailleWidth}
+            x={plateWidth - side - brailleWidth}
             y={numberBaseline - brailleHeight - 0.08}
             width={brailleWidth}
             height={brailleHeight}
@@ -167,11 +225,40 @@ export const HolderMockup = ({ insertSize, viewableOffset, roomNumber, plateStyl
         )}
       </svg>
 
-      <div className="holder-mockup__window" style={windowStyle}>
+      {/* The whole cut card, at its real place behind the frame. */}
+      <div className="holder-mockup__card" style={percentOfPlate(trim)}>
         <div className="holder-mockup__insert" style={insertStyle}>
           {children}
         </div>
       </div>
+
+      {!seeThrough && <div className="holder-mockup__window" style={percentOfPlate(windowRect)} />}
+
+      <svg
+        className="holder-mockup__frame"
+        viewBox={`0 0 ${plateWidth} ${plateHeight}`}
+        preserveAspectRatio="xMidYMid meet"
+        aria-hidden="true"
+      >
+        {seeThrough && (
+          <defs>
+            <pattern id="holder-mockup-hatch" patternUnits="userSpaceOnUse" width="0.08" height="0.08" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="0.08" className="holder-mockup__hatch-line" />
+            </pattern>
+          </defs>
+        )}
+        {hidesAnything && <path className="holder-mockup__frame-fill" d={framePath} fillRule="evenodd" />}
+        {seeThrough && hidesAnything && (
+          <path d={framePath} fillRule="evenodd" fill="url(#holder-mockup-hatch)" />
+        )}
+        {seeThrough && (
+          <>
+            <path className="holder-mockup__frame-edge" d={rectPath(windowRect)} />
+            <path className="holder-mockup__cut-edge" d={rectPath(trim)} />
+            <HiddenLabels trim={trim} offset={offset} size={0.13} />
+          </>
+        )}
+      </svg>
     </div>
   )
 }

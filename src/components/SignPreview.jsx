@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { SignArtwork } from '../sign/SignArtwork'
-import { resolveCardHolderGeometry, getPrintLayout } from '../sign/signGeometry'
+import { resolveCardHolderGeometry, getPrintLayout, formatInches } from '../sign/signGeometry'
 import { exportSignPNG, exportSignPDF } from '../sign/signExport'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { CardHolderSelector } from './CardHolderSelector'
@@ -46,6 +46,13 @@ const VIEW_OPTIONS = [
   { value: 'plain', label: 'Plain' }
 ]
 
+// On the door: the sign as people see it, or with the frame see-through to show the whole cut
+// card and the strip the frame hides.
+const DOOR_OPTIONS = [
+  { value: 'mounted', label: 'Mounted' },
+  { value: 'see-through', label: 'See-through' }
+]
+
 const PLATE_OPTIONS = Object.entries(PLATE_STYLES).map(([value, { label }]) => ({ value, label }))
 
 // The preview card (artwork, print guides, legend) and the print & export card (holder, sheet,
@@ -65,6 +72,7 @@ export const SignPreview = ({
   const [view, setView] = useState('guides')
   const [roomNumber, setRoomNumber] = useState('')
   const [plateStyle, setPlateStyle] = useState('plain')
+  const [doorView, setDoorView] = useState('mounted')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
   const {
@@ -75,6 +83,17 @@ export const SignPreview = ({
     measurementSummary
   } = resolveCardHolderGeometry(selectedCardHolder)
   const showGuides = view === 'guides'
+
+  const doorNote = !selectedCardHolder
+    ? 'No holder selected, so the whole insert shows. Pick a holder under Print & export to see what its frame hides.'
+    : doorView === 'see-through'
+      ? `Cut size ${formatInches(insertSize.width)}" × ${formatInches(insertSize.height)}" (dashed). The frame hides ${
+        ['top', 'bottom', 'left', 'right']
+          .filter(edge => viewableOffset[edge] > 0)
+          .map(edge => `${formatInches(viewableOffset[edge])}" ${edge}`)
+          .join(', ')
+      }, leaving the ${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}" window.`
+      : `Only the ${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}" window shows; the frame hides the rest of the insert.`
 
   const doorSignClass = [
     'door-sign',
@@ -118,6 +137,7 @@ export const SignPreview = ({
               viewableOffset={selectedCardHolder ? viewableOffset : null}
               roomNumber={roomNumber}
               plateStyle={plateStyle}
+              seeThrough={doorView === 'see-through'}
             >
               <SignArtwork ref={signRef} content={content} />
             </HolderMockup>
@@ -151,12 +171,16 @@ export const SignPreview = ({
 
         {view === 'door' && (
           <div className="door-preview-footer">
-            <p className="door-preview-note">
-              {selectedCardHolder
-                ? `Only the ${viewableSize.width}" × ${viewableSize.height}" window shows; the frame hides the rest of the insert.`
-                : 'No holder selected, so the whole insert shows. Pick a holder under Print & export to see what its frame hides.'}
-            </p>
+            <p className="door-preview-note">{doorNote}</p>
             <div className="door-preview-controls">
+              <SegmentedControl
+                name="doorView"
+                className="segmented--compact"
+                options={DOOR_OPTIONS}
+                value={doorView}
+                onChange={setDoorView}
+                aria-label="On the door"
+              />
               <SegmentedControl
                 name="plateStyle"
                 className="segmented--compact"
