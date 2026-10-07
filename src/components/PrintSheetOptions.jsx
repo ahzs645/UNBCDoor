@@ -1,6 +1,7 @@
 import React from 'react'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
+import { InfoTip } from './InfoTip'
 
 const GUIDE_OPTIONS = [
   { value: 'marks', label: 'Crop marks' },
@@ -124,7 +125,14 @@ export const PrintSheetOptions = ({
       {usingList ? (
         <div className="sheet-list">
           <div className="sheet-list__head">
-            <span className="field-label">Sheet list</span>
+            <span className="sheet-list__title">
+              <span className="field-label">Sheet list</span>
+              <InfoTip label="About the sheet list">
+                Each entry is a snapshot: change the sign (or open another saved sign) and add it again to
+                print variants side by side. Click an entry to open it in the editor, change it, and save
+                it back. Cards of different sizes print on separate sheets.
+              </InfoTip>
+            </span>
             {entries.length > 0 && (
               <button type="button" className="text-btn text-btn--danger" onClick={onClearEntries}>Clear</button>
             )}
@@ -180,11 +188,6 @@ export const PrintSheetOptions = ({
           <button type="button" className="sheet-list__add" onClick={onAddEntry} disabled={!canAdd}>
             + Add this sign as it is now
           </button>
-          <p className="field-hint">
-            Each entry is a snapshot: change the sign (or open another saved sign) and add it again to
-            print variants side by side. Click an entry to open it in the editor, change it, and save
-            it back. Cards of different sizes print on separate sheets.
-          </p>
         </div>
       ) : (
         <button type="button" className="text-btn sheet-options__list-link" onClick={onAddEntry} disabled={!canAdd}>
