@@ -372,13 +372,20 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
             />
           </div>
 
-          <div className="department-field">
-            <DepartmentField
-              departments={departments}
-              value={signData}
-              onChange={onUpdate}
-            />
-          </div>
+          {signData.organization === 'nugss' ? (
+            <p className="field-hint sign-basics__note">
+              NUGSS signs carry the NUGSS logo, which has no department line. Switch back to UNBC
+              with the logo at the top of the page.
+            </p>
+          ) : (
+            <div className="department-field">
+              <DepartmentField
+                departments={departments}
+                value={signData}
+                onChange={onUpdate}
+              />
+            </div>
+          )}
         </div>
       </FormSection>
 

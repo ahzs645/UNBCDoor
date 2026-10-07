@@ -1,5 +1,6 @@
 import { INITIAL_SIGN_DATA } from './signData.js'
 import { foldPositionIntoRoles, normalizeRoles } from './signRoles.js'
+import { ORGANIZATION_KEYS } from './organizations.js'
 
 export const SIGN_ARCHIVE_FORMAT = 'unbc-door-sign-archive'
 export const SIGN_ARCHIVE_VERSION = 1
@@ -31,6 +32,7 @@ export const normalizeSignData = (value = {}) => {
   normalized.roles2 = normalizeRoles(value.roles2)
 
   if (!SIGN_TYPES.has(normalized.signType)) normalized.signType = INITIAL_SIGN_DATA.signType
+  if (!ORGANIZATION_KEYS.includes(normalized.organization)) normalized.organization = INITIAL_SIGN_DATA.organization
   if (!['regular', 'bold', 'black'].includes(normalized.headlineWeight)) {
     normalized.headlineWeight = INITIAL_SIGN_DATA.headlineWeight
   }
@@ -76,7 +78,7 @@ export const normalizeSignData = (value = {}) => {
   if (!['stacked', 'inline'].includes(normalized.contactLayout)) {
     normalized.contactLayout = INITIAL_SIGN_DATA.contactLayout
   }
-  if (!['standard', 'large'].includes(normalized.contactSize)) {
+  if (!['standard', 'large', 'largest'].includes(normalized.contactSize)) {
     normalized.contactSize = INITIAL_SIGN_DATA.contactSize
   }
   if (!['hierarchy', 'uniform'].includes(normalized.bodyTextMode)) {

@@ -134,3 +134,29 @@ test('a deep holder frame never covers the wordmark', () => {
   assert.ok(geometry.logoY + WORDMARK.top * geometry.scale >= frameTop - 0.001, 'wordmark below frame')
   assert.ok(geometry.bandHeight > frameTop, 'band extends below the frame')
 })
+
+test('a NUGSS band matches the NUGSS production artboards seen through the 6-352 holder', () => {
+  // "Final V1 - Doug Minaker": a 498.9 × 318.05pt artboard, a 89.95pt band, the logo's ink at
+  // 51.25, 41.25 and the body text at x = 66.
+  const holder = cardHolders['6-352']
+  const width = 498.898
+  const height = 318.047
+  const viewable = Object.fromEntries(Object.entries(holder.viewableOffset)
+    .map(([edge, inches]) => [edge, inches * PT_PER_INCH]))
+  const padX = (width - viewable.left - viewable.right) * 0.08
+  const geometry = resolveHeaderGeometry({
+    width,
+    height,
+    viewable,
+    textX: viewable.left + padX,
+    rightInset: padX,
+    departmentText: 'Faculty of Environment',
+    organization: 'nugss'
+  })
+  close(geometry.bandHeight, 89.95, 0.5, 'band height')
+  close(geometry.logoY, 41.25, 0.5, 'logo top')
+  close(geometry.logoX, 51.25, 1, 'logo left')
+  close(viewable.left + padX, 66.08, 3, 'text column')
+  assert.deepEqual(geometry.departmentLines, [], 'NUGSS has no department line')
+  close(geometry.logoY - viewable.top, geometry.bandHeight - geometry.lockupBottom, 0.01, 'blue above and below the logo')
+})

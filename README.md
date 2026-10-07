@@ -12,11 +12,23 @@ A web-based tool for generating standardized door signs for the University of No
   - General Room
   - Custodian Closet
 
+- **Organizations: UNBC and NUGSS**
+  - Click the logo in the app bar to switch the sign (and the app's colours) between **UNBC** and
+    **NUGSS** (Northern Undergraduate Student Society). A NUGSS sign prints the NUGSS logo —
+    outlined from the society's `nugss.ai` master, so no fonts ship — on a cerulean (#0579ba)
+    band, sized and placed as on the NUGSS "Final V1" production artboards, with no department
+    line. Switching to NUGSS also starts the sign on the NUGSS look (one size for the position
+    and contact lines, at the new **Largest** contact size, and the wide text column); Appearance
+    can still change it
+  - The organization travels with the sign in share links and archives, and the editor opens on
+    the organization last used in that browser
+
 - **Dynamic Content**
   - Name and position display
   - One or more positions per person, each with an optional faculty/department and an italic
     subtext line. Each position prints its department beside it ("Position | Department", with
-    the bars aligned or run in), on a line of its own, or not at all, and either splits at
+    the bars aligned or run in — or with the bar hidden, leaving just the gap), on a line of its
+    own, or not at all, and either splits at
     | · ; or prints as typed. A position typed as "Position | Department" can be separated into
     the two fields in one click; signs saved with the older single Position field load it as
     the first position and print unchanged
@@ -82,6 +94,8 @@ A web-based tool for generating standardized door signs for the University of No
     strip) and a
     **See-through** mode that shows the whole cut card behind a translucent frame, with the cut
     edge dashed and how much each edge hides
+  - **6-352** is a measured preset (178mm × 113.5mm insert; the frame hides 11mm at the top and
+    10mm at each side). The NUGSS artboards fit its frame exactly
   - Automatic scaling based on card holder dimensions
   - Detailed specifications display
   - Dedicated `/measuring-sheets/` page with a live preview: configure a sheet, then print
@@ -145,6 +159,19 @@ A web-based tool for generating standardized door signs for the University of No
 
 6. **Export**
    - Export the artwork as PNG or print-ready PDF
+   - **Print sheet** options for the PDF (under Print & export; see it in Preview → **Sheet**):
+     - **Cards per sheet** — one card, or **Fill sheet**, which tries the paper both ways round
+       and fits as many cards as it can (e.g. 2 Building 10 cards on Letter, 4 on Tabloid)
+     - **Fill with** copies of this sign, or the **sheet list**: snapshots of signs added with
+       **+ Add this sign as it is now** — change the sign (or open another saved sign) and add it
+       again to print variants or different signs side by side. Cards of different sizes print on
+       separate sheets; the list is kept in the browser
+     - **Between cards** — a gap (each card keeps its own 1/8" bleed; two cuts between
+       neighbours) or butted (one shared cut; fewer cuts, less forgiving)
+     - **Cut guides** — crop marks in the margin, cut lines along every cut (running through the
+       gaps and past the block, for a ruler or guillotine), both, or none
+     - A **1" scale check** bar and a **label** (sign, cut size, cards per sheet, page, print date)
+       along the bottom margin when there is room
    - Use **Export this sign** or **Export archive** in Saved signs to save editable JSON
 
 7. **Check a Physical Holder**
@@ -288,6 +315,10 @@ under `tools/compare-viewer`; it is never included in the production website.
 - `src/sign/signGrid.js` - Printable 1" cutting grid for an unmeasured holder
 - `src/sign/signContent.js` - Builds the artwork content from the editor's sign data
 - `src/sign/headerGeometry.js` - Header band, lockup position, and department-line width
+- `src/sign/organizations.js` - UNBC and NUGSS: band colour, logo, starting appearance
+- `src/assets/nugssLogo.js` - The NUGSS logo as outlines (from `nugss.ai`)
+- `src/sign/printSheet.js` - Cards per sheet, cut positions, crop marks and cut lines for the PDF
+  and the Sheet preview
 - `src/sign/pdfPrimitives.js` - Drawing helpers shared by the measuring sheets
 - `src/sign/signShare.js` - Share links: the sign compressed into the URL with json-url
 - `vendor/unbc-logo` - UNBC brand kit, as a git submodule (see below)

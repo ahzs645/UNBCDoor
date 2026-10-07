@@ -2,12 +2,14 @@
 // italic line under it (e.g. Director | Northern Analytical Laboratory Services, then "Northern
 // BC’s Environment & Climate Solutions Innovation Hub"). Each one says how its own department
 // prints — beside the job after a bar, on its own line, or not at all — and whether the job
-// itself starts a new line at every | · or ;.
+// itself starts a new line at every | · or ;. A department beside the job is set off by a bar,
+// or by space alone.
 
 export const ROLE_UNIT_LAYOUTS = ['beside', 'below', 'hidden']
 export const ROLE_TITLE_LAYOUTS = ['stacked', 'inline']
+export const ROLE_UNIT_DIVIDERS = ['bar', 'none']
 
-export const EMPTY_ROLE = { title: '', unit: '', note: '', unitLayout: 'beside', titleLayout: 'stacked' }
+export const EMPTY_ROLE = { title: '', unit: '', note: '', unitLayout: 'beside', unitDivider: 'bar', titleLayout: 'stacked' }
 
 const SEPARATORS = /\s*(?:\r?\n|[·•|;])\s*/
 const LINE_BREAKS = /\s*\r?\n\s*/
@@ -28,6 +30,7 @@ export const normalizeRole = (role) => ({
   unit: typeof role.unit === 'string' ? role.unit : '',
   note: typeof role.note === 'string' ? role.note : '',
   unitLayout: ROLE_UNIT_LAYOUTS.includes(role.unitLayout) ? role.unitLayout : 'beside',
+  unitDivider: ROLE_UNIT_DIVIDERS.includes(role.unitDivider) ? role.unitDivider : 'bar',
   titleLayout: ROLE_TITLE_LAYOUTS.includes(role.titleLayout) ? role.titleLayout : 'inline'
 })
 
