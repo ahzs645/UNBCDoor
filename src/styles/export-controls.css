@@ -338,7 +338,14 @@
 /* Four long paper labels wrap three-and-one in the config column; a 2×2 grid reads cleaner. */
 .measuring-sheets .segmented:has(> :nth-child(4)) {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* On a narrow phone a long choice ("A4 (210mm × 297mm)") wraps inside its half of the grid
+   rather than pushing the control past the card. */
+.measuring-sheets .segmented:has(> :nth-child(4)) .segmented__option {
+    white-space: normal;
+    text-align: center;
 }
 
 .measuring-sheets__hint {
@@ -993,10 +1000,13 @@
     margin-top: 8px;
 }
 
-.export-card__holder .sheet-options {
-    margin: 16px 0;
-    padding-top: 14px;
-    border-top: 1px solid var(--ui-border);
+/* Stacked (below the two-column layout), a rule sets the sheet and downloads apart from the
+   holder and its sizes. */
+@media (max-width: 1199px) {
+    .export-card__output {
+        padding-top: 14px;
+        border-top: 1px solid var(--ui-border);
+    }
 }
 
 .sheet-list__open {

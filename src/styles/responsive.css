@@ -181,13 +181,15 @@
     }
 }
 
-/* ---------- Phones (< 600px) ---------- */
-@media (max-width: 599px) {
+/* ---------- Narrow tablets and phones (< 820px): the app bar on two rows ---------- */
+/* On one row the brand, page tabs and tools need about 800px; any narrower and the tabs run
+   under the settings and theme buttons. */
+@media (max-width: 819px) {
     :root {
         --ui-appbar-height: auto;
     }
 
-    /* App bar: brand and theme on the first row, page tabs on a scrollable second row. */
+    /* Brand and tools on the first row, page tabs on a scrollable second row. */
     .app-header__inner {
         flex-wrap: wrap;
         gap: 0 12px;
@@ -197,18 +199,6 @@
     .app-header__brand {
         flex: 1;
         min-height: 52px;
-    }
-
-    .app-header__logo {
-        height: 24px;
-    }
-
-    .app-header__logo--nugss {
-        height: 30px;
-    }
-
-    .app-header__product {
-        font-size: 0.9rem;
     }
 
     .app-header__nav {
@@ -227,6 +217,24 @@
 
     .app-header__link {
         min-height: 44px;
+    }
+}
+
+/* ---------- Phones (< 600px) ---------- */
+@media (max-width: 599px) {
+    .app-header__logo {
+        height: 24px;
+    }
+
+    .app-header__logo--nugss {
+        height: 30px;
+    }
+
+    .app-header__product {
+        font-size: 0.9rem;
+    }
+
+    .app-header__link {
         font-size: 0.85rem;
     }
 
@@ -324,6 +332,15 @@
 }
 
 /* Very narrow phones: the contact label no longer fits beside the value. */
+/* The logo, the product name and the settings and theme buttons need 374px on one row; any
+   narrower and the buttons drop under the logo (and the settings menu opens off the left edge).
+   The page tabs under them say where you are, so the product name goes. */
+@media (max-width: 379px) {
+    .app-header__product {
+        display: none;
+    }
+}
+
 @media (max-width: 359px) {
     .contact-row__fields--labelled {
         grid-template-columns: 1fr;

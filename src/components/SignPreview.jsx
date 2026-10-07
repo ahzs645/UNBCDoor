@@ -388,6 +388,20 @@ export const SignPreview = ({
                 </div>
               ))}
             </dl>
+          </div>
+
+          <div className="export-card__output">
+            <div className="form-group paper-size-field">
+              <span className="field-label" id="paperSizeLabel">Paper</span>
+              <SegmentedControl
+                name="paperSize"
+                className="segmented--fill"
+                options={PAPER_OPTIONS}
+                value={paperSize}
+                onChange={setPaperSize}
+                aria-labelledby="paperSizeLabel"
+              />
+            </div>
 
             <PrintSheetOptions
               options={sheetOptions}
@@ -405,20 +419,6 @@ export const SignPreview = ({
               onCloseEntry={() => printSheet.setOpenId(null)}
               onShowSheet={view === 'sheet' ? null : () => setView('sheet')}
             />
-          </div>
-
-          <div className="export-card__output">
-            <div className="form-group paper-size-field">
-              <span className="field-label" id="paperSizeLabel">Paper</span>
-              <SegmentedControl
-                name="paperSize"
-                className="segmented--fill"
-                options={PAPER_OPTIONS}
-                value={paperSize}
-                onChange={setPaperSize}
-                aria-labelledby="paperSizeLabel"
-              />
-            </div>
 
             {fitWarning && (
               <p className="print-fit-warning" role="alert">{fitWarning}</p>

@@ -5,7 +5,8 @@ import { useUnits } from '../hooks/useUnits'
 import { Switch } from './Switch'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { resolveCardHolderGeometry } from '../sign/signGeometry'
-import { MM_PER_INCH, formatDualSize } from '../sign/templateGeometry'
+import { MM_PER_INCH } from '../sign/templateGeometry'
+import { formatSizeBoth } from '../sign/units'
 import { holderFromStripReadings, stripReadingsForHolder } from '../sign/stripGeometry'
 import { DEFAULT_PLATE_STYLE, PLATE_STYLES } from './HolderMockup'
 import { MAX_HOLDER_NAME, validateCustomHolder } from '../sign/customHolders'
@@ -323,11 +324,11 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '', onSave
             <dl className="measuring-sheets__summary">
               <div>
                 <dt>Card / cut size</dt>
-                <dd>{formatDualSize(fromStrip.insertSize)}</dd>
+                <dd>{formatSizeBoth(fromStrip.insertSize, units)}</dd>
               </div>
               <div>
                 <dt>Window</dt>
-                <dd>{formatDualSize(fromStrip.viewableSize)}</dd>
+                <dd>{formatSizeBoth(fromStrip.viewableSize, units)}</dd>
               </div>
               <div>
                 <dt>Hidden by the frame</dt>
@@ -421,14 +422,14 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '', onSave
             <dl className="measuring-sheets__summary">
               <div>
                 <dt>Insert / cut size</dt>
-                <dd>{formatDualSize(geometry.insertSize)}</dd>
+                <dd>{formatSizeBoth(geometry.insertSize, units)}</dd>
               </div>
               {/* Without a holder there is no window — the sheet falls back to the safe area,
                   so quoting a "viewable window" the same size as the insert would be a lie. */}
               {holderKey && (
                 <div>
                   <dt>Viewable window</dt>
-                  <dd>{formatDualSize(geometry.viewableSize)}</dd>
+                  <dd>{formatSizeBoth(geometry.viewableSize, units)}</dd>
                 </div>
               )}
             </dl>

@@ -20,3 +20,8 @@ export const formatSize = (width, height, units) => (
     ? `${formatInches(width)}" × ${formatInches(height)}"`
     : `${toMillimetres(width)} × ${toMillimetres(height)} mm`
 )
+
+// The size in the chosen units, then in the other: "177 × 105.9 mm (6.97" × 4.17")".
+export const formatSizeBoth = ({ width, height }, units) => (
+  `${formatSize(width, height, units)} (${formatSize(width, height, units === 'in' ? 'mm' : 'in')})`
+)
