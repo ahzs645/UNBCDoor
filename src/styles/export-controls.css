@@ -998,3 +998,59 @@
     padding-top: 14px;
     border-top: 1px solid var(--ui-border);
 }
+
+.sheet-list__open {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sheet-list__open:hover {
+    text-decoration: underline;
+}
+
+.sheet-list__item--open {
+    border-color: var(--ui-accent);
+    box-shadow: inset 3px 0 0 var(--ui-accent);
+}
+
+.sheet-list__badge {
+    flex: none;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--ui-accent-soft-strong);
+    color: var(--ui-accent-text);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.sheet-list__editing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--ui-accent-soft);
+    font-size: 0.82rem;
+}
+
+.sheet-list__editing-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sheet-list__save {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+}

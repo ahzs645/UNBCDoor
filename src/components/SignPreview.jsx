@@ -7,7 +7,7 @@ import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { paginatePrintRun, resolvePrintSheet } from '../sign/printSheet'
 import { buildSignContent } from '../sign/signContent'
 import { renderArtworkNode } from '../sign/renderArtwork'
-import { usePrintSheet } from '../hooks/usePrintSheet'
+import { entryDiffers, usePrintSheet } from '../hooks/usePrintSheet'
 import { PrintSheetOptions } from './PrintSheetOptions'
 import { SheetPreview } from './SheetPreview'
 import { CardHolderSelector } from './CardHolderSelector'
@@ -76,6 +76,7 @@ export const SignPreview = ({
   onSaveCustomHolder,
   onDeleteCustomHolder,
   onUpdate,
+  onReplaceSign,
   archiveState,
   editorHref,
   measuringSheetsHref,
@@ -86,6 +87,20 @@ export const SignPreview = ({
   const [sheetPage, setSheetPage] = useState(0)
   const printSheet = usePrintSheet()
   const sheetOptions = printSheet.options
+  // A sheet entry opened in the editor: edits stay in the editor until saved back to the entry.
+  const openEntry = printSheet.openEntry
+  const openEntryChanged = Boolean(openEntry && entryDiffers(openEntry, signData))
+  const openSheetEntry = (entry) => {
+    if (entry.id === openEntry?.id) return
+    const question = openEntryChanged
+      ? `Discard your unsaved changes to “${openEntry.label}” and open “${entry.label}”?`
+      : !openEntry && !printSheet.entries.some(item => !entryDiffers(item, signData))
+        ? `Open “${entry.label}”? It replaces the sign in the editor, which isn’t on the sheet list — add it first to keep it.`
+        : null
+    if (question && !window.confirm(question)) return
+    onReplaceSign(entry.signData)
+    printSheet.setOpenId(entry.id)
+  }
   // The plate (its style, line colour and room number) follows the holder preset; a pick in the
   // door view holds until the holder changes.
   const [plateChoice, setPlateChoice] = useState({ holder: null, style: null, lineColor: null, roomNumber: null })
@@ -374,6 +389,11 @@ export const SignPreview = ({
               onAddEntry={() => printSheet.addEntry(signData)}
               onRemoveEntry={printSheet.removeEntry}
               onClearEntries={printSheet.clearEntries}
+              openId={openEntry?.id || null}
+              openEntryChanged={openEntryChanged}
+              onOpenEntry={onReplaceSign ? openSheetEntry : null}
+              onSaveEntry={() => openEntry && printSheet.saveEntry(openEntry.id, signData)}
+              onCloseEntry={() => printSheet.setOpenId(null)}
               onShowSheet={view === 'sheet' ? null : () => setView('sheet')}
             />
           </div>
