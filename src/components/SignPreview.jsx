@@ -183,8 +183,8 @@ export const SignPreview = ({
   const printedOn = new Date().toISOString().slice(0, 10)
   const describePage = (index, total, sheet) => [
     runTitle,
-    `${formatSize(sheet.card.width / 72, sheet.card.height / 72, units)} cut`,
-    sheet.perSheet > 1 ? `${sheet.perSheet} per sheet` : null,
+    `${sheet.cardSizes.map(size => formatSize(size.width, size.height, units)).join(' + ')} cut`,
+    sheet.perSheet > 1 && sheet.cardSizes.length === 1 ? `${sheet.perSheet} per sheet` : null,
     total > 1 ? `page ${index + 1} of ${total}` : null,
     `printed ${printedOn}`
   ].filter(Boolean).join(' · ')
@@ -209,9 +209,9 @@ export const SignPreview = ({
     }
     const run = pages.map(page => ({
       sheet: page.sheet,
-      items: page.items.map(item => ({ node: nodeFor(item.content) }))
+      items: page.items.map(item => item && { node: nodeFor(item.content) })
     }))
-    const cards = pages.reduce((sum, page) => sum + page.items.length, 0)
+    const cards = pages.reduce((sum, page) => sum + page.items.filter(Boolean).length, 0)
     const name = usingList
       ? `${organizationPrefix}-door-signs-sheet-list`
       : cards > 1
@@ -227,7 +227,7 @@ export const SignPreview = ({
     })
   }
 
-  const cardCount = pages.reduce((sum, page) => sum + page.items.length, 0)
+  const cardCount = pages.reduce((sum, page) => sum + page.items.filter(Boolean).length, 0)
   const sheetSummary = `${cardCount} card${cardCount === 1 ? '' : 's'} on ${pages.length} ${PAPER_DIMENSIONS[paperSize].label.replace(/\s*\(.*\)$/, '')} sheet${pages.length === 1 ? '' : 's'}`
 
   return (
@@ -376,7 +376,15 @@ export const SignPreview = ({
               {specs.map(({ label, value }) => (
                 <div key={label} className="print-specs__item">
                   <dt>{label}</dt>
-                  <dd>{value}</dd>
+                  {/* A narrow box breaks the size after the ×, never inside a number. */}
+                  <dd>
+                    {value.split(' × ').map((part, index, parts) => (
+                      <React.Fragment key={index}>
+                        {index > 0 && ' '}
+                        <span>{index < parts.length - 1 ? `${part} ×` : part}</span>
+                      </React.Fragment>
+                    ))}
+                  </dd>
                 </div>
               ))}
             </dl>

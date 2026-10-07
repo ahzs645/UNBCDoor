@@ -130,7 +130,8 @@ export const PrintSheetOptions = ({
               <InfoTip label="About the sheet list">
                 Each entry is a snapshot: change the sign (or open another saved sign) and add it again to
                 print variants side by side. Click an entry to open it in the editor, change it, and save
-                it back. Cards of different sizes print on separate sheets.
+                it back. Cards for different holders can share a sheet: each size gets its own rows and
+                crop marks.
               </InfoTip>
             </span>
             {entries.length > 0 && (

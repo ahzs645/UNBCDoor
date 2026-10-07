@@ -7,19 +7,21 @@ import { PT_PER_INCH } from '../sign/signConstants'
 // marks in the margin and the footer. Empty slots are outlined so the sheet's capacity shows.
 export const SheetPreview = ({ page, showLabel, showScale, footerText }) => {
   const { sheet, items } = page
-  const { width: W, height: H, bleed: B } = sheet.card
+  const B = sheet.bleed
+  const cards = items.filter(Boolean).length
 
   return (
     <svg
       className="sheet-preview__page"
       viewBox={`0 0 ${sheet.pageWidth} ${sheet.pageHeight}`}
       role="img"
-      aria-label={`${sheet.paperSize} sheet, ${items.length} of ${sheet.perSheet} card${sheet.perSheet === 1 ? '' : 's'}`}
+      aria-label={`${sheet.paperSize} sheet, ${cards} of ${sheet.perSheet} card${sheet.perSheet === 1 ? '' : 's'}`}
     >
       <rect width={sheet.pageWidth} height={sheet.pageHeight} fill="#ffffff" />
 
       {sheet.slots.map((slot, index) => {
         const item = items[index]
+        const { width: W, height: H } = slot
         if (!item) {
           return (
             <rect

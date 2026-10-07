@@ -364,13 +364,15 @@
 /* Insert, window and print sizes for the chosen holder. */
 .print-specs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr));
     gap: 8px;
     margin: -6px 0 18px;
 }
 
 .print-specs__item {
     display: grid;
+    align-content: start;
+    min-width: 0;
     gap: 2px;
     padding: 9px 12px;
     border-radius: var(--ui-radius-sm);
@@ -390,6 +392,9 @@
     font-size: 0.9rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+}
+
+.print-specs__item dd span {
     white-space: nowrap;
 }
 

@@ -164,8 +164,9 @@ A web-based tool for generating standardized door signs for the University of No
        and fits as many cards as it can (e.g. 2 Building 10 cards on Letter, 4 on Tabloid)
      - **Fill with** copies of this sign, or the **sheet list**: snapshots of signs added with
        **+ Add this sign as it is now** — change the sign (or open another saved sign) and add it
-       again to print variants or different signs side by side. Cards of different sizes print on
-       separate sheets; the list is kept in the browser
+       again to print variants or different signs side by side. Cards for different holders share
+       sheets: each size gets its own band of rows, with its own crop marks and cut lines, and the
+       sheet turns whichever way fits more; the list is kept in the browser
      - **Between cards** — a gap (each card keeps its own 1/8" bleed; two cuts between
        neighbours) or butted (one shared cut; fewer cuts, less forgiving)
      - **Cut guides** — crop marks in the margin, cut lines along every cut (running through the

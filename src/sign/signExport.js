@@ -150,7 +150,8 @@ export const exportSignPNG = async (source, { insertSize, fileName = 'unbc-door-
 // Writes a print run to one PDF: each page is a sheet from printSheet.js (one card, or as many as
 // fit) with its cards placed at 1:1, the cut lines drawn over them, crop marks in the margin and,
 // where there's room, a footer with a 1" scale bar and a label. `pages` are
-// [{ sheet, items: [{ node }] }], `node` being each card's artwork <svg>.
+// [{ sheet, items: [{ node } | null] }], `node` being each card's artwork <svg> and null an
+// empty slot.
 export const exportPrintRunPDF = async ({ pages, paperSize, fileName, showLabel, showScale, describePage }) => {
   if (!pages?.length) return
 
@@ -159,7 +160,7 @@ export const exportPrintRunPDF = async ({ pages, paperSize, fileName, showLabel,
     const doc = new jsPDF({ orientation: first.orientation, unit: 'pt', format: paperSize })
     const availableFonts = await registerArtworkFonts(
       doc,
-      fallbackFamiliesFor(pages.flatMap(({ items }) => items.map(({ node }) => node)))
+      fallbackFamiliesFor(pages.flatMap(({ items }) => items.filter(Boolean).map(({ node }) => node)))
     )
 
     for (const [pageIndex, { sheet, items }] of pages.entries()) {
@@ -167,10 +168,14 @@ export const exportPrintRunPDF = async ({ pages, paperSize, fileName, showLabel,
       // jsPDF's own sheet sizes are authoritative (A4 is metric); centre on them.
       const dx = (doc.internal.pageSize.getWidth() - sheet.pageWidth) / 2
       const dy = (doc.internal.pageSize.getHeight() - sheet.pageHeight) / 2
-      const { width: W, height: H, bleed: B } = sheet.card
+      const B = sheet.bleed
 
-      for (const [index, { node }] of items.entries()) {
+      for (const [index, item] of items.entries()) {
+        // Slots a page leaves empty (between bands of different sizes, or at its end) print nothing.
+        if (!item) continue
+        const { node } = item
         const slot = sheet.slots[index]
+        const { width: W, height: H } = slot
         // svg2pdf needs the node laid out in the document to resolve geometry/styles.
         const clone = cloneArtworkForExport(node, availableFonts)
         clone.setAttribute('width', W + B * 2)
