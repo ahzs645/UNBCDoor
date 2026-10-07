@@ -1,4 +1,5 @@
 export const INITIAL_SIGN_DATA = {
+  organization: 'unbc',
   signType: 'faculty',
   departmentType: '',
   mainDepartment: '',

@@ -87,6 +87,25 @@ export const cardHolders = {
     },
     notes: 'Matches the NUGSS "Final V1" artboards (6.93" × 4.42").'
   },
+  '6-352': {
+    name: 'Room 6-352 Holder (measured)',
+    description: 'Measured on the holder at room 6-352 (178mm × 113.5mm insert; the frame hides 11mm at the top and 10mm at each side).',
+    insertSize: {
+      width: 7.008,
+      height: 4.469
+    },
+    viewableSize: {
+      width: 6.22,
+      height: 4.036
+    },
+    viewableOffset: {
+      top: 0.433,
+      bottom: 0,
+      left: 0.394,
+      right: 0.394
+    },
+    notes: 'Measured, not estimated. The NUGSS artboards fit this frame exactly: the 11mm it hides at the top is the extra blue above the NUGSS logo.'
+  },
   'Legacy Letter-Half': {
     name: 'Legacy Letter-Half Holder',
     description: 'Older 8.5" × 5.5" holders — only the archived signs use this size.',

@@ -1,6 +1,6 @@
 import React from 'react'
-import { UnbcLogoMark } from '@unbc/logo'
 import { ThemeToggle } from './ThemeToggle'
+import { OrganizationSwitcher } from './OrganizationSwitcher'
 
 const NAV_ITEMS = [
   { page: 'editor', label: 'Editor' },
@@ -8,24 +8,32 @@ const NAV_ITEMS = [
   { page: 'measuring-sheets', label: 'Measuring sheets' }
 ]
 
-// The app bar shared by all three pages: the UNBC wordmark, the page tabs and the theme toggle.
-// The tabs are real links, so they open in a new tab with a modifier key like any other link.
-export const AppHeader = ({ page, paths, onNavigate, archiveCount, isDarkMode, onToggleTheme }) => (
+// The app bar shared by all three pages: the organization's logo (which also switches the
+// organization), the page tabs and the theme toggle. The tabs are real links, so they open in a new
+// tab with a modifier key like any other link.
+export const AppHeader = ({
+  page,
+  paths,
+  onNavigate,
+  archiveCount,
+  isDarkMode,
+  onToggleTheme,
+  organization,
+  onChangeOrganization
+}) => (
   <header className="app-header">
     <div className="app-header__inner">
-      <a
-        className="app-header__brand"
-        href={paths.editor}
-        onClick={(event) => onNavigate('editor', event)}
-        aria-label="UNBC Door Sign Generator — editor"
-      >
-        {/* Cropped to the wordmark: the lockup's native box leaves room for a department line. */}
-        <svg className="app-header__logo" viewBox="0 15 178 31" aria-hidden="true" focusable="false">
-          <UnbcLogoMark />
-        </svg>
-        <span className="app-header__product">Door Signs</span>
-      </a>
-
+      <div className="app-header__brand">
+        <OrganizationSwitcher organization={organization} onChange={onChangeOrganization} />
+        <a
+          className="app-header__product"
+          href={paths.editor}
+          onClick={(event) => onNavigate('editor', event)}
+          aria-label="Door Sign Generator — editor"
+        >
+          Door Signs
+        </a>
+      </div>
       <nav className="app-header__nav" aria-label="Pages">
         {NAV_ITEMS.map(({ page: target, label }) => (
           <a

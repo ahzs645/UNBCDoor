@@ -8,7 +8,6 @@ import {
   ARTWORK_BLACK_FAMILY
 } from './pdfFonts'
 import { PT_PER_INCH, BLEED_INCHES } from './signConstants'
-import { getPrintLayout } from './signGeometry'
 
 // Pure, non-React export helpers. Each takes the live artwork <svg> node plus the geometry
 // it needs and triggers a browser download. Kept out of the React tree so the heavy
@@ -78,7 +77,7 @@ const inlineArtworkImages = async (svg) => {
 }
 
 // Rasterizes the artwork to a trimmed PNG (bleed cropped off, matching the finished cut).
-export const exportSignPNG = async (source, { insertSize }) => {
+export const exportSignPNG = async (source, { insertSize, fileName = 'unbc-door-sign.png' }) => {
   if (!source) return
 
   const [, , viewW, viewH] = (source.getAttribute('viewBox') || '0 0 612 396')
@@ -126,7 +125,7 @@ export const exportSignPNG = async (source, { insertSize }) => {
     )
 
     const link = document.createElement('a')
-    link.download = 'unbc-door-sign.png'
+    link.download = fileName
     link.href = canvas.toDataURL('image/png')
     link.click()
   }
@@ -134,80 +133,91 @@ export const exportSignPNG = async (source, { insertSize }) => {
   image.src = svgUrl
 }
 
-// Renders the artwork (with bleed) onto a print sheet and adds vector crop marks at the trim.
-export const exportSignPDF = async (source, { insertSize, paperSize, signType }) => {
-  if (!source) return
+// Writes a print run to one PDF: each page is a sheet from printSheet.js (one card, or as many as
+// fit) with its cards placed at 1:1, the cut lines drawn over them, crop marks in the margin and,
+// where there's room, a footer with a 1" scale bar and a label. `pages` are
+// [{ sheet, items: [{ node }] }], `node` being each card's artwork <svg>.
+export const exportPrintRunPDF = async ({ pages, paperSize, fileName, showLabel, showScale, describePage }) => {
+  if (!pages?.length) return
 
   try {
-    // Orient the sheet to the insert so a landscape insert prints on the rotated page —
-    // otherwise wide inserts (e.g. the 8.5"×5.5" standard holder) overrun a portrait sheet
-    // and lose their side bleed and crop marks off the page edge.
-    const { orientation } = getPrintLayout({ insertSize, paperSize })
-
-    const doc = new jsPDF({ orientation, unit: 'pt', format: paperSize })
+    const first = pages[0].sheet
+    const doc = new jsPDF({ orientation: first.orientation, unit: 'pt', format: paperSize })
     const availableFonts = await registerArtworkFonts(doc)
 
-    // The artwork carries bleed on every edge; crop marks below pin the trim (cut) line.
-    const bleedPt = BLEED_INCHES * PT_PER_INCH
-    const trimW = insertSize.width * PT_PER_INCH
-    const trimH = insertSize.height * PT_PER_INCH
-    const artWidth = trimW + bleedPt * 2
-    const artHeight = trimH + bleedPt * 2
-    // Read the page size back from the oriented document so centering math matches the
-    // sheet jsPDF actually produced (its A4/Legal/Tabloid sizes are authoritative).
-    const pageWidth = doc.internal.pageSize.getWidth()
-    const pageHeight = doc.internal.pageSize.getHeight()
-    // Center the TRIM box on the page; bleed extends outward from there. When the insert
-    // is as wide as the sheet (e.g. 8.5" insert on Letter) the side bleed falls off the
-    // page — expected, since the trim edge is then the paper edge.
-    const xOffset = (pageWidth - trimW) / 2 - bleedPt
-    const yOffset = (pageHeight - trimH) / 2 - bleedPt
+    for (const [pageIndex, { sheet, items }] of pages.entries()) {
+      if (pageIndex > 0) doc.addPage(paperSize, sheet.orientation)
+      // jsPDF's own sheet sizes are authoritative (A4 is metric); centre on them.
+      const dx = (doc.internal.pageSize.getWidth() - sheet.pageWidth) / 2
+      const dy = (doc.internal.pageSize.getHeight() - sheet.pageHeight) / 2
+      const { width: W, height: H, bleed: B } = sheet.card
 
-    // svg2pdf needs the node laid out in the document to resolve geometry/styles.
-    const clone = cloneArtworkForExport(source, availableFonts)
-    clone.setAttribute('width', artWidth)
-    clone.setAttribute('height', artHeight)
-    await inlineArtworkImages(clone)
+      for (const [index, { node }] of items.entries()) {
+        const slot = sheet.slots[index]
+        // svg2pdf needs the node laid out in the document to resolve geometry/styles.
+        const clone = cloneArtworkForExport(node, availableFonts)
+        clone.setAttribute('width', W + B * 2)
+        clone.setAttribute('height', H + B * 2)
+        await inlineArtworkImages(clone)
 
-    const holder = document.createElement('div')
-    holder.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0;pointer-events:none;'
-    holder.appendChild(clone)
-    document.body.appendChild(holder)
+        const holder = document.createElement('div')
+        holder.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0;pointer-events:none;'
+        holder.appendChild(clone)
+        document.body.appendChild(holder)
 
-    try {
-      await svg2pdf(clone, doc, { x: xOffset, y: yOffset, width: artWidth, height: artHeight })
-    } finally {
-      holder.remove()
+        // Each card paints only its own part of the sheet: its trim, plus the bleed it keeps
+        // (butted neighbours stop at the shared cut).
+        doc.saveGraphicsState()
+        doc.rect(slot.clip.x + dx, slot.clip.y + dy, slot.clip.width, slot.clip.height, null)
+        doc.clip()
+        doc.discardPath()
+        try {
+          await svg2pdf(clone, doc, { x: slot.x - B + dx, y: slot.y - B + dy, width: W + B * 2, height: H + B * 2 })
+        } finally {
+          doc.restoreGraphicsState()
+          holder.remove()
+        }
+      }
+
+      // Cut lines sit exactly on the cuts, over the artwork, and go with the offcuts.
+      doc.setLineDashPattern([], 0)
+      doc.setDrawColor(90, 90, 90)
+      doc.setLineWidth(0.3)
+      sheet.cutLines.forEach(([x1, y1, x2, y2]) => doc.line(x1 + dx, y1 + dy, x2 + dx, y2 + dy))
+
+      // Crop marks in the margin, in line with every cut, clear of the bleed.
+      doc.setDrawColor(0, 0, 0)
+      doc.setLineWidth(0.5)
+      sheet.cropMarks.forEach(([x1, y1, x2, y2]) => doc.line(x1 + dx, y1 + dy, x2 + dx, y2 + dy))
+
+      if (sheet.footer && (showLabel || showScale)) {
+        const y = sheet.footer.baseline + dy
+        let x = sheet.footer.left + dx
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(7)
+        doc.setTextColor(80, 80, 80)
+        if (showScale) {
+          // Measures exactly 1" when the sheet is printed at 100%.
+          const barY = y - 2.5
+          doc.setDrawColor(0, 0, 0)
+          doc.setLineWidth(0.5)
+          doc.line(x, barY, x + PT_PER_INCH, barY)
+          ;[0, 0.25, 0.5, 0.75, 1].forEach((step) => {
+            const tick = step === 0 || step === 1 ? 4 : step === 0.5 ? 3 : 2
+            doc.line(x + step * PT_PER_INCH, barY - tick, x + step * PT_PER_INCH, barY)
+          })
+          doc.text('1 in — check at 100%', x + PT_PER_INCH + 4, y)
+          x += PT_PER_INCH + 4 + doc.getTextWidth('1 in — check at 100%') + 12
+        }
+        if (showLabel && describePage) {
+          const maxWidth = doc.internal.pageSize.getWidth() - x - sheet.footer.left
+          const [line] = doc.splitTextToSize(describePage(pageIndex, pages.length, sheet), Math.max(maxWidth, 40))
+          doc.text(line, x, y)
+        }
+      }
     }
 
-    // Vector crop marks aligned to the trim (cut) line, sitting in the margin just
-    // outside the bleed so they never print on the live artwork (0.25" arms).
-    const mark = 0.25 * PT_PER_INCH
-    const ax0 = xOffset                 // artwork (bleed) edges
-    const ay0 = yOffset
-    const ax1 = xOffset + artWidth
-    const ay1 = yOffset + artHeight
-    const tx0 = xOffset + bleedPt        // trim (cut) lines
-    const ty0 = yOffset + bleedPt
-    const tx1 = ax1 - bleedPt
-    const ty1 = ay1 - bleedPt
-
-    doc.setDrawColor(0, 0, 0)
-    doc.setLineWidth(0.75)
-
-    // Horizontal arms in the left/right margins, aligned to the trim top & bottom.
-    doc.line(ax0 - mark, ty0, ax0, ty0)
-    doc.line(ax1, ty0, ax1 + mark, ty0)
-    doc.line(ax0 - mark, ty1, ax0, ty1)
-    doc.line(ax1, ty1, ax1 + mark, ty1)
-
-    // Vertical arms in the top/bottom margins, aligned to the trim left & right.
-    doc.line(tx0, ay0 - mark, tx0, ay0)
-    doc.line(tx1, ay0 - mark, tx1, ay0)
-    doc.line(tx0, ay1, tx0, ay1 + mark)
-    doc.line(tx1, ay1, tx1, ay1 + mark)
-
-    doc.save(`unbc-door-sign-${signType || 'custom'}.pdf`)
+    doc.save(fileName)
   } catch (error) {
     console.error('Error exporting PDF:', error)
   }

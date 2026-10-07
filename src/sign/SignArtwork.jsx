@@ -3,6 +3,8 @@ import { UnbcLogoMark, AlumniCrest } from '@unbc/logo'
 import { PT_PER_INCH, DEFAULT_INSERT_SIZE } from './signConstants'
 import { resolveHeaderGeometry } from './headerGeometry'
 import { splitRoleTitle } from './signRoles'
+import { resolveOrganization } from './organizations'
+import { NugssLogoMark } from './NugssLogoMark'
 import ctaanLogo from '../assets/ctaan-logo.png'
 
 export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
@@ -87,7 +89,8 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
 // "Position | Department" lines when the positions are too long to leave room for a column (or
 // there is nothing to align, or no canvas to measure with). A role can instead put its
 // department on a line of its own or leave it off, and its subtext follows in italics — under
-// the department column when the role sits in it. Each line comes back with its segments and
+// the department column when the role sits in it. A role can drop the bar and keep only the gap
+// (in the aligned column the department still lines up with the others). Each line comes back with its segments and
 // whether it is a subtext line.
 const ROLE_SEPARATOR = '|'
 
@@ -101,6 +104,7 @@ const layoutRoles = (roles, { aligned, font, noteFont }) => {
       role,
       leading: pieces.slice(0, -1),
       title: pieces[pieces.length - 1] || '',
+      bar: role.unitDivider !== 'none',
       unit: role.unitLayout === 'beside' ? role.unit : '',
       unitBelow: role.unitLayout === 'below' ? role.unit : ''
     }
@@ -114,12 +118,16 @@ const layoutRoles = (roles, { aligned, font, noteFont }) => {
   if (column) {
     ctx.font = `${font.style} ${font.weight} ${font.size}px ${font.family}`
     const space = ctx.measureText(' ').width
-    separatorX = Math.max(...paired.map(row => ctx.measureText(row.title).width)) + space
-    unitX = separatorX + ctx.measureText(ROLE_SEPARATOR).width + space
+    const titleWidth = Math.max(...paired.map(row => ctx.measureText(row.title).width))
+    separatorX = titleWidth + space
+    // With no bar in the column at all, the gap the bar would have filled is closed up.
+    unitX = paired.some(row => row.bar)
+      ? separatorX + ctx.measureText(ROLE_SEPARATOR).width + space
+      : titleWidth + space * 2
     if (unitX > font.maxWidth * 0.5) column = false
   }
 
-  return rows.flatMap(({ role, leading, title, unit, unitBelow }) => {
+  return rows.flatMap(({ role, leading, title, bar, unit, unitBelow }) => {
     const lines = leading.flatMap(piece => plain(piece))
     let noteX = 0
     if (title && unit && column) {
@@ -127,13 +135,17 @@ const layoutRoles = (roles, { aligned, font, noteFont }) => {
         lines.push({
           note: false,
           segments: index === 0
-            ? [{ text: title, dx: 0 }, { text: ROLE_SEPARATOR, dx: separatorX }, { text: line, dx: unitX }]
+            ? [
+                { text: title, dx: 0 },
+                ...(bar ? [{ text: ROLE_SEPARATOR, dx: separatorX }] : []),
+                { text: line, dx: unitX }
+              ]
             : [{ text: line, dx: unitX }]
         })
       })
       noteX = unitX
     } else {
-      lines.push(...plain([title, unit].filter(Boolean).join(` ${ROLE_SEPARATOR} `)))
+      lines.push(...plain([title, unit].filter(Boolean).join(bar ? ` ${ROLE_SEPARATOR} ` : ' ')))
     }
     if (unitBelow) lines.push(...plain(unitBelow))
     if (role.note) lines.push(...plain(role.note, noteFont, noteX))
@@ -162,7 +174,8 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   const contentScale = content.contentSize === 'largest' ? 1.55 : content.contentSize === 'large' ? 1.2 : 1
   const compactContent = content.contentSpacing === 'compact'
   const spacingScale = compactContent ? 0.48 : 1
-  const contactScale = content.contactSize === 'large' ? 1.25 : 1
+  // 'largest' is the NUGSS production size: ≈6.6% of the window, as big as a position line.
+  const contactScale = content.contactSize === 'largest' ? 1.45 : content.contactSize === 'large' ? 1.25 : 1
   const uniformBodyText = content.bodyTextMode === 'uniform'
   const headlineWeight = content.headlineWeight === 'black' ? 900 : content.headlineWeight === 'bold' ? 700 : 400
   const gap = value => value * spacingScale
@@ -455,7 +468,7 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
   const VW = W - VL - VR   // viewable width  (the design space below works in these dims)
   const VH = H - VT - VB   // viewable height
 
-  const headerColor = readBrandVar('--brand-header', '#2a634d')
+  const headerColor = resolveOrganization(content.organization).headerColor
   const nameColor = readBrandVar('--sign-name-color', '#373535')
   const secondaryColor = readBrandVar('--sign-secondary-color', '#454343')
 
@@ -472,7 +485,8 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
     textX: VL + PAD_X,
     rightInset: PAD_X,
     departmentText: content.departmentText,
-    departmentWrap: content.departmentWrap
+    departmentWrap: content.departmentWrap,
+    organization: content.organization
   })
   const HEADER_H = header.bandHeight - VT
   const logoX = header.logoX - VL
@@ -673,12 +687,16 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
       <rect x="0" y="0" width={CW} height={headerBottom} fill={headerColor} />
 
       <g transform={`translate(${originX}, ${originY})`}>
-        <UnbcLogoMark
-          transform={`translate(${logoX}, ${logoY}) scale(${header.scale})`}
-          departmentText={content.departmentText}
-          maxWidth={header.departmentMaxWidth}
-          fontFamily={fontFamily}
-        />
+        {content.organization === 'nugss' ? (
+          <NugssLogoMark transform={`translate(${logoX}, ${logoY}) scale(${header.scale})`} />
+        ) : (
+          <UnbcLogoMark
+            transform={`translate(${logoX}, ${logoY}) scale(${header.scale})`}
+            departmentText={content.departmentText}
+            maxWidth={header.departmentMaxWidth}
+            fontFamily={fontFamily}
+          />
+        )}
 
         {texts.map((item, index) => item.kind === 'logo' ? (
           <image

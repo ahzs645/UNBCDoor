@@ -15,6 +15,7 @@ import { useTheme } from './hooks/useTheme'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { buildSignContent } from './sign/signContent'
 import { readSignFromUrl, removeSignShareToken } from './sign/signShare'
+import { switchOrganization } from './sign/organizations'
 import { departmentTypes } from '@unbc/logo'
 
 const EDITOR_PATH = import.meta.env.BASE_URL
@@ -163,6 +164,8 @@ function App() {
       archiveCount={archiveState.archive ? archiveState.signs.length : 0}
       isDarkMode={isDarkMode}
       onToggleTheme={toggleTheme}
+      organization={signContent.organization}
+      onChangeOrganization={(organization) => updateSignData(switchOrganization(organization))}
     />
   )
 

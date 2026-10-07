@@ -865,3 +865,136 @@
     background: var(--ui-accent-soft);
     color: var(--ui-accent-text);
 }
+
+/* ---------- Sheet options (PrintSheetOptions) ---------- */
+
+.sheet-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.sheet-options__row .field-label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.sheet-options__switches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+}
+
+.sheet-options__list-link,
+.sheet-options__preview-link {
+    align-self: flex-start;
+    text-align: left;
+}
+
+.sheet-options__list-link:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.sheet-list {
+    padding: 12px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+.sheet-list__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.sheet-list__items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+    counter-reset: sheet-list;
+}
+
+.sheet-list__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 6px 6px 10px;
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    background: var(--ui-surface);
+    font-size: 0.84rem;
+    counter-increment: sheet-list;
+}
+
+.sheet-list__item::before {
+    content: counter(sheet-list);
+    flex: none;
+    min-width: 1.4em;
+    color: var(--ui-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.sheet-list__label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sheet-list__remove {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: var(--ui-text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.sheet-list__remove:hover {
+    background: var(--ui-surface-hover);
+    color: var(--ui-text);
+}
+
+.sheet-list__add {
+    padding: 7px 12px;
+    border: 1px dashed var(--ui-border-strong);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sheet-list__add:hover:not(:disabled) {
+    border-color: var(--ui-text-muted);
+    background: var(--ui-surface-hover);
+}
+
+.sheet-list__add:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.sheet-list .field-hint {
+    margin-top: 8px;
+}
+
+.export-card__holder .sheet-options {
+    margin: 16px 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--ui-border);
+}

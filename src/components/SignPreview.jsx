@@ -1,8 +1,14 @@
-import React, { useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { SignArtwork } from '../sign/SignArtwork'
 import { resolveCardHolderGeometry, getPrintLayout, formatInches } from '../sign/signGeometry'
-import { exportSignPNG, exportSignPDF } from '../sign/signExport'
+import { exportSignPNG, exportPrintRunPDF } from '../sign/signExport'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
+import { paginatePrintRun, resolvePrintSheet } from '../sign/printSheet'
+import { buildSignContent } from '../sign/signContent'
+import { renderArtworkNode } from '../sign/renderArtwork'
+import { usePrintSheet } from '../hooks/usePrintSheet'
+import { PrintSheetOptions } from './PrintSheetOptions'
+import { SheetPreview } from './SheetPreview'
 import { CardHolderSelector } from './CardHolderSelector'
 import { SegmentedControl } from './SegmentedControl'
 import { SignGuides } from './SignGuides'
@@ -13,8 +19,8 @@ import { ShareLinkButton } from './ShareLinkButton'
 
 // Turns the print-fit result into a one-line caution shown above the export buttons. Returns
 // null when the insert + bleed + crop marks all fit the chosen sheet at the required 1:1 scale.
-const buildFitWarning = (layout) => {
-  if (layout.fitsMarks) return null
+const buildFitWarning = (layout, cutGuides) => {
+  if (layout.fitsMarks || (cutGuides === 'none' && layout.fitsBleed)) return null
   const target = layout.recommendedPaperLabel
   if (!layout.fitsBleed) {
     return target
@@ -44,8 +50,11 @@ const PAPER_OPTIONS = PAPER_ORDER.map((key) => ({
 const VIEW_OPTIONS = [
   { value: 'guides', label: 'Print guides' },
   { value: 'door', label: 'On the door' },
+  { value: 'sheet', label: 'Sheet' },
   { value: 'plain', label: 'Plain' }
 ]
+
+const fileSafe = text => (text || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40)
 
 // On the door: the sign as people see it, or with the frame see-through to show the whole cut
 // card and the strip the frame hides.
@@ -71,9 +80,11 @@ export const SignPreview = ({
   measuringSheetsHref,
   onOpenMeasuringSheets
 }) => {
-  const signRef = useRef(null)
   const [paperSize, setPaperSize] = useState('letter')
   const [view, setView] = useState('guides')
+  const [sheetPage, setSheetPage] = useState(0)
+  const printSheet = usePrintSheet()
+  const sheetOptions = printSheet.options
   const [roomNumber, setRoomNumber] = useState('')
   // The plate (and its line colour) follows the holder preset; a pick in the door view holds
   // until the holder changes.
@@ -123,18 +134,83 @@ export const SignPreview = ({
     selectedCardHolder ? 'with-holder' : ''
   ].filter(Boolean).join(' ')
 
-  const printLayout = getPrintLayout({ insertSize, paperSize })
-  const fitWarning = buildFitWarning(printLayout)
   const specs = Object.keys(SPEC_LABELS)
     .map(label => measurementSummary.find(item => item.label === label))
     .filter(Boolean)
 
-  const handleExportPNG = () => exportSignPNG(signRef.current, { insertSize })
-  const handleExportPDF = () => exportSignPDF(signRef.current, {
-    insertSize,
+  // The print run: this sign once, a sheet of copies of it, or the sheet list — laid out on as
+  // many sheets as it takes (printSheet.js). The Sheet preview and the PDF both draw these pages.
+  const sheetSettings = {
     paperSize,
-    signType: signData.signType
+    layout: sheetOptions.layout,
+    spacing: sheetOptions.spacing,
+    cutGuides: sheetOptions.cutGuides
+  }
+  const thisSheet = resolvePrintSheet({ ...sheetSettings, insertSize })
+  const usingList = sheetOptions.layout === 'fill' && sheetOptions.fillWith === 'list' && printSheet.entries.length > 0
+  const pages = useMemo(() => {
+    const items = usingList
+      ? printSheet.entries.map((entry) => {
+        const entryContent = buildSignContent(entry.signData, { cardHolders })
+        return { content: entryContent, insertSize: entryContent.insert }
+      })
+      : Array.from({ length: thisSheet.perSheet }, () => ({ content, insertSize }))
+    return paginatePrintRun(items, sheetSettings)
+  }, [usingList, printSheet.entries, cardHolders, content, insertSize, thisSheet.perSheet, paperSize, sheetOptions.layout, sheetOptions.spacing, sheetOptions.cutGuides])
+  const currentPage = Math.min(sheetPage, pages.length - 1)
+
+  const runTitle = usingList
+    ? 'Sheet list'
+    : content.roomName && !content.name ? content.roomName : content.name || content.roomName
+  const printedOn = new Date().toISOString().slice(0, 10)
+  const describePage = (index, total, sheet) => [
+    runTitle,
+    `${formatInches(sheet.card.width / 72)}" × ${formatInches(sheet.card.height / 72)}" cut`,
+    sheet.perSheet > 1 ? `${sheet.perSheet} per sheet` : null,
+    total > 1 ? `page ${index + 1} of ${total}` : null,
+    `printed ${printedOn}`
+  ].filter(Boolean).join(' · ')
+
+  const fitWarning = sheetOptions.layout === 'fill' && !usingList
+    ? (thisSheet.fits ? null : buildFitWarning(getPrintLayout({ insertSize, paperSize }), sheetOptions.cutGuides))
+    : sheetOptions.layout === 'single'
+      ? buildFitWarning(getPrintLayout({ insertSize, paperSize }), sheetOptions.cutGuides)
+      : null
+
+  const organizationPrefix = content.organization === 'nugss' ? 'nugss' : 'unbc'
+  const handleExportPNG = () => exportSignPNG(renderArtworkNode(content), {
+    insertSize,
+    fileName: `${organizationPrefix}-door-sign${fileSafe(runTitle) ? `-${fileSafe(runTitle)}` : ''}.png`
   })
+  const handleExportPDF = () => {
+    // Draw each distinct sign once; copies share its artwork.
+    const nodes = new Map()
+    const nodeFor = (itemContent) => {
+      if (!nodes.has(itemContent)) nodes.set(itemContent, renderArtworkNode(itemContent))
+      return nodes.get(itemContent)
+    }
+    const run = pages.map(page => ({
+      sheet: page.sheet,
+      items: page.items.map(item => ({ node: nodeFor(item.content) }))
+    }))
+    const cards = pages.reduce((sum, page) => sum + page.items.length, 0)
+    const name = usingList
+      ? `${organizationPrefix}-door-signs-sheet-list`
+      : cards > 1
+        ? `${organizationPrefix}-door-signs-${fileSafe(runTitle) || signData.signType}-${cards}-up`
+        : `${organizationPrefix}-door-sign-${fileSafe(runTitle) || signData.signType || 'custom'}`
+    return exportPrintRunPDF({
+      pages: run,
+      paperSize,
+      fileName: `${name}.pdf`,
+      showLabel: sheetOptions.showLabel,
+      showScale: sheetOptions.showScale,
+      describePage
+    })
+  }
+
+  const cardCount = pages.reduce((sum, page) => sum + page.items.length, 0)
+  const sheetSummary = `${cardCount} card${cardCount === 1 ? '' : 's'} on ${pages.length} ${PAPER_DIMENSIONS[paperSize].label.replace(/\s*\(.*\)$/, '')} sheet${pages.length === 1 ? '' : 's'}`
 
   return (
     <>
@@ -162,8 +238,17 @@ export const SignPreview = ({
               lineColor={lineColor}
               seeThrough={doorView === 'see-through'}
             >
-              <SignArtwork ref={signRef} content={content} />
+              <SignArtwork content={content} />
             </HolderMockup>
+          </div>
+        ) : view === 'sheet' ? (
+          <div className="preview-stage preview-stage--sheet">
+            <SheetPreview
+              page={pages[currentPage]}
+              showLabel={sheetOptions.showLabel}
+              showScale={sheetOptions.showScale}
+              footerText={describePage(currentPage, pages.length, pages[currentPage].sheet)}
+            />
           </div>
         ) : (
           <div className="preview-stage">
@@ -172,7 +257,7 @@ export const SignPreview = ({
               style={previewFrameStyle}
             >
               <div className={doorSignClass}>
-                <SignArtwork ref={signRef} content={content} />
+                <SignArtwork content={content} />
               </div>
               {showGuides && <SignGuides content={content} hasHolder={Boolean(selectedCardHolder)} />}
             </div>
@@ -189,6 +274,25 @@ export const SignPreview = ({
               <span className="preview-legend__item preview-legend__item--safe">Safe area</span>
             )}
             <span className="preview-legend__item preview-legend__item--margin">Margins</span>
+          </div>
+        )}
+
+        {view === 'sheet' && (
+          <div className="sheet-preview-footer">
+            <p className="door-preview-note">
+              {sheetSummary}. {sheetOptions.cutGuides === 'none'
+                ? 'No cut guides — cut to the card size by hand.'
+                : sheetOptions.cutGuides === 'marks'
+                  ? 'Cut in line with the crop marks.'
+                  : 'Cut along the grey lines.'} Set it up under Print & export.
+            </p>
+            {pages.length > 1 && (
+              <div className="sheet-preview-pager">
+                <button type="button" onClick={() => setSheetPage(currentPage - 1)} disabled={currentPage === 0} aria-label="Previous sheet">‹</button>
+                <span>Sheet {currentPage + 1} of {pages.length}</span>
+                <button type="button" onClick={() => setSheetPage(currentPage + 1)} disabled={currentPage === pages.length - 1} aria-label="Next sheet">›</button>
+              </div>
+            )}
           </div>
         )}
 
@@ -258,6 +362,18 @@ export const SignPreview = ({
                 </div>
               ))}
             </dl>
+
+            <PrintSheetOptions
+              options={sheetOptions}
+              setOption={printSheet.setOption}
+              capacity={resolvePrintSheet({ ...sheetSettings, layout: 'fill', insertSize }).capacity}
+              entries={printSheet.entries}
+              canAdd={printSheet.canAdd}
+              onAddEntry={() => printSheet.addEntry(signData)}
+              onRemoveEntry={printSheet.removeEntry}
+              onClearEntries={printSheet.clearEntries}
+              onShowSheet={view === 'sheet' ? null : () => setView('sheet')}
+            />
           </div>
 
           <div className="export-card__output">

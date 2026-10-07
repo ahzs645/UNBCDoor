@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { INITIAL_SIGN_DATA } from '../sign/signData'
+import { switchOrganization } from '../sign/organizations'
 import { ROOM_SIGN_TYPES } from '../sign/signConstants'
 
 // Style options are stored with each sign so JSON imports retain their exact appearance.
@@ -107,7 +108,8 @@ const STYLE_CONTROLS = {
     when: (sign) => sign.hasContacts,
     options: [
       { value: 'standard', label: 'Standard' },
-      { value: 'large', label: 'Larger' }
+      { value: 'large', label: 'Larger' },
+      { value: 'largest', label: 'Largest' }
     ]
   },
   // The UNBC rule wraps the department at the lockup's width. "Full width" is only for matching
@@ -281,14 +283,16 @@ export const SignStyleControls = ({ signData, content, onUpdate }) => {
     .map(group => ({ ...group, keys: group.keys.filter(applies) }))
     .filter(group => group.keys.length > 0)
 
-  // Only controls that apply to this sign count as changed — the rest have no visible effect.
+  // Only controls that apply to this sign count as changed — the rest have no visible effect. The
+  // defaults are the sign's organization's (NUGSS starts from its own production look).
+  const defaults = { ...INITIAL_SIGN_DATA, ...switchOrganization(content.organization) }
   const changedKeys = groups
     .flatMap(group => group.keys)
-    .filter(key => readValue(key, signData) !== readValue(key, INITIAL_SIGN_DATA))
+    .filter(key => readValue(key, signData) !== readValue(key, defaults))
 
   const resetStyles = () => {
     onUpdate(changedKeys.reduce(
-      (patch, key) => ({ ...patch, ...writeValue(key, readValue(key, INITIAL_SIGN_DATA)) }),
+      (patch, key) => ({ ...patch, ...writeValue(key, readValue(key, defaults)) }),
       {}
     ))
   }

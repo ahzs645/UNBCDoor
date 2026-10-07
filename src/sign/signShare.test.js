@@ -82,19 +82,22 @@ test('roles survive a share link round trip', async () => {
     ...sample,
     position: '',
     roles: [
-      { title: 'Professor', unit: 'Faculty of Environment', note: '', unitLayout: 'below', titleLayout: 'stacked' },
+      { title: 'Professor', unit: 'Faculty of Environment', note: '', unitLayout: 'below', unitDivider: 'bar', titleLayout: 'stacked' },
       {
         title: 'Director',
         unit: 'Northern Analytical Laboratory Services',
         note: 'Northern BC’s Environment & Climate Solutions Innovation Hub',
         unitLayout: 'beside',
+        unitDivider: 'none',
         titleLayout: 'inline'
       }
     ],
-    roleLayout: 'inline'
+    roleLayout: 'inline',
+    organization: 'nugss'
   }
   const decoded = await decodeSignToken(await encodeSignToken(signData))
   assert.deepEqual(decoded.roles, signData.roles)
+  assert.equal(decoded.organization, 'nugss')
   assert.deepEqual(decoded.roles2, [])
   assert.equal(decoded.roleLayout, 'inline')
 })

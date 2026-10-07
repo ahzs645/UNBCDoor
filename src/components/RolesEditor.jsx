@@ -8,6 +8,11 @@ const UNIT_LAYOUT_OPTIONS = [
   { value: 'hidden', label: 'Hide' }
 ]
 
+const UNIT_DIVIDER_OPTIONS = [
+  { value: 'bar', label: 'Show |' },
+  { value: 'none', label: 'Hide |' }
+]
+
 const TITLE_LAYOUT_OPTIONS = [
   { value: 'stacked', label: 'Split at | · ;' },
   { value: 'inline', label: 'As typed' }
@@ -138,6 +143,16 @@ export const RolesEditor = ({ id, roles = [], onChange, placeholder = 'e.g. Asso
                       onChange={(unitLayout) => update(index, { unitLayout })}
                     />
                   )}
+                  {role.unit && (role.unitLayout || 'beside') === 'beside' && (
+                    <RoleOption
+                      id={`${key}-unitDivider`}
+                      label="Divider"
+                      name={`${key}-unitDivider`}
+                      options={UNIT_DIVIDER_OPTIONS}
+                      value={role.unitDivider || 'bar'}
+                      onChange={(unitDivider) => update(index, { unitDivider })}
+                    />
+                  )}
                   {hasTitleSeparator(role.title) && (
                     <RoleOption
                       id={`${key}-titleLayout`}
@@ -178,8 +193,8 @@ export const RolesEditor = ({ id, roles = [], onChange, placeholder = 'e.g. Asso
         + Add another position
       </button>
       <p className="field-hint">
-        A department prints as “Position | Department”, on its own line, or not at all. Press
-        Enter in a position for a line break you want kept on the sign.
+        A department prints as “Position | Department” (or without the bar), on its own line, or
+        not at all. Press Enter in a position for a line break you want kept on the sign.
       </p>
     </div>
   )

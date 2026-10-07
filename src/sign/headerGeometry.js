@@ -17,11 +17,18 @@
 //     COLUMBIA" on one line. `departmentWrap: 'band'` reproduces those: it wraps at the right
 //     edge of the band rather than the lockup.
 //   * The wordmark's slanted "U" sits ~2.5% of the width left of the body text column.
+//   * NUGSS signs (organization 'nugss') follow the same band rule with the NUGSS logo in place of
+//     the lockup. Measured from the NUGSS "Final V1" artboards: the logo is placed at its native
+//     size (~15.7% of the card width), whole — wordmark and society name — centred in the band,
+//     ~2.5% of the width left of the (wide) body text column, and there is no department line. On those
+//     artboards, seen through the 6-352 holder, the band is 20.5% of the window and the blue
+//     above the logo matches the blue below it, as on UNBC signs.
 //
 // Everything here is plain arithmetic in points so it runs under `node --test` as well as in the
 // artwork renderer, and the preview, PNG and PDF exports all share it.
 
 import { DEPARTMENT_LINE, LOGO_VIEWBOX, splitDepartmentText } from '../../vendor/unbc-logo/src/logo/logoText.js'
+import { NUGSS_LOGO } from '../assets/nugssLogo.js'
 
 export const HEADER_BAND_RATIO = 0.205
 export const LOGO_WIDTH_RATIO = 0.355
@@ -30,6 +37,9 @@ export const LOGO_TEXT_OFFSET_RATIO = 0.025
 // Wordmark ink inside the lockup's 178×80 viewBox (the rest of the box is room for the
 // department line).
 export const WORDMARK = { top: 15, height: 30.68 }
+
+export const NUGSS_LOGO_WIDTH_RATIO = 0.157
+export const NUGSS_LOGO_TEXT_OFFSET_RATIO = 0.025
 
 /**
  * @param {object} options
@@ -41,6 +51,7 @@ export const WORDMARK = { top: 15, height: 30.68 }
  * @param {string} options.departmentText
  * @param {'logo'|'band'} [options.departmentWrap] wrap at the lockup width (UNBC rule, default)
  *        or run to the right edge of the band, as some older production files did
+ * @param {'unbc'|'nugss'} [options.organization] whose logo sits in the band
  * @returns trim-space geometry: band height, lockup origin/scale, wrapped department lines, the
  *          wrap width (lockup units) the lockup should be rendered with, and the margins above
  *          and below the lockup (for the preview's spacing guides).
@@ -52,19 +63,38 @@ export const resolveHeaderGeometry = ({
   textX,
   rightInset = 0,
   departmentText = '',
-  departmentWrap = 'logo'
+  departmentWrap = 'logo',
+  organization = 'unbc'
 }) => {
   const top = Math.max(viewable.top || 0, 0)
   const bottom = Math.max(viewable.bottom || 0, 0)
   const left = Math.max(viewable.left || 0, 0)
   const right = Math.max(viewable.right || 0, 0)
+  const windowHeight = height - top - bottom
+
+  if (organization === 'nugss') {
+    const scale = (width * NUGSS_LOGO_WIDTH_RATIO) / NUGSS_LOGO.width
+    const logoHeight = NUGSS_LOGO.height * scale
+    const margin = Math.max((windowHeight * HEADER_BAND_RATIO - logoHeight) / 2, 0)
+    const logoY = top + margin
+    return {
+      bandHeight: logoY + logoHeight + margin,
+      logoX: Math.max(textX - width * NUGSS_LOGO_TEXT_OFFSET_RATIO, left),
+      logoY,
+      scale,
+      departmentLines: [],
+      departmentMaxWidth: 0,
+      margin,
+      wordmarkTop: logoY,
+      lockupBottom: logoY + logoHeight
+    }
+  }
 
   const scale = (width * LOGO_WIDTH_RATIO) / LOGO_VIEWBOX.width
   const logoX = Math.max(textX - width * LOGO_TEXT_OFFSET_RATIO, left)
 
   // The margin a bare wordmark gets when centred in the visible band. Never negative, so a tiny
   // window still keeps the frame off the wordmark.
-  const windowHeight = height - top - bottom
   const wordmarkHeight = WORDMARK.height * scale
   const margin = Math.max((windowHeight * HEADER_BAND_RATIO - wordmarkHeight) / 2, 0)
   const wordmarkTop = top + margin

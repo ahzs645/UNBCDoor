@@ -156,6 +156,12 @@ textarea::placeholder {
     grid-column: 1 / -1;
 }
 
+/* A NUGSS sign has no department: a note takes the department's place beside the type. */
+.sign-basics__note {
+    align-self: end;
+    margin: 0 0 4px;
+}
+
 /* Stacked (phones), the two fields need the usual gap between them. */
 @media (max-width: 599px) {
     .sign-basics {

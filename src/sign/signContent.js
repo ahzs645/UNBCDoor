@@ -2,6 +2,7 @@ import { getDepartmentDisplayName } from '@unbc/logo'
 import { BLEED_INCHES } from './signConstants'
 import { resolveSignValues } from './signDefaults'
 import { resolveCardHolderGeometry } from './signGeometry'
+import { DEFAULT_ORGANIZATION, ORGANIZATIONS } from './organizations'
 
 // Turns the editor's sign data into the content object <SignArtwork> draws. The main preview,
 // the phone/tablet live preview, both exporters, and the archive review viewer all build their
@@ -11,10 +12,13 @@ export const buildSignContent = (signData, { cardHolders = {}, bleed = BLEED_INC
   const { insertSize, viewableOffset } = resolveCardHolderGeometry(selectedCardHolder)
   const values = resolveSignValues(signData)
   const supportsAlumni = signData.signType === 'faculty' || signData.signType === 'staff'
+  const organization = ORGANIZATIONS[signData.organization] ? signData.organization : DEFAULT_ORGANIZATION
 
   return {
+    organization,
     signType: signData.signType || 'faculty',
-    departmentText: getDepartmentDisplayName(signData),
+    // A NUGSS logo has no department line; the department stays in the data for switching back.
+    departmentText: ORGANIZATIONS[organization].hasDepartments ? getDepartmentDisplayName(signData) : '',
     name: values.name,
     credentials: (signData.showDesignations && signData.designations?.length > 0)
       ? signData.designations.join(', ')

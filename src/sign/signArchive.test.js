@@ -46,7 +46,7 @@ test('keeps roles as position / department pairs and drops anything else', () =>
     roleLayout: 'sideways'
   })
 
-  const legacy = { note: '', unitLayout: 'beside', titleLayout: 'inline' }
+  const legacy = { note: '', unitLayout: 'beside', unitDivider: 'bar', titleLayout: 'inline' }
   assert.deepEqual(sign.roles, [
     { title: 'Director', unit: 'Northern Analytical Laboratory Services', ...legacy },
     { title: 'Professor', unit: '', ...legacy },
@@ -61,13 +61,15 @@ test('keeps each role’s subtext and layouts, falling back for unknown layouts'
   const sign = normalizeSignData({
     roles: [
       { title: 'Director', unit: 'NALS', note: 'Innovation Hub', unitLayout: 'below', titleLayout: 'stacked' },
-      { title: 'Professor', unitLayout: 'sideways', titleLayout: 'diagonal', note: 4 }
+      { title: 'Professor', unitLayout: 'sideways', unitDivider: 'slash', titleLayout: 'diagonal', note: 4 },
+      { title: 'Manager', unit: 'NUGSS', unitDivider: 'none' }
     ]
   })
 
   assert.deepEqual(sign.roles, [
-    { title: 'Director', unit: 'NALS', note: 'Innovation Hub', unitLayout: 'below', titleLayout: 'stacked' },
-    { title: 'Professor', unit: '', note: '', unitLayout: 'beside', titleLayout: 'inline' }
+    { title: 'Director', unit: 'NALS', note: 'Innovation Hub', unitLayout: 'below', unitDivider: 'bar', titleLayout: 'stacked' },
+    { title: 'Professor', unit: '', note: '', unitLayout: 'beside', unitDivider: 'bar', titleLayout: 'inline' },
+    { title: 'Manager', unit: 'NUGSS', note: '', unitLayout: 'beside', unitDivider: 'none', titleLayout: 'inline' }
   ])
 })
 
@@ -89,4 +91,10 @@ test('an old position field becomes the first role, split the way it printed', (
   const inline = normalizeSignData({ position: 'Professor | Geography', positionLayout: 'inline' })
   assert.equal(inline.roles[0].titleLayout, 'inline')
   assert.equal(inline.positionLayout, 'stacked')
+})
+
+test('keeps the organization, falling back to UNBC for one it doesn’t know', () => {
+  assert.equal(normalizeSignData({}).organization, 'unbc')
+  assert.equal(normalizeSignData({ organization: 'nugss' }).organization, 'nugss')
+  assert.equal(normalizeSignData({ organization: 'acme' }).organization, 'unbc')
 })

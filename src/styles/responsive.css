@@ -203,6 +203,10 @@
         height: 24px;
     }
 
+    .app-header__logo--nugss {
+        height: 30px;
+    }
+
     .app-header__product {
         font-size: 0.9rem;
     }
