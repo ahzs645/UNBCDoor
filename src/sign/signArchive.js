@@ -1,21 +1,11 @@
 import { INITIAL_SIGN_DATA } from './signData.js'
+import { foldPositionIntoRoles, normalizeRoles } from './signRoles.js'
 
 export const SIGN_ARCHIVE_FORMAT = 'unbc-door-sign-archive'
 export const SIGN_ARCHIVE_VERSION = 1
 
 const SIGN_DATA_KEYS = new Set(Object.keys(INITIAL_SIGN_DATA))
 const SIGN_TYPES = new Set(['faculty', 'staff', 'student', 'lab', 'general-room', 'custodian-closet'])
-
-// A role is a position paired with the faculty or department it belongs to. Anything else in
-// the list is dropped; a missing half reads as blank.
-const normalizeRoles = (roles) => (Array.isArray(roles)
-  ? roles
-    .filter(role => role && typeof role === 'object' && !Array.isArray(role))
-    .map(role => ({
-      title: typeof role.title === 'string' ? role.title : '',
-      unit: typeof role.unit === 'string' ? role.unit : ''
-    }))
-  : [])
 
 export const normalizeSignData = (value = {}) => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -50,6 +40,12 @@ export const normalizeSignData = (value = {}) => {
   if (!['stacked', 'inline'].includes(normalized.positionLayout)) {
     normalized.positionLayout = INITIAL_SIGN_DATA.positionLayout
   }
+  // The position is now the first of the roles, which each carry their own layout.
+  normalized.roles = foldPositionIntoRoles(normalized.position, normalized.roles, normalized.positionLayout)
+  normalized.roles2 = foldPositionIntoRoles(normalized.position2, normalized.roles2, normalized.positionLayout)
+  normalized.position = ''
+  normalized.position2 = ''
+  normalized.positionLayout = INITIAL_SIGN_DATA.positionLayout
   if (!['aligned', 'inline'].includes(normalized.roleLayout)) {
     normalized.roleLayout = INITIAL_SIGN_DATA.roleLayout
   }

@@ -9,8 +9,6 @@ import { ROOM_SIGN_TYPES } from '../sign/signConstants'
 // room door. `describeSign` reduces the artwork content to the facts the `when` predicates
 // need, so the panel and the artwork always agree on what is on the card.
 
-const POSITION_SEPARATOR = /[\n\r·•|;]/
-
 const describeSign = (content) => {
   const isRoom = ROOM_SIGN_TYPES.includes(content.signType)
 
@@ -28,7 +26,8 @@ const describeSign = (content) => {
     : []
 
   const hasSecondPerson = !isRoom && Boolean(content.showSecondOccupant && content.name2)
-  const hasRoles = Boolean(content.roles?.length || (hasSecondPerson && content.roles2?.length))
+  const roles = [...(content.roles || []), ...(hasSecondPerson ? content.roles2 || [] : [])]
+  const hasRoles = roles.length > 0
   const hasPosition = Boolean(content.position || (hasSecondPerson && content.position2) || hasRoles)
   const hasTagline = Boolean(content.tagline || (hasSecondPerson && content.tagline2))
   const secondRoomEntry = isRoom && Boolean(content.showSecondOccupant)
@@ -42,9 +41,8 @@ const describeSign = (content) => {
     hasPosition,
     hasRoles,
     hasTagline,
-    // Splitting a position on separators only changes the sign when there is one to split on.
-    hasSplitPosition: POSITION_SEPARATOR.test(content.position || '')
-      || (hasSecondPerson && POSITION_SEPARATOR.test(content.position2 || '')),
+    // Lining up the bars needs a position with its department printed beside it.
+    hasRoleColumn: roles.some(role => role.title && role.unit && role.unitLayout === 'beside'),
     // The artwork pins two-person type sizes, so the size presets only bite on a solo sign.
     isCompactTwoPerson: hasSecondPerson && content.twoPersonSpacing !== 'relaxed',
     hasContacts: primaryContacts.length + secondaryContacts.length > 0,
@@ -144,19 +142,11 @@ const STYLE_CONTROLS = {
       { value: 'compact', label: 'Compact' }
     ]
   },
-  positionLayout: {
-    label: 'Position layout',
-    when: (sign) => !sign.isRoom && sign.hasSplitPosition,
-    options: [
-      // Starts a new line at every |, · or ; as well as at each Enter.
-      { value: 'stacked', label: 'Split at | · ;' },
-      // Prints the position exactly as typed: separators stay, only Enter breaks the line.
-      { value: 'inline', label: 'As typed' }
-    ]
-  },
+  // Each position sets its own split and department placement in the form; this lines up the
+  // bars of the ones printed "Position | Department".
   roleLayout: {
-    label: 'Roles',
-    when: (sign) => !sign.isRoom && sign.hasRoles,
+    label: 'Department column',
+    when: (sign) => !sign.isRoom && sign.hasRoleColumn,
     options: [
       { value: 'aligned', label: 'Aligned |' },
       { value: 'inline', label: 'Run-in' }
@@ -230,7 +220,7 @@ const STYLE_CONTROLS = {
 
 const GROUPS = [
   { id: 'type', label: 'Type & size', keys: ['headlineWeight', 'contentSize', 'roomNameStyle', 'positionSize', 'contactSize'] },
-  { id: 'layout', label: 'Layout & spacing', keys: ['departmentWrap', 'textAlignment', 'contentWidth', 'contentSpacing', 'positionLayout', 'roleLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
+  { id: 'layout', label: 'Layout & spacing', keys: ['departmentWrap', 'textAlignment', 'contentWidth', 'contentSpacing', 'roleLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
   { id: 'extras', label: 'Crest & logo', keys: ['alumniCrestSize', 'alumniCrestSpacing', 'organizationLogo'] }
 ]
 

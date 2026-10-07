@@ -46,12 +46,47 @@ test('keeps roles as position / department pairs and drops anything else', () =>
     roleLayout: 'sideways'
   })
 
+  const legacy = { note: '', unitLayout: 'beside', titleLayout: 'inline' }
   assert.deepEqual(sign.roles, [
-    { title: 'Director', unit: 'Northern Analytical Laboratory Services' },
-    { title: 'Professor', unit: '' },
-    { title: '', unit: 'Faculty of Environment' }
+    { title: 'Director', unit: 'Northern Analytical Laboratory Services', ...legacy },
+    { title: 'Professor', unit: '', ...legacy },
+    { title: '', unit: 'Faculty of Environment', ...legacy }
   ])
   assert.deepEqual(sign.roles2, [])
   assert.equal(sign.roleLayout, 'aligned')
   assert.equal(normalizeSignData({ roleLayout: 'inline' }).roleLayout, 'inline')
+})
+
+test('keeps each role’s subtext and layouts, falling back for unknown layouts', () => {
+  const sign = normalizeSignData({
+    roles: [
+      { title: 'Director', unit: 'NALS', note: 'Innovation Hub', unitLayout: 'below', titleLayout: 'stacked' },
+      { title: 'Professor', unitLayout: 'sideways', titleLayout: 'diagonal', note: 4 }
+    ]
+  })
+
+  assert.deepEqual(sign.roles, [
+    { title: 'Director', unit: 'NALS', note: 'Innovation Hub', unitLayout: 'below', titleLayout: 'stacked' },
+    { title: 'Professor', unit: '', note: '', unitLayout: 'beside', titleLayout: 'inline' }
+  ])
+})
+
+test('an old position field becomes the first role, split the way it printed', () => {
+  const stacked = normalizeSignData({
+    position: 'Associate Professor | Faculty of Environment',
+    roles: [{ title: 'Director', unit: 'NALS' }],
+    position2: 'Research Associate'
+  })
+
+  assert.equal(stacked.position, '')
+  assert.equal(stacked.position2, '')
+  assert.deepEqual(stacked.roles.map(role => [role.title, role.titleLayout]), [
+    ['Associate Professor | Faculty of Environment', 'stacked'],
+    ['Director', 'inline']
+  ])
+  assert.deepEqual(stacked.roles2.map(role => role.title), ['Research Associate'])
+
+  const inline = normalizeSignData({ position: 'Professor | Geography', positionLayout: 'inline' })
+  assert.equal(inline.roles[0].titleLayout, 'inline')
+  assert.equal(inline.positionLayout, 'stacked')
 })
