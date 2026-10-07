@@ -52,13 +52,13 @@ export const cardHolders = {
   },
   'Building 6': {
     name: 'Building 6 Holder (measured)',
-    description: 'Building 6 holders (195mm × 101mm insert; the frame hides 13mm at each side and nothing at the top or bottom).',
+    description: 'Building 6 holders (176mm × 101mm insert; the frame hides 13mm at each side and nothing at the top or bottom).',
     insertSize: {
-      width: 7.677,
+      width: 6.929,
       height: 3.976
     },
     viewableSize: {
-      width: 6.654,
+      width: 5.905,
       height: 3.976
     },
     viewableOffset: {
