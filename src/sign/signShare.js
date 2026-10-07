@@ -79,7 +79,8 @@ const SHORT_KEYS = {
   roles: 'ro',
   roles2: 'ro2',
   roleLayout: 'rly',
-  organization: 'org'
+  organization: 'org',
+  ligatures: 'lg'
 }
 
 // Encode order: drop every field still at its default (most of a sign), then shorten the keys.

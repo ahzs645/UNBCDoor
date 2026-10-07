@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CustomSelect } from './CustomSelect'
 import { SegmentedControl } from './SegmentedControl'
+import { useUnits } from '../hooks/useUnits'
 import { Switch } from './Switch'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { resolveCardHolderGeometry } from '../sign/signGeometry'
@@ -140,7 +141,9 @@ export const MeasuringSheetsPage = ({ cardHolders, initialHolderKey = '', onSave
   const [mode, setMode] = useState('template')
   const [paperSize, setPaperSize] = useState('letter')
   const [holderKey, setHolderKey] = useState(initialHolderKey)
-  const [units, setUnits] = useState('in')
+  // Starts in the units picked under Settings; switching here is for this form only.
+  const defaultUnits = useUnits()
+  const [units, setUnits] = useState(defaultUnits)
   const [custom, setCustom] = useState(CUSTOM_DEFAULTS)
   const [subdivisions, setSubdivisions] = useState(4)
   const [showCoordinates, setShowCoordinates] = useState(true)

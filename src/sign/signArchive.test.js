@@ -98,3 +98,9 @@ test('keeps the organization, falling back to UNBC for one it doesn’t know', (
   assert.equal(normalizeSignData({ organization: 'nugss' }).organization, 'nugss')
   assert.equal(normalizeSignData({ organization: 'acme' }).organization, 'unbc')
 })
+
+test('ligatures are on unless a sign turns them off', () => {
+  assert.equal(normalizeSignData({}).ligatures, 'on')
+  assert.equal(normalizeSignData({ ligatures: 'off' }).ligatures, 'off')
+  assert.equal(normalizeSignData({ ligatures: 'sometimes' }).ligatures, 'on')
+})

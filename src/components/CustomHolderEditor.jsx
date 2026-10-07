@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { SegmentedControl } from './SegmentedControl'
+import { useUnits } from '../hooks/useUnits'
 import { LineColorPicker } from './LineColorPicker'
 import { DEFAULT_LINE_COLOR, PLATE_STYLES, resolveHolderPlate } from './HolderMockup'
-import { MAX_HOLDER_NAME, validateCustomHolder } from '../sign/customHolders'
+import { MAX_HOLDER_NAME, MAX_ROOM_NUMBER, validateCustomHolder } from '../sign/customHolders'
 import { MM_PER_INCH } from '../sign/templateGeometry'
 
 const EDGES = [
@@ -52,18 +53,21 @@ const NumberInput = ({ id, label, value, units, onChange }) => (
 // Create or edit a holder preset that lives in this browser. `initial` is the holder to start
 // from (a copy of the selected one when making a new holder); `editingName` is set when editing.
 export const CustomHolderEditor = ({ initial, editingName, takenNames, onSave, onCancel }) => {
-  const [units, setUnits] = useState('in')
+  // Starts in the units picked under Settings; switching here is for this form only.
+  const defaultUnits = useUnits()
+  const [units, setUnits] = useState(defaultUnits)
   const [name, setName] = useState(editingName || '')
   const [insert, setInsert] = useState({
-    width: toText(initial.insertSize.width, 'in'),
-    height: toText(initial.insertSize.height, 'in')
+    width: toText(initial.insertSize.width, defaultUnits),
+    height: toText(initial.insertSize.height, defaultUnits)
   })
   const [offset, setOffset] = useState(Object.fromEntries(
-    EDGES.map(({ key }) => [key, toText(initial.viewableOffset[key] || 0, 'in')])
+    EDGES.map(({ key }) => [key, toText(initial.viewableOffset[key] || 0, defaultUnits)])
   ))
   const initialPlate = resolveHolderPlate(initial)
   const [plateStyle, setPlateStyle] = useState(initialPlate.style)
   const [lineColor, setLineColor] = useState(initialPlate.lineColor || DEFAULT_LINE_COLOR)
+  const [roomNumber, setRoomNumber] = useState(initial.roomNumber || '')
   const [notes, setNotes] = useState(editingName ? initial.notes || '' : '')
   const [showProblems, setShowProblems] = useState(false)
 
@@ -84,6 +88,7 @@ export const CustomHolderEditor = ({ initial, editingName, takenNames, onSave, o
     viewableOffset: Object.fromEntries(Object.entries(offset).map(([edge, text]) => [edge, toInches(text, units)])),
     plateStyle,
     plateLineColor: lineColor,
+    roomNumber: roomNumber.trim(),
     notes: notes.trim()
   }
   const problems = validateCustomHolder(holder, takenNames)
@@ -164,6 +169,17 @@ export const CustomHolderEditor = ({ initial, editingName, takenNames, onSave, o
         {plateStyle === 'line' && (
           <LineColorPicker name="holderEditorLineColor" value={lineColor} onChange={setLineColor} />
         )}
+        <div className="holder-editor__field">
+          <label htmlFor="holder-editor-room">Room no.</label>
+          <input
+            id="holder-editor-room"
+            type="text"
+            value={roomNumber}
+            maxLength={MAX_ROOM_NUMBER}
+            placeholder="Optional — the number on this plate"
+            onChange={(event) => setRoomNumber(event.target.value)}
+          />
+        </div>
       </fieldset>
 
       <div className="holder-editor__field">

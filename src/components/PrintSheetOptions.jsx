@@ -1,6 +1,7 @@
 import React from 'react'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
+import { InfoTip } from './InfoTip'
 
 const GUIDE_OPTIONS = [
   { value: 'marks', label: 'Crop marks' },
@@ -32,8 +33,14 @@ export const PrintSheetOptions = ({
   onAddEntry,
   onRemoveEntry,
   onClearEntries,
+  openId,
+  openEntryChanged,
+  onOpenEntry,
+  onSaveEntry,
+  onCloseEntry,
   onShowSheet
 }) => {
+  const openEntry = entries.find(entry => entry.id === openId)
   const filling = options.layout === 'fill'
   const usingList = filling && options.fillWith === 'list'
 
@@ -118,7 +125,14 @@ export const PrintSheetOptions = ({
       {usingList ? (
         <div className="sheet-list">
           <div className="sheet-list__head">
-            <span className="field-label">Sheet list</span>
+            <span className="sheet-list__title">
+              <span className="field-label">Sheet list</span>
+              <InfoTip label="About the sheet list">
+                Each entry is a snapshot: change the sign (or open another saved sign) and add it again to
+                print variants side by side. Click an entry to open it in the editor, change it, and save
+                it back. Cards of different sizes print on separate sheets.
+              </InfoTip>
+            </span>
             {entries.length > 0 && (
               <button type="button" className="text-btn text-btn--danger" onClick={onClearEntries}>Clear</button>
             )}
@@ -126,8 +140,21 @@ export const PrintSheetOptions = ({
           {entries.length > 0 ? (
             <ol className="sheet-list__items">
               {entries.map(entry => (
-                <li key={entry.id} className="sheet-list__item">
-                  <span className="sheet-list__label">{entry.label}</span>
+                <li key={entry.id} className={`sheet-list__item${entry.id === openId ? ' sheet-list__item--open' : ''}`}>
+                  {onOpenEntry ? (
+                    <button
+                      type="button"
+                      className="sheet-list__label sheet-list__open"
+                      onClick={() => onOpenEntry(entry)}
+                      aria-current={entry.id === openId ? 'true' : undefined}
+                      title={entry.id === openId ? 'Open in the editor' : 'Open in the editor to change it'}
+                    >
+                      {entry.label}
+                      {entry.id === openId && <span className="sheet-list__badge">{openEntryChanged ? 'Editing · unsaved' : 'Editing'}</span>}
+                    </button>
+                  ) : (
+                    <span className="sheet-list__label">{entry.label}</span>
+                  )}
                   <button
                     type="button"
                     className="sheet-list__remove"
@@ -143,13 +170,24 @@ export const PrintSheetOptions = ({
           ) : (
             <p className="field-hint">Nothing on the list yet — copies of this sign print until you add some.</p>
           )}
+          {openEntry && (
+            <div className="sheet-list__editing">
+              <span>
+                {openEntryChanged
+                  ? <>Changes to <strong>{openEntry.label}</strong> aren’t on the sheet yet.</>
+                  : <>Editing <strong>{openEntry.label}</strong> — change it in the editor, then save it back.</>}
+              </span>
+              <div className="sheet-list__editing-actions">
+                <button type="button" className="export-btn sheet-list__save" onClick={onSaveEntry} disabled={!openEntryChanged}>
+                  {openEntryChanged ? 'Save changes' : 'Saved'}
+                </button>
+                <button type="button" className="text-btn" onClick={onCloseEntry}>Done</button>
+              </div>
+            </div>
+          )}
           <button type="button" className="sheet-list__add" onClick={onAddEntry} disabled={!canAdd}>
             + Add this sign as it is now
           </button>
-          <p className="field-hint">
-            Each entry is a snapshot: change the sign (or open another saved sign) and add it again to
-            print variants side by side. Cards of different sizes print on separate sheets.
-          </p>
         </div>
       ) : (
         <button type="button" className="text-btn sheet-options__list-link" onClick={onAddEntry} disabled={!canAdd}>

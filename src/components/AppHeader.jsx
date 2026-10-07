@@ -1,5 +1,6 @@
 import React from 'react'
 import { ThemeToggle } from './ThemeToggle'
+import { SettingsMenu } from './SettingsMenu'
 import { OrganizationSwitcher } from './OrganizationSwitcher'
 
 const NAV_ITEMS = [
@@ -9,7 +10,7 @@ const NAV_ITEMS = [
 ]
 
 // The app bar shared by all three pages: the organization's logo (which also switches the
-// organization), the page tabs and the theme toggle. The tabs are real links, so they open in a new
+// organization), the page tabs, the settings menu and the theme toggle. The tabs are real links, so they open in a new
 // tab with a modifier key like any other link.
 export const AppHeader = ({
   page,
@@ -51,7 +52,10 @@ export const AppHeader = ({
         ))}
       </nav>
 
-      <ThemeToggle isDarkMode={isDarkMode} onToggle={onToggleTheme} />
+      <div className="app-header__tools">
+        <SettingsMenu />
+        <ThemeToggle isDarkMode={isDarkMode} onToggle={onToggleTheme} />
+      </div>
     </div>
   </header>
 )

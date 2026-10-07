@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react'
 import { SignArtwork } from '../sign/SignArtwork'
-import { resolveCardHolderGeometry, getPrintLayout, formatInches } from '../sign/signGeometry'
+import { MAX_ROOM_NUMBER } from '../sign/customHolders'
+import { resolveCardHolderGeometry, getPrintLayout } from '../sign/signGeometry'
+import { formatLength, formatSize } from '../sign/units'
+import { useUnits } from '../hooks/useUnits'
 import { exportSignPNG, exportPrintRunPDF } from '../sign/signExport'
-import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
+import { BLEED_INCHES, PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { paginatePrintRun, resolvePrintSheet } from '../sign/printSheet'
 import { buildSignContent } from '../sign/signContent'
 import { renderArtworkNode } from '../sign/renderArtwork'
-import { usePrintSheet } from '../hooks/usePrintSheet'
+import { entryDiffers, usePrintSheet } from '../hooks/usePrintSheet'
 import { PrintSheetOptions } from './PrintSheetOptions'
 import { SheetPreview } from './SheetPreview'
 import { CardHolderSelector } from './CardHolderSelector'
@@ -30,13 +33,6 @@ const buildFitWarning = (layout, cutGuides) => {
   return target
     ? `The artwork fits, but there's no room for crop marks on this sheet. Switch to ${target} for crop marks, or cut to the insert size by hand.`
     : "There's no room for crop marks on this sheet; cut to the insert size by hand."
-}
-
-// The sizes worth reading before printing, in the order you'd check them.
-const SPEC_LABELS = {
-  'Trim / insert': 'Insert',
-  Viewable: 'Window',
-  'Print (with bleed)': 'With bleed'
 }
 
 // Paper sizes as short segment labels; the full dimensions stay in the tooltip.
@@ -75,6 +71,7 @@ export const SignPreview = ({
   onSaveCustomHolder,
   onDeleteCustomHolder,
   onUpdate,
+  onReplaceSign,
   archiveState,
   editorHref,
   measuringSheetsHref,
@@ -85,10 +82,23 @@ export const SignPreview = ({
   const [sheetPage, setSheetPage] = useState(0)
   const printSheet = usePrintSheet()
   const sheetOptions = printSheet.options
-  const [roomNumber, setRoomNumber] = useState('')
-  // The plate (and its line colour) follows the holder preset; a pick in the door view holds
-  // until the holder changes.
-  const [plateChoice, setPlateChoice] = useState({ holder: null, style: null, lineColor: null })
+  // A sheet entry opened in the editor: edits stay in the editor until saved back to the entry.
+  const openEntry = printSheet.openEntry
+  const openEntryChanged = Boolean(openEntry && entryDiffers(openEntry, signData))
+  const openSheetEntry = (entry) => {
+    if (entry.id === openEntry?.id) return
+    const question = openEntryChanged
+      ? `Discard your unsaved changes to “${openEntry.label}” and open “${entry.label}”?`
+      : !openEntry && !printSheet.entries.some(item => !entryDiffers(item, signData))
+        ? `Open “${entry.label}”? It replaces the sign in the editor, which isn’t on the sheet list — add it first to keep it.`
+        : null
+    if (question && !window.confirm(question)) return
+    onReplaceSign(entry.signData)
+    printSheet.setOpenId(entry.id)
+  }
+  // The plate (its style, line colour and room number) follows the holder preset; a pick in the
+  // door view holds until the holder changes.
+  const [plateChoice, setPlateChoice] = useState({ holder: null, style: null, lineColor: null, roomNumber: null })
   const [doorView, setDoorView] = useState('mounted')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
@@ -96,9 +106,9 @@ export const SignPreview = ({
     insertSize,
     viewableSize,
     viewableOffset,
-    previewFrameStyle,
-    measurementSummary
+    previewFrameStyle
   } = resolveCardHolderGeometry(selectedCardHolder)
+  const units = useUnits()
   const showGuides = view === 'guides'
 
   const holderKey = signData.cardHolderType || ''
@@ -106,8 +116,10 @@ export const SignPreview = ({
   const choice = plateChoice.holder === holderKey ? plateChoice : {}
   const plateStyle = choice.style || holderPlate.style
   const lineColor = choice.lineColor || holderPlate.lineColor || DEFAULT_LINE_COLOR
+  // An emptied box is a choice too (no number on the plate), so only null falls back.
+  const roomNumber = choice.roomNumber ?? selectedCardHolder?.roomNumber ?? ''
   const choosePlate = (change) => setPlateChoice(prev => ({
-    ...(prev.holder === holderKey ? prev : { style: null, lineColor: null }),
+    ...(prev.holder === holderKey ? prev : { style: null, lineColor: null, roomNumber: null }),
     ...change,
     holder: holderKey
   }))
@@ -120,13 +132,13 @@ export const SignPreview = ({
   const doorNote = !selectedCardHolder
     ? 'No holder selected, so the whole insert shows. Pick a holder under Print & export to see what its frame hides.'
     : doorView === 'see-through'
-      ? `Cut size ${formatInches(insertSize.width)}" × ${formatInches(insertSize.height)}" (dashed). The frame hides ${
+      ? `Cut size ${formatSize(insertSize.width, insertSize.height, units)} (dashed). The frame hides ${
         ['top', 'bottom', 'left', 'right']
           .filter(edge => viewableOffset[edge] > 0)
-          .map(edge => `${formatInches(viewableOffset[edge])}" ${edge}`)
+          .map(edge => `${formatLength(viewableOffset[edge], units)} ${edge}`)
           .join(', ')
-      }, leaving the ${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}" window.`
-      : `Only the ${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}" window shows; the frame hides the rest of the insert.`
+      }, leaving the ${formatSize(viewableSize.width, viewableSize.height, units)} window.`
+      : `Only the ${formatSize(viewableSize.width, viewableSize.height, units)} window shows; the frame hides the rest of the insert.`
 
   const doorSignClass = [
     'door-sign',
@@ -134,9 +146,15 @@ export const SignPreview = ({
     selectedCardHolder ? 'with-holder' : ''
   ].filter(Boolean).join(' ')
 
-  const specs = Object.keys(SPEC_LABELS)
-    .map(label => measurementSummary.find(item => item.label === label))
-    .filter(Boolean)
+  // The sizes worth reading before printing, in the order you'd check them.
+  const specs = [
+    { label: 'Insert', value: formatSize(insertSize.width, insertSize.height, units) },
+    selectedCardHolder && { label: 'Window', value: formatSize(viewableSize.width, viewableSize.height, units) },
+    {
+      label: 'With bleed',
+      value: formatSize(insertSize.width + BLEED_INCHES * 2, insertSize.height + BLEED_INCHES * 2, units)
+    }
+  ].filter(Boolean)
 
   // The print run: this sign once, a sheet of copies of it, or the sheet list — laid out on as
   // many sheets as it takes (printSheet.js). The Sheet preview and the PDF both draw these pages.
@@ -165,7 +183,7 @@ export const SignPreview = ({
   const printedOn = new Date().toISOString().slice(0, 10)
   const describePage = (index, total, sheet) => [
     runTitle,
-    `${formatInches(sheet.card.width / 72)}" × ${formatInches(sheet.card.height / 72)}" cut`,
+    `${formatSize(sheet.card.width / 72, sheet.card.height / 72, units)} cut`,
     sheet.perSheet > 1 ? `${sheet.perSheet} per sheet` : null,
     total > 1 ? `page ${index + 1} of ${total}` : null,
     `printed ${printedOn}`
@@ -328,9 +346,9 @@ export const SignPreview = ({
                 <input
                   type="text"
                   value={roomNumber}
-                  onChange={(e) => setRoomNumber(e.target.value)}
+                  onChange={(e) => choosePlate({ roomNumber: e.target.value })}
                   placeholder="4-257"
-                  maxLength={8}
+                  maxLength={MAX_ROOM_NUMBER}
                 />
               </label>
             </div>
@@ -357,7 +375,7 @@ export const SignPreview = ({
             <dl className="print-specs">
               {specs.map(({ label, value }) => (
                 <div key={label} className="print-specs__item">
-                  <dt>{SPEC_LABELS[label]}</dt>
+                  <dt>{label}</dt>
                   <dd>{value}</dd>
                 </div>
               ))}
@@ -372,6 +390,11 @@ export const SignPreview = ({
               onAddEntry={() => printSheet.addEntry(signData)}
               onRemoveEntry={printSheet.removeEntry}
               onClearEntries={printSheet.clearEntries}
+              openId={openEntry?.id || null}
+              openEntryChanged={openEntryChanged}
+              onOpenEntry={onReplaceSign ? openSheetEntry : null}
+              onSaveEntry={() => openEntry && printSheet.saveEntry(openEntry.id, signData)}
+              onCloseEntry={() => printSheet.setOpenId(null)}
               onShowSheet={view === 'sheet' ? null : () => setView('sheet')}
             />
           </div>

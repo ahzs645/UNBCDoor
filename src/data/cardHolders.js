@@ -8,6 +8,8 @@
 // PLATE_STYLES in components/HolderMockup.jsx): 'plain' (number only), or a line under the number
 // and a braille strip — 'line' (with an optional `plateLineColor`), or the shorthands 'grey' and
 // 'green'. Left out, the on-the-door preview starts on the default line + braille plate.
+// `roomNumber`, for a holder measured at one particular door, is the number on that plate; the
+// on-the-door preview starts on it and it can still be typed over there.
 export const cardHolders = {
   'Building 10': {
     name: 'Building 10 Acrylic Holder',
@@ -47,6 +49,27 @@ export const cardHolders = {
     },
     plateStyle: 'grey',
     notes: 'Matches the "NON-Building 10" template (6.85" × 3.94"). Later Building 4 revisions used slightly taller inserts (up to 4.16") — confirm against the specific holder.'
+  },
+  'Building 6': {
+    name: 'Building 6 Holder (measured)',
+    description: 'Building 6 holders (195mm × 101mm insert; the frame hides 13mm at each side and nothing at the top or bottom).',
+    insertSize: {
+      width: 7.677,
+      height: 3.976
+    },
+    viewableSize: {
+      width: 6.654,
+      height: 3.976
+    },
+    viewableOffset: {
+      top: 0,
+      bottom: 0,
+      left: 0.512,
+      right: 0.512
+    },
+    plateStyle: 'line',
+    plateLineColor: '#b0234e',
+    notes: 'Measured by hand. The plate line colour was matched by eye from a screenshot — replace it with the exact colour if you have it.'
   },
   'Number-Only Plate': {
     name: 'Plain Black Plate (estimated from photos)',
@@ -104,6 +127,8 @@ export const cardHolders = {
       left: 0.394,
       right: 0.394
     },
+    plateStyle: 'plain',
+    roomNumber: '6-352',
     notes: 'Measured, not estimated. The NUGSS artboards fit this frame exactly: the 11mm it hides at the top is the extra blue above the NUGSS logo.'
   },
   'Legacy Letter-Half': {

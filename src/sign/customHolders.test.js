@@ -58,6 +58,13 @@ test('the line colour is dropped for a number-only plate', () => {
   assert.equal(toCustomRecord({ ...holder, plateStyle: 'plain' }).plateLineColor, undefined)
 })
 
+test('a holder keeps the room number on its plate, trimmed; a blank one is left out', () => {
+  assert.equal(toCardHolder(toCustomRecord({ ...holder, roomNumber: ' 6-352 ' })).roomNumber, '6-352')
+  assert.equal(toCustomRecord({ ...holder, roomNumber: '123456789' }).roomNumber, '12345678')
+  assert.equal('roomNumber' in toCustomRecord({ ...holder, roomNumber: '  ' }), false)
+  assert.equal('roomNumber' in toCustomRecord({ ...holder, roomNumber: 42 }), false)
+})
+
 test('storage round-trips, and junk in storage is ignored', () => {
   const storage = memoryStorage()
   assert.deepEqual(readCustomHolders(storage), {})

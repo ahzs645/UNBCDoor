@@ -71,6 +71,15 @@ const STYLE_CONTROLS = {
       { value: 'black', label: 'Black' }
     ]
   },
+  // Joined "fi" and "fl" glyphs, on by default as in UNBC's own documents (LT Pro has no ffi; the
+  // older faces' ff/ffi only appear for text LT Pro can't set).
+  ligatures: {
+    label: 'Ligatures (fi)',
+    options: [
+      { value: 'off', label: 'Off' },
+      { value: 'on', label: 'On' }
+    ]
+  },
   contentSize: {
     label: 'Content size',
     options: [
@@ -221,7 +230,7 @@ const STYLE_CONTROLS = {
 }
 
 const GROUPS = [
-  { id: 'type', label: 'Type & size', keys: ['headlineWeight', 'contentSize', 'roomNameStyle', 'positionSize', 'contactSize'] },
+  { id: 'type', label: 'Type & size', keys: ['headlineWeight', 'contentSize', 'roomNameStyle', 'positionSize', 'contactSize', 'ligatures'] },
   { id: 'layout', label: 'Layout & spacing', keys: ['departmentWrap', 'textAlignment', 'contentWidth', 'contentSpacing', 'roleLayout', 'contactLayout', 'designationLayout', 'twoPersonSpacing', 'roomContactGrouping'] },
   { id: 'extras', label: 'Crest & logo', keys: ['alumniCrestSize', 'alumniCrestSpacing', 'organizationLogo'] }
 ]

@@ -252,6 +252,11 @@ function App() {
             onSaveCustomHolder={saveCustomHolder}
             onDeleteCustomHolder={deleteCustomHolder}
             onUpdate={updateSignData}
+            onReplaceSign={(nextSignData) => {
+              // Like a shared sign, a sheet entry isn't one of the open archive's entries.
+              deselectArchiveEntry()
+              setSignData(nextSignData)
+            }}
             archiveState={archiveState}
             editorHref={EDITOR_PATH}
             measuringSheetsHref={MEASURING_SHEETS_PATH}
