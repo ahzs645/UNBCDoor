@@ -7,7 +7,7 @@ import { resolveOrganization } from './organizations'
 import { NugssLogoMark } from './NugssLogoMark'
 import ctaanLogo from '../assets/ctaan-logo.png'
 
-export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'HelveticaNeueUNBCFallback', 'Helvetica Neue', Helvetica, Arial, sans-serif"
 
 const ALUMNI_CREST_SIZE_SCALE = {
   small: 0.85,
@@ -44,10 +44,10 @@ const getMeasureContext = () => {
   return measureContext
 }
 
-// Ligatures ("ff", "ffi" and friends drawn as one joined glyph) are a per-sign choice, off by
-// default: Helvetica Neue's pinch the f's together. <SignArtwork> switches them with CSS, but a
-// canvas has no such switch, so with them off the measured text gets a zero-width non-joiner
-// after each f, which breaks the ligature without adding any width.
+// Ligatures (the "fi" and "fl" drawn as one joined glyph) are a per-sign choice, on by default as
+// in UNBC's own documents. <SignArtwork> switches them with CSS, but a canvas has no such switch,
+// so with them off the measured text gets a zero-width non-joiner after each f, which breaks the
+// ligature without adding any width.
 const NO_LIGATURE = '\u200c'
 const measureText = (ctx, text, ligatures = false) => ctx.measureText(
   ligatures ? text : text.replace(/f(?=\S)/g, `f${NO_LIGATURE}`)

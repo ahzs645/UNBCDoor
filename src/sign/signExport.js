@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf'
 import { svg2pdf } from 'svg2pdf.js'
 import {
   applyFaceLigatures,
+  pdfFamilyForText,
   registerArtworkFonts,
   getEmbeddedArtworkFontCss,
   ARTWORK_ITALIC_FAMILY,
@@ -14,14 +15,29 @@ import { PT_PER_INCH, BLEED_INCHES } from './signConstants'
 // it needs and triggers a browser download. Kept out of the React tree so the heavy
 // DOM/canvas/jsPDF logic is testable and reusable.
 
+// The embedded face a <text> goes out in: Italic, Bold and Black route to the matching
+// embedded Helvetica Neue faces (or, for text one of them can't draw, its older stand-in);
+// anything else is Roman, which stays on jsPDF's standard Helvetica for a small, crisp
+// selectable base face.
+const embeddedFamilyFor = (node) => {
+  const weight = parseInt(node.getAttribute('font-weight'), 10) || 400
+  const family = node.getAttribute('font-style') === 'italic'
+    ? ARTWORK_ITALIC_FAMILY
+    : weight >= 800 ? ARTWORK_BLACK_FAMILY : weight >= 600 ? ARTWORK_BOLD_FAMILY : null
+  return family && pdfFamilyForText(family, node.textContent)
+}
+
+const BRAND_FAMILIES = [ARTWORK_ITALIC_FAMILY, ARTWORK_BOLD_FAMILY, ARTWORK_BLACK_FAMILY]
+
+// The older faces any text on these cards needs, so they're embedded only when used.
+const fallbackFamiliesFor = (nodes) => [...new Set(
+  nodes.flatMap(node => [...node.querySelectorAll('text')].map(embeddedFamilyFor))
+)].filter(family => family && !BRAND_FAMILIES.includes(family))
+
 // Clones the artwork and rewrites its font references for PDF embedding. The on-screen SVG
 // leans on CSS font-style/weight; svg2pdf under jsPDF v3 needs explicit family mapping.
 const cloneArtworkForExport = (source, availableFonts = {}) => {
   const clone = source.cloneNode(true)
-
-  const italicFamily = availableFonts[ARTWORK_ITALIC_FAMILY]
-  const boldFamily = availableFonts[ARTWORK_BOLD_FAMILY]
-  const blackFamily = availableFonts[ARTWORK_BLACK_FAMILY]
   const ligatures = source.getAttribute('data-ligatures') === 'on'
 
   const useFamily = (node, family) => {
@@ -35,16 +51,11 @@ const cloneArtworkForExport = (source, availableFonts = {}) => {
     if (ligatures) node.textContent = applyFaceLigatures(node.textContent, family)
   }
 
-  // Italic, Bold, and Black route to the matching embedded Helvetica Neue faces. Roman text
-  // stays on jsPDF's standard Helvetica for a small, crisp selectable base face.
   clone.setAttribute('font-family', 'helvetica')
   clone.querySelectorAll('text').forEach((node) => {
     const weight = parseInt(node.getAttribute('font-weight'), 10) || 400
-    const isItalic = node.getAttribute('font-style') === 'italic'
-
-    if (isItalic && italicFamily) return useFamily(node, italicFamily)
-    if (weight >= 800 && blackFamily) return useFamily(node, blackFamily)
-    if (weight >= 600 && boldFamily) return useFamily(node, boldFamily)
+    const family = availableFonts[embeddedFamilyFor(node)]
+    if (family) return useFamily(node, family)
 
     // Standard Helvetica only has normal/bold — collapse other weights so svg2pdf matches
     // the face instead of silently falling back to Times.
@@ -101,7 +112,7 @@ export const exportSignPNG = async (source, { insertSize, fileName = 'unbc-door-
     const defs = clone.querySelector('defs') || document.createElementNS('http://www.w3.org/2000/svg', 'defs')
     if (!defs.parentNode) clone.prepend(defs)
     const style = document.createElementNS('http://www.w3.org/2000/svg', 'style')
-    style.textContent = await getEmbeddedArtworkFontCss()
+    style.textContent = await getEmbeddedArtworkFontCss(clone.textContent)
     defs.appendChild(style)
   } catch (error) {
     console.error('Could not embed brand fonts in PNG:', error)
@@ -146,7 +157,10 @@ export const exportPrintRunPDF = async ({ pages, paperSize, fileName, showLabel,
   try {
     const first = pages[0].sheet
     const doc = new jsPDF({ orientation: first.orientation, unit: 'pt', format: paperSize })
-    const availableFonts = await registerArtworkFonts(doc)
+    const availableFonts = await registerArtworkFonts(
+      doc,
+      fallbackFamiliesFor(pages.flatMap(({ items }) => items.map(({ node }) => node)))
+    )
 
     for (const [pageIndex, { sheet, items }] of pages.entries()) {
       if (pageIndex > 0) doc.addPage(paperSize, sheet.orientation)

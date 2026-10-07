@@ -40,7 +40,7 @@ export const INITIAL_SIGN_DATA = {
   alumniCrestSize: 'standard',
   alumniCrestSpacing: 'auto',
   headlineWeight: 'black',
-  ligatures: 'off',
+  ligatures: 'on',
   roomNameStyle: 'standard',
   positionLayout: 'stacked',
   positionSize: 'standard',

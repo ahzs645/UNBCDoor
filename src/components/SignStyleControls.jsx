@@ -71,9 +71,10 @@ const STYLE_CONTROLS = {
       { value: 'black', label: 'Black' }
     ]
   },
-  // Joined "ff", "fi", "ffi"… glyphs. Off by default: Helvetica Neue's pinch the f's together.
+  // Joined "fi" and "fl" glyphs, on by default as in UNBC's own documents (LT Pro has no ffi; the
+  // older faces' ff/ffi only appear for text LT Pro can't set).
   ligatures: {
-    label: 'Ligatures (ffi)',
+    label: 'Ligatures (fi)',
     options: [
       { value: 'off', label: 'Off' },
       { value: 'on', label: 'On' }

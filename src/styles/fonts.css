@@ -1,9 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
 
-/* UNBC brand typeface for the sign artwork (matches the print templates) */
+/* UNBC brand typeface for the sign artwork: Helvetica Neue LT Pro, the cut UNBC's own documents
+   are set in (built by tools/build_brand_fonts.py). It covers about 380 characters; the older
+   Helvetica Neue faces after it stand in for anything else, and are only downloaded if a sign
+   needs one of those characters. */
 @font-face {
     font-family: 'HelveticaNeueUNBC';
-    src: url('../../Fonts/HelveticaNeueRoman.otf') format('opentype');
+    src: url('../../Fonts/HelveticaNeueLTPro-Roman.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -11,15 +14,15 @@
 
 @font-face {
     font-family: 'HelveticaNeueUNBC';
-    src: url('../../Fonts/HelveticaNeueBlack.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
+    src: url('../../Fonts/HelveticaNeueLTPro-Italic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
     font-display: swap;
 }
 
 @font-face {
     font-family: 'HelveticaNeueUNBC';
-    src: url('../../Fonts/HelveticaNeueBold.ttf') format('truetype');
+    src: url('../../Fonts/HelveticaNeueLTPro-Bold.otf') format('opentype');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -27,8 +30,42 @@
 
 @font-face {
     font-family: 'HelveticaNeueUNBC';
+    src: url('../../Fonts/HelveticaNeueLTPro-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+/* Fallback for characters LT Pro doesn't have. */
+@font-face {
+    font-family: 'HelveticaNeueUNBCFallback';
+    src: url('../../Fonts/HelveticaNeueRoman.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'HelveticaNeueUNBCFallback';
     src: url('../../Fonts/HelveticaNeueItalic.ttf') format('truetype');
     font-weight: 400;
     font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'HelveticaNeueUNBCFallback';
+    src: url('../../Fonts/HelveticaNeueBold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'HelveticaNeueUNBCFallback';
+    src: url('../../Fonts/HelveticaNeueBlack.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
     font-display: swap;
 }

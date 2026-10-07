@@ -168,7 +168,7 @@
 
 .holder-mockup__number {
     fill: #f4f4ee;
-    font-family: 'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'HelveticaNeueUNBC', 'HelveticaNeueUNBCFallback', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight: 700;
 }
 
