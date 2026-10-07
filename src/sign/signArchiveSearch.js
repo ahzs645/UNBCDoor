@@ -13,9 +13,9 @@ export const SIGN_TYPE_LABELS = {
 // Fields a person would reasonably type to find a sign: who, what room, which department,
 // how to reach them, and which holder it prints for.
 const SEARCH_FIELDS = [
-  'name', 'name2', 'position', 'position2', 'roomName', 'roomName2', 'contactName', 'contactName2',
-  'mainDepartment', 'subDepartment', 'subSubDepartment', 'email', 'email2', 'phone', 'phone2',
-  'cardHolderType', 'tagline', 'tagline2'
+  'name', 'name2', 'name3', 'position', 'position2', 'roomName', 'roomName2', 'contactName', 'contactName2',
+  'mainDepartment', 'subDepartment', 'subSubDepartment', 'email', 'email2', 'email3', 'phone', 'phone2',
+  'phone3', 'cardHolderType', 'tagline', 'tagline2', 'tagline3'
 ]
 
 // Lower-case and strip accents so "Therese" finds "Thérèse".
@@ -30,7 +30,7 @@ const entryHaystack = (entry) => {
     entry.label,
     SIGN_TYPE_LABELS[signData.signType],
     ...SEARCH_FIELDS.map(field => signData[field]),
-    ...[...(signData.roles || []), ...(signData.roles2 || [])].flatMap(role => [role.title, role.unit, role.note])
+    ...[...(signData.roles || []), ...(signData.roles2 || []), ...(signData.roles3 || [])].flatMap(role => [role.title, role.unit, role.note])
   ].filter(Boolean).join(' \n '))
 }
 

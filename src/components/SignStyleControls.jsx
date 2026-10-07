@@ -25,17 +25,29 @@ const describeSign = (content) => {
       !isRoom && content.showCellPhone2 && content.cellPhone2
     ].filter(Boolean)
     : []
+  const hasThirdPerson = !isRoom && Boolean(content.showSecondOccupant && content.showThirdOccupant && content.name3)
+  const tertiaryContacts = hasThirdPerson
+    ? [
+      content.showEmail3 && content.email3,
+      content.showPhone3 && content.phone3,
+      content.showCellPhone3 && content.cellPhone3
+    ].filter(Boolean)
+    : []
 
-  const hasSecondPerson = !isRoom && Boolean(content.showSecondOccupant && content.name2)
-  const roles = [...(content.roles || []), ...(hasSecondPerson ? content.roles2 || [] : [])]
+  const hasSecondPerson = !isRoom && Boolean(content.showSecondOccupant && (content.name2 || hasThirdPerson))
+  const roles = [
+    ...(content.roles || []),
+    ...(hasSecondPerson ? content.roles2 || [] : []),
+    ...(hasThirdPerson ? content.roles3 || [] : [])
+  ]
   const hasRoles = roles.length > 0
   const hasPosition = Boolean(content.position || (hasSecondPerson && content.position2) || hasRoles)
-  const hasTagline = Boolean(content.tagline || (hasSecondPerson && content.tagline2))
+  const hasTagline = Boolean(content.tagline || (hasSecondPerson && content.tagline2) || (hasThirdPerson && content.tagline3))
   const secondRoomEntry = isRoom && Boolean(content.showSecondOccupant)
 
   return {
     isRoom,
-    hasAlumni: Boolean(content.showAlumni || content.showAlumni2),
+    hasAlumni: Boolean(content.showAlumni || content.showAlumni2 || (hasThirdPerson && content.showAlumni3)),
     hasCredentials: Boolean(content.credentials),
     hasDepartment: Boolean(content.departmentText),
     hasSecondPerson,
@@ -46,9 +58,9 @@ const describeSign = (content) => {
     hasRoleColumn: roles.some(role => role.title && role.unit && role.unitLayout === 'beside'),
     // The artwork pins two-person type sizes, so the size presets only bite on a solo sign.
     isCompactTwoPerson: hasSecondPerson && content.twoPersonSpacing !== 'relaxed',
-    hasContacts: primaryContacts.length + secondaryContacts.length > 0,
+    hasContacts: primaryContacts.length + secondaryContacts.length + tertiaryContacts.length > 0,
     // Joining contact lines onto one line needs at least two of them in the same block.
-    hasMultipleContacts: Math.max(primaryContacts.length, secondaryContacts.length) > 1,
+    hasMultipleContacts: Math.max(primaryContacts.length, secondaryContacts.length, tertiaryContacts.length) > 1,
     // Grouping by field only applies when a second *contact* — not a second room — shares the card.
     hasSecondRoomContact: secondRoomEntry && content.secondaryEntryType === 'contact',
     // Spacing and alignment need something below the headline to move.

@@ -104,3 +104,15 @@ test('ligatures are on unless a sign turns them off', () => {
   assert.equal(normalizeSignData({ ligatures: 'off' }).ligatures, 'off')
   assert.equal(normalizeSignData({ ligatures: 'sometimes' }).ligatures, 'on')
 })
+
+test('keeps the third person’s roles, and a sign without one has none', () => {
+  const normalized = normalizeSignData({
+    showThirdOccupant: true,
+    name3: 'Alex Lee',
+    roles3: [{ title: 'Research Associate', unit: 'Chemistry' }, 'not a role']
+  })
+  assert.equal(normalized.showThirdOccupant, true)
+  assert.equal(normalized.name3, 'Alex Lee')
+  assert.deepEqual(normalized.roles3.map(role => [role.title, role.unit]), [['Research Associate', 'Chemistry']])
+  assert.deepEqual(normalizeSignData({}).roles3, [])
+})

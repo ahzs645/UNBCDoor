@@ -101,3 +101,21 @@ test('roles survive a share link round trip', async () => {
   assert.deepEqual(decoded.roles2, [])
   assert.equal(decoded.roleLayout, 'inline')
 })
+
+test('a third person survives a share link round trip', async () => {
+  const signData = normalizeSignData({
+    ...sample,
+    showSecondOccupant: true,
+    name2: 'Dorna Sobhani',
+    showThirdOccupant: true,
+    name3: 'Alex Lee',
+    roles3: [{ title: 'Research Associate', unit: '' }],
+    email3: 'alex.lee@unbc.ca',
+    showPhone3: false,
+    showAlumni3: true
+  })
+  const decoded = await decodeSignToken(await encodeSignToken(signData))
+  assert.equal(signDataDiffers(decoded, signData), false)
+  assert.equal(decoded.name3, 'Alex Lee')
+  assert.equal(decoded.roles3[0].title, 'Research Associate')
+})

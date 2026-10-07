@@ -13,7 +13,7 @@ export const normalizeSignData = (value = {}) => {
     throw new Error('Each sign must contain a signData object.')
   }
 
-  const normalized = { ...INITIAL_SIGN_DATA, designations: [], roles: [], roles2: [] }
+  const normalized = { ...INITIAL_SIGN_DATA, designations: [], roles: [], roles2: [], roles3: [] }
   Object.entries(value).forEach(([key, fieldValue]) => {
     if (!SIGN_DATA_KEYS.has(key) || Array.isArray(INITIAL_SIGN_DATA[key])) return
 
@@ -30,6 +30,7 @@ export const normalizeSignData = (value = {}) => {
     : []
   normalized.roles = normalizeRoles(value.roles)
   normalized.roles2 = normalizeRoles(value.roles2)
+  normalized.roles3 = normalizeRoles(value.roles3)
 
   if (!SIGN_TYPES.has(normalized.signType)) normalized.signType = INITIAL_SIGN_DATA.signType
   if (!ORGANIZATION_KEYS.includes(normalized.organization)) normalized.organization = INITIAL_SIGN_DATA.organization

@@ -42,6 +42,8 @@ A web-based tool for generating standardized door signs for the University of No
   - Alumni badge option
   - Adjustable Alumni crest size and minimum text spacing with safe maximums
   - Optional second occupant, second room/lab, or additional contact for a shared room
+  - Up to three people on a person sign: the third is drawn at four fifths the size so all
+    three fit under the header, each with their own alumni crest
   - Independent alumni badges and contact visibility for each occupant
 
 - **Saved Sign Archives**
