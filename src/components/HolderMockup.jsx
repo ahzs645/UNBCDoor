@@ -1,5 +1,7 @@
 import React, { useId } from 'react'
 import { BLEED_INCHES } from '../sign/signConstants'
+import { formatLength } from '../sign/units'
+import { useUnits } from '../hooks/useUnits'
 
 // The sign as it hangs on the door: the black room plate (room number, and on older plates a
 // coloured rule and a braille strip) with the printed insert behind its window. Only the window
@@ -125,11 +127,9 @@ const BrailleStrip = ({ text, x, y, width, height }) => {
   )
 }
 
-const formatInches = (value) => `${Number(value.toFixed(3))}"`
-
 // One label per frame edge. Top and bottom sit on the plate just outside the cut edge; the card
 // runs to the plate's sides, so the left and right labels go inside the hidden strip itself.
-const HiddenLabels = ({ trim, offset, size }) => {
+const HiddenLabels = ({ trim, offset, size, units }) => {
   const sideSize = (edge) => Math.min(size, offset[edge] * 0.7)
   const labels = [
     { edge: 'top', x: trim.x + trim.width / 2, y: trim.y - size * 0.45, angle: 0, fontSize: size },
@@ -149,7 +149,7 @@ const HiddenLabels = ({ trim, offset, size }) => {
         textAnchor="middle"
         transform={angle ? `rotate(${angle} ${x} ${y})` : undefined}
       >
-        {`${formatInches(offset[edge])} hidden`}
+        {`${formatLength(offset[edge], units)} hidden`}
       </text>
     ))
 }
@@ -165,6 +165,7 @@ export const HolderMockup = ({
   seeThrough = false,
   children
 }) => {
+  const units = useUnits()
   const plate = PLATE_STYLES[plateStyle] || PLATE_STYLES[DEFAULT_PLATE_STYLE]
   const ruleColor = HEX.test(lineColor || '') ? lineColor : DEFAULT_LINE_COLOR
   const ruleGradientId = `holder-mockup-rule-${useId().replace(/[^a-z0-9]/gi, '')}`
@@ -312,7 +313,7 @@ export const HolderMockup = ({
           <>
             <path className="holder-mockup__frame-edge" d={rectPath(windowRect)} />
             <path className="holder-mockup__cut-edge" d={rectPath(trim)} />
-            <HiddenLabels trim={trim} offset={offset} size={0.13} />
+            <HiddenLabels trim={trim} offset={offset} size={0.13} units={units} />
           </>
         )}
       </svg>

@@ -17,7 +17,7 @@ export const formatInches = (value) => {
 
 // Derives every measurement the preview needs from the selected card holder (or the default
 // insert when none is chosen): the trim/viewable sizes, the CSS custom properties that drive
-// the preview frame's aspect ratio, and the human-readable measurement summary.
+// the preview frame's aspect ratio.
 export const resolveCardHolderGeometry = (selectedCardHolder) => {
   const insertSize = selectedCardHolder?.insertSize || DEFAULT_INSERT_SIZE
   const viewableSize = selectedCardHolder?.viewableSize || insertSize
@@ -41,22 +41,7 @@ export const resolveCardHolderGeometry = (selectedCardHolder) => {
     '--sign-aspect': canvasWidth / canvasHeight
   }
 
-  const measurementSummary = [
-    {
-      label: 'Print (with bleed)',
-      value: `${formatInches(canvasWidth)}" × ${formatInches(canvasHeight)}"`
-    },
-    {
-      label: 'Trim / insert',
-      value: `${formatInches(insertSize.width)}" × ${formatInches(insertSize.height)}"`
-    },
-    ...(selectedCardHolder ? [{
-      label: 'Viewable',
-      value: `${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}"`
-    }] : [])
-  ]
-
-  return { insertSize, viewableSize, viewableOffset, previewFrameStyle, measurementSummary }
+  return { insertSize, viewableSize, viewableOffset, previewFrameStyle }
 }
 
 // Oriented sheet dimensions (inches) for an insert: a landscape insert (wider than tall)

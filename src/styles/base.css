@@ -505,3 +505,42 @@ body {
     font-size: 0.9rem;
     line-height: 1.55;
 }
+
+/* ---------- Settings menu (app bar) ---------- */
+
+.app-header__tools {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2px;
+}
+
+.settings-menu {
+    position: relative;
+}
+
+.app-header .settings-menu .theme-toggle-button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: -2px;
+    box-shadow: none;
+}
+
+.settings-menu__panel {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 8px);
+    right: 0;
+    display: grid;
+    gap: 8px;
+    width: min(300px, calc(100vw - 32px));
+    padding: 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+}
+
+.settings-menu__panel .field-hint {
+    margin: 0;
+}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { SegmentedControl } from './SegmentedControl'
+import { useUnits } from '../hooks/useUnits'
 import { LineColorPicker } from './LineColorPicker'
 import { DEFAULT_LINE_COLOR, PLATE_STYLES, resolveHolderPlate } from './HolderMockup'
 import { MAX_HOLDER_NAME, MAX_ROOM_NUMBER, validateCustomHolder } from '../sign/customHolders'
@@ -52,14 +53,16 @@ const NumberInput = ({ id, label, value, units, onChange }) => (
 // Create or edit a holder preset that lives in this browser. `initial` is the holder to start
 // from (a copy of the selected one when making a new holder); `editingName` is set when editing.
 export const CustomHolderEditor = ({ initial, editingName, takenNames, onSave, onCancel }) => {
-  const [units, setUnits] = useState('in')
+  // Starts in the units picked under Settings; switching here is for this form only.
+  const defaultUnits = useUnits()
+  const [units, setUnits] = useState(defaultUnits)
   const [name, setName] = useState(editingName || '')
   const [insert, setInsert] = useState({
-    width: toText(initial.insertSize.width, 'in'),
-    height: toText(initial.insertSize.height, 'in')
+    width: toText(initial.insertSize.width, defaultUnits),
+    height: toText(initial.insertSize.height, defaultUnits)
   })
   const [offset, setOffset] = useState(Object.fromEntries(
-    EDGES.map(({ key }) => [key, toText(initial.viewableOffset[key] || 0, 'in')])
+    EDGES.map(({ key }) => [key, toText(initial.viewableOffset[key] || 0, defaultUnits)])
   ))
   const initialPlate = resolveHolderPlate(initial)
   const [plateStyle, setPlateStyle] = useState(initialPlate.style)

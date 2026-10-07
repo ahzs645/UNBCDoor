@@ -1,6 +1,8 @@
 import React, { useId } from 'react'
 import { layoutSignArtwork } from '../sign/SignArtwork'
 import { PT_PER_INCH, SAFE_INCHES } from '../sign/signConstants'
+import { formatLength } from '../sign/units'
+import { useUnits } from '../hooks/useUnits'
 
 // Print guides drawn over the artwork in its own canvas points, from the same layout the artwork
 // is drawn with:
@@ -14,15 +16,13 @@ import { PT_PER_INCH, SAFE_INCHES } from '../sign/signConstants'
 
 const RECT_PATH = ({ x, y, width, height }) => `M${x} ${y}h${width}v${height}h${-width}Z`
 
-const inches = (points) => `${(points / PT_PER_INCH).toFixed(2)}"`
-
 // A vertical dimension: end ticks and a pill label beside the line. `side` puts the label to the
 // right or left of the line.
-const Dimension = ({ x, from, to, side = 'right', unit }) => {
+const Dimension = ({ x, from, to, side = 'right', unit, units }) => {
   const length = to - from
   if (!(length > 0.5)) return null
-  const text = inches(length)
-  const pillWidth = unit * 5.6
+  const text = formatLength(length / PT_PER_INCH, units)
+  const pillWidth = unit * Math.max(5.6, text.length * 0.85 + 1)
   const pillHeight = unit * 2.1
   const pillX = side === 'right' ? x + unit * 0.7 : x - unit * 0.7 - pillWidth
   const midY = from + length / 2
@@ -41,6 +41,7 @@ const Dimension = ({ x, from, to, side = 'right', unit }) => {
 
 export const SignGuides = ({ content, hasHolder }) => {
   const id = useId().replace(/:/g, '')
+  const units = useUnits()
   const layout = layoutSignArtwork(content)
   const { BLEED, CW, CH, W, H, VL, VT, VW, VH, PAD_X, header, HEADER_H, originX, originY, body } = layout
 
@@ -97,6 +98,7 @@ export const SignGuides = ({ content, hasHolder }) => {
         to={BLEED + header.wordmarkTop}
         side="left"
         unit={unit}
+        units={units}
       />
       <Dimension
         x={headerX}
@@ -104,13 +106,14 @@ export const SignGuides = ({ content, hasHolder }) => {
         to={BLEED + header.bandHeight}
         side="left"
         unit={unit}
+        units={units}
       />
 
       {/* Body: white above the first line matches the white below the last. */}
       {body && (
         <>
-          <Dimension x={bodyX} from={originY + HEADER_H} to={originY + body.inkTop} unit={unit} />
-          <Dimension x={bodyX} from={originY + body.inkBottom} to={windowBottom} unit={unit} />
+          <Dimension x={bodyX} from={originY + HEADER_H} to={originY + body.inkTop} unit={unit} units={units} />
+          <Dimension x={bodyX} from={originY + body.inkBottom} to={windowBottom} unit={unit} units={units} />
         </>
       )}
     </svg>

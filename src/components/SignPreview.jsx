@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react'
 import { SignArtwork } from '../sign/SignArtwork'
 import { MAX_ROOM_NUMBER } from '../sign/customHolders'
-import { resolveCardHolderGeometry, getPrintLayout, formatInches } from '../sign/signGeometry'
+import { resolveCardHolderGeometry, getPrintLayout } from '../sign/signGeometry'
+import { formatLength, formatSize } from '../sign/units'
+import { useUnits } from '../hooks/useUnits'
 import { exportSignPNG, exportPrintRunPDF } from '../sign/signExport'
-import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
+import { BLEED_INCHES, PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
 import { paginatePrintRun, resolvePrintSheet } from '../sign/printSheet'
 import { buildSignContent } from '../sign/signContent'
 import { renderArtworkNode } from '../sign/renderArtwork'
@@ -31,13 +33,6 @@ const buildFitWarning = (layout, cutGuides) => {
   return target
     ? `The artwork fits, but there's no room for crop marks on this sheet. Switch to ${target} for crop marks, or cut to the insert size by hand.`
     : "There's no room for crop marks on this sheet; cut to the insert size by hand."
-}
-
-// The sizes worth reading before printing, in the order you'd check them.
-const SPEC_LABELS = {
-  'Trim / insert': 'Insert',
-  Viewable: 'Window',
-  'Print (with bleed)': 'With bleed'
 }
 
 // Paper sizes as short segment labels; the full dimensions stay in the tooltip.
@@ -111,9 +106,9 @@ export const SignPreview = ({
     insertSize,
     viewableSize,
     viewableOffset,
-    previewFrameStyle,
-    measurementSummary
+    previewFrameStyle
   } = resolveCardHolderGeometry(selectedCardHolder)
+  const units = useUnits()
   const showGuides = view === 'guides'
 
   const holderKey = signData.cardHolderType || ''
@@ -137,13 +132,13 @@ export const SignPreview = ({
   const doorNote = !selectedCardHolder
     ? 'No holder selected, so the whole insert shows. Pick a holder under Print & export to see what its frame hides.'
     : doorView === 'see-through'
-      ? `Cut size ${formatInches(insertSize.width)}" × ${formatInches(insertSize.height)}" (dashed). The frame hides ${
+      ? `Cut size ${formatSize(insertSize.width, insertSize.height, units)} (dashed). The frame hides ${
         ['top', 'bottom', 'left', 'right']
           .filter(edge => viewableOffset[edge] > 0)
-          .map(edge => `${formatInches(viewableOffset[edge])}" ${edge}`)
+          .map(edge => `${formatLength(viewableOffset[edge], units)} ${edge}`)
           .join(', ')
-      }, leaving the ${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}" window.`
-      : `Only the ${formatInches(viewableSize.width)}" × ${formatInches(viewableSize.height)}" window shows; the frame hides the rest of the insert.`
+      }, leaving the ${formatSize(viewableSize.width, viewableSize.height, units)} window.`
+      : `Only the ${formatSize(viewableSize.width, viewableSize.height, units)} window shows; the frame hides the rest of the insert.`
 
   const doorSignClass = [
     'door-sign',
@@ -151,9 +146,15 @@ export const SignPreview = ({
     selectedCardHolder ? 'with-holder' : ''
   ].filter(Boolean).join(' ')
 
-  const specs = Object.keys(SPEC_LABELS)
-    .map(label => measurementSummary.find(item => item.label === label))
-    .filter(Boolean)
+  // The sizes worth reading before printing, in the order you'd check them.
+  const specs = [
+    { label: 'Insert', value: formatSize(insertSize.width, insertSize.height, units) },
+    selectedCardHolder && { label: 'Window', value: formatSize(viewableSize.width, viewableSize.height, units) },
+    {
+      label: 'With bleed',
+      value: formatSize(insertSize.width + BLEED_INCHES * 2, insertSize.height + BLEED_INCHES * 2, units)
+    }
+  ].filter(Boolean)
 
   // The print run: this sign once, a sheet of copies of it, or the sheet list — laid out on as
   // many sheets as it takes (printSheet.js). The Sheet preview and the PDF both draw these pages.
@@ -182,7 +183,7 @@ export const SignPreview = ({
   const printedOn = new Date().toISOString().slice(0, 10)
   const describePage = (index, total, sheet) => [
     runTitle,
-    `${formatInches(sheet.card.width / 72)}" × ${formatInches(sheet.card.height / 72)}" cut`,
+    `${formatSize(sheet.card.width / 72, sheet.card.height / 72, units)} cut`,
     sheet.perSheet > 1 ? `${sheet.perSheet} per sheet` : null,
     total > 1 ? `page ${index + 1} of ${total}` : null,
     `printed ${printedOn}`
@@ -374,7 +375,7 @@ export const SignPreview = ({
             <dl className="print-specs">
               {specs.map(({ label, value }) => (
                 <div key={label} className="print-specs__item">
-                  <dt>{SPEC_LABELS[label]}</dt>
+                  <dt>{label}</dt>
                   <dd>{value}</dd>
                 </div>
               ))}
