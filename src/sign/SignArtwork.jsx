@@ -44,6 +44,13 @@ const getMeasureContext = () => {
   return measureContext
 }
 
+// The sign is drawn with ligatures off (see <SignArtwork>): Helvetica Neue's "ffi"/"fi" glyphs
+// pinch the f's together, and the PDF export can't use them anyway, so preview and print would
+// disagree. A canvas has no switch for that, so measured text gets a zero-width non-joiner after
+// each f, which breaks the ligature without adding any width.
+const NO_LIGATURE = '\u200c'
+const measureText = (ctx, text) => ctx.measureText(text.replace(/f(?=\S)/g, `f${NO_LIGATURE}`))
+
 // Spaces inside a phrase that should wrap as one unit (a designation kept together) are joined
 // with this no-break space. The wrapper treats the phrase as a single word, falls back to normal
 // wrapping only if the phrase can't fit on a line by itself, and hands back ordinary spaces.
@@ -65,14 +72,14 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
     const words = paragraph
       .split(/[^\S\u00a0]+/)
       .flatMap(word => (
-        word.includes(KEEP_TOGETHER) && ctx.measureText(word).width > maxWidth
+        word.includes(KEEP_TOGETHER) && measureText(ctx, word).width > maxWidth
           ? word.split(KEEP_TOGETHER)
           : [word]
       ))
     let current = ''
     words.forEach((word) => {
       const candidate = current ? `${current} ${word}` : word
-      if (ctx.measureText(candidate).width > maxWidth && current) {
+      if (measureText(ctx, candidate).width > maxWidth && current) {
         lines.push(current)
         current = word
       } else {
@@ -117,12 +124,12 @@ const layoutRoles = (roles, { aligned, font, noteFont }) => {
   let column = Boolean(aligned && ctx && paired.length)
   if (column) {
     ctx.font = `${font.style} ${font.weight} ${font.size}px ${font.family}`
-    const space = ctx.measureText(' ').width
-    const titleWidth = Math.max(...paired.map(row => ctx.measureText(row.title).width))
+    const space = measureText(ctx, ' ').width
+    const titleWidth = Math.max(...paired.map(row => measureText(ctx, row.title).width))
     separatorX = titleWidth + space
     // With no bar in the column at all, the gap the bar would have filled is closed up.
     unitX = paired.some(row => row.bar)
-      ? separatorX + ctx.measureText(ROLE_SEPARATOR).width + space
+      ? separatorX + measureText(ctx, ROLE_SEPARATOR).width + space
       : titleWidth + space * 2
     if (unitX > font.maxWidth * 0.5) column = false
   }
@@ -434,7 +441,7 @@ const measureInk = (item, fontFamily) => {
   const ctx = getMeasureContext()
   if (ctx && text) {
     ctx.font = `${item.style} ${item.weight} ${item.size}px ${fontFamily}`
-    const metrics = ctx.measureText(text)
+    const metrics = measureText(ctx, text)
     if (Number.isFinite(metrics.actualBoundingBoxAscent) && Number.isFinite(metrics.actualBoundingBoxDescent)) {
       return { ascent: metrics.actualBoundingBoxAscent, descent: metrics.actualBoundingBoxDescent }
     }
@@ -676,6 +683,7 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
       height="100%"
       preserveAspectRatio="xMidYMid meet"
       fontFamily={fontFamily}
+      style={{ fontVariantLigatures: 'none' }}
       data-bleed={BLEED}
       data-trim-width={W}
       data-trim-height={H}
