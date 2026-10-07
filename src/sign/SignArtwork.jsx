@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react'
 import { UnbcLogoMark, AlumniCrest } from '@unbc/logo'
 import { PT_PER_INCH, DEFAULT_INSERT_SIZE } from './signConstants'
 import { resolveHeaderGeometry } from './headerGeometry'
+import { splitRoleTitle } from './signRoles'
 import ctaanLogo from '../assets/ctaan-logo.png'
 
 export const ARTWORK_FONT = "'HelveticaNeueUNBC', 'Helvetica Neue', Helvetica, Arial, sans-serif"
@@ -84,32 +85,73 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
 // Roles print as "Position | Faculty or department". Aligned, the bars line up in one column
 // and a long department wraps under itself, as on the printed signs. Falls back to plain
 // "Position | Department" lines when the positions are too long to leave room for a column (or
-// there is nothing to align, or no canvas to measure with).
+// there is nothing to align, or no canvas to measure with). A role can instead put its
+// department on a line of its own or leave it off, and its subtext follows in italics — under
+// the department column when the role sits in it. Each line comes back with its segments and
+// whether it is a subtext line.
 const ROLE_SEPARATOR = '|'
 
-const layoutRoles = (roles, { aligned, ...font }) => {
-  const plain = (text, dx = 0) => wrapText(text, font).map(line => [{ text: line, dx }])
-  const inline = () => roles.flatMap(role => plain([role.title, role.unit].filter(Boolean).join(` ${ROLE_SEPARATOR} `)))
+const layoutRoles = (roles, { aligned, font, noteFont }) => {
+  const plain = (text, lineFont = font, dx = 0) => wrapText(text, { ...lineFont, maxWidth: lineFont.maxWidth - dx })
+    .map(line => ({ segments: [{ text: line, dx }], note: lineFont === noteFont }))
+
+  const rows = roles.map((role) => {
+    const pieces = splitRoleTitle(role)
+    return {
+      role,
+      leading: pieces.slice(0, -1),
+      title: pieces[pieces.length - 1] || '',
+      unit: role.unitLayout === 'beside' ? role.unit : '',
+      unitBelow: role.unitLayout === 'below' ? role.unit : ''
+    }
+  })
 
   const ctx = getMeasureContext()
-  const paired = roles.filter(role => role.title && role.unit)
-  if (!aligned || !ctx || !paired.length) return inline()
+  const paired = rows.filter(row => row.title && row.unit)
+  let separatorX = 0
+  let unitX = 0
+  let column = Boolean(aligned && ctx && paired.length)
+  if (column) {
+    ctx.font = `${font.style} ${font.weight} ${font.size}px ${font.family}`
+    const space = ctx.measureText(' ').width
+    separatorX = Math.max(...paired.map(row => ctx.measureText(row.title).width)) + space
+    unitX = separatorX + ctx.measureText(ROLE_SEPARATOR).width + space
+    if (unitX > font.maxWidth * 0.5) column = false
+  }
 
-  ctx.font = `${font.style} ${font.weight} ${font.size}px ${font.family}`
-  const space = ctx.measureText(' ').width
-  const separatorX = Math.max(...paired.map(role => ctx.measureText(role.title).width)) + space
-  const unitX = separatorX + ctx.measureText(ROLE_SEPARATOR).width + space
-  if (unitX > font.maxWidth * 0.5) return inline()
-
-  return roles.flatMap((role) => {
-    if (!role.title || !role.unit) return plain(role.title || role.unit)
-    return wrapText(role.unit, { ...font, maxWidth: font.maxWidth - unitX }).map((line, index) => (
-      index === 0
-        ? [{ text: role.title, dx: 0 }, { text: ROLE_SEPARATOR, dx: separatorX }, { text: line, dx: unitX }]
-        : [{ text: line, dx: unitX }]
-    ))
+  return rows.flatMap(({ role, leading, title, unit, unitBelow }) => {
+    const lines = leading.flatMap(piece => plain(piece))
+    let noteX = 0
+    if (title && unit && column) {
+      wrapText(unit, { ...font, maxWidth: font.maxWidth - unitX }).forEach((line, index) => {
+        lines.push({
+          note: false,
+          segments: index === 0
+            ? [{ text: title, dx: 0 }, { text: ROLE_SEPARATOR, dx: separatorX }, { text: line, dx: unitX }]
+            : [{ text: line, dx: unitX }]
+        })
+      })
+      noteX = unitX
+    } else {
+      lines.push(...plain([title, unit].filter(Boolean).join(` ${ROLE_SEPARATOR} `)))
+    }
+    if (unitBelow) lines.push(...plain(unitBelow))
+    if (role.note) lines.push(...plain(role.note, noteFont, noteX))
+    return lines
   })
 }
+
+// The extra line is italic, and a line wrapped in *asterisks* switches to regular — so one
+// line of it can stand upright above an italic one.
+const taglineLines = (tagline) => tagline
+  .split(/\r?\n/)
+  .map(line => line.trim())
+  .filter(Boolean)
+  .map((line) => {
+    const flipped = line.match(/^\*(.+)\*$/)
+    return flipped ? { text: flipped[1].trim(), italic: false } : { text: line, italic: true }
+  })
+  .filter(line => line.text)
 
 // Block sizes are fractions of the viewable height, matched against the production
 // Illustrator files: names ≈ 10% H, positions ≈ 5% H, contact lines ≈ 4.6% H.
@@ -256,39 +298,37 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
       lineHeightRatio: uniformBodyText ? contactLineHeight : compactTwoPerson || compactContent ? 1.08 : 1.3
     }
     const positionGap = compactContent ? 0 : gap(H * (compactTwoPerson ? 0.01 : 0.03))
+    // Subtext under a role and the extra line share a size: a step down from the position.
+    const italicLineStyle = {
+      size: uniformBodyText ? contactTextSize : H * 0.046 * contentScale,
+      lineHeightRatio: uniformBodyText ? contactLineHeight : 1.32
+    }
     if (group.position) {
-      const positions = content.positionLayout === 'inline'
-        ? [group.position]
-        : group.position.split(/\s*(?:\r?\n|[·•|;])\s*/).filter(Boolean)
-
-      positions.forEach((position, index) => {
-        blocks.push({
-          ...positionStyle,
-          text: position,
-          gapBefore: index === 0 ? positionGap : 0,
-          wrap: true
-        })
-      })
+      // The placeholder position, shown until a role is typed.
+      blocks.push({ ...positionStyle, text: group.position, gapBefore: positionGap, wrap: true })
     }
     if (group.roles?.length) {
       blocks.push({
         ...positionStyle,
         kind: 'roles',
         roles: group.roles,
+        noteSize: italicLineStyle.size,
+        noteLineHeightRatio: italicLineStyle.lineHeightRatio,
         gapBefore: group.position ? 0 : positionGap
       })
     }
     if (group.tagline) {
-      blocks.push({
-        occupant,
-        text: group.tagline,
-        size: uniformBodyText ? contactTextSize : H * 0.046 * contentScale,
-        weight: 400,
-        style: 'italic',
-        fill: secondaryColor,
-        lineHeightRatio: uniformBodyText ? contactLineHeight : 1.32,
-        gapBefore: gap(H * 0.03),
-        wrap: true
+      taglineLines(group.tagline).forEach((line, index) => {
+        blocks.push({
+          occupant,
+          text: line.text,
+          ...italicLineStyle,
+          weight: 400,
+          style: line.italic ? 'italic' : 'normal',
+          fill: secondaryColor,
+          gapBefore: index === 0 ? gap(H * 0.03) : 0,
+          wrap: true
+        })
       })
     }
     const contactLines = compactTwoPerson
@@ -482,22 +522,18 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
     }
     if (block.kind === 'roles') {
       const aligned = content.roleLayout !== 'inline' && content.textAlignment !== 'center'
-      layoutRoles(block.roles, {
-        aligned,
-        weight: block.weight,
-        style: block.style,
-        size: block.size,
-        family: fontFamily,
-        maxWidth: textMaxWidth
-      }).forEach((segments, index) => {
+      const font = { weight: block.weight, style: block.style, size: block.size, family: fontFamily, maxWidth: textMaxWidth }
+      const noteFont = { ...font, style: 'italic', size: block.noteSize }
+      layoutRoles(block.roles, { aligned, font, noteFont }).forEach(({ segments, note }, index) => {
+        const lineFont = note ? noteFont : font
         items.push({
           occupant: block.occupant,
           segments,
-          size: block.size,
-          weight: block.weight,
-          style: block.style,
+          size: lineFont.size,
+          weight: lineFont.weight,
+          style: lineFont.style,
           fill: block.fill,
-          lineHeight: block.size * block.lineHeightRatio,
+          lineHeight: lineFont.size * (note ? block.noteLineHeightRatio : block.lineHeightRatio),
           marginTop: index === 0 ? (block.gapBefore || 0) : 0
         })
       })

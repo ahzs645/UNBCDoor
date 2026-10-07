@@ -11,6 +11,7 @@ import {
 } from './signShare.js'
 import { INITIAL_SIGN_DATA } from './signData.js'
 import { signDataDiffers } from './signArchiveSearch.js'
+import { normalizeSignData } from './signArchive.js'
 import archive from '../../data/door-sign-archive.json' with { type: 'json' }
 
 const EDITOR = 'https://ahzs645.github.io/UNBCDoor/'
@@ -29,7 +30,7 @@ const sample = {
 
 test('every production sign survives a share link round trip', async () => {
   for (const entry of archive.signs) {
-    const signData = { ...INITIAL_SIGN_DATA, ...entry.signData }
+    const signData = normalizeSignData(entry.signData)
     const decoded = await decodeSignToken(await encodeSignToken(signData))
     assert.equal(signDataDiffers(decoded, signData), false, entry.label)
   }
@@ -49,7 +50,7 @@ test('share URLs put the token in the hash and read back', async () => {
   assert.equal(hasSignShareToken(url), true)
 
   const result = await readSignFromUrl(url)
-  assert.equal(signDataDiffers(result.signData, sample), false)
+  assert.equal(signDataDiffers(result.signData, normalizeSignData(sample)), false)
 })
 
 test('a URL without a token reads as nothing to load', async () => {
@@ -79,9 +80,16 @@ test('removing the token keeps the rest of the URL', () => {
 test('roles survive a share link round trip', async () => {
   const signData = {
     ...sample,
+    position: '',
     roles: [
-      { title: 'Professor', unit: 'Faculty of Environment' },
-      { title: 'Director', unit: 'Northern Analytical Laboratory Services' }
+      { title: 'Professor', unit: 'Faculty of Environment', note: '', unitLayout: 'below', titleLayout: 'stacked' },
+      {
+        title: 'Director',
+        unit: 'Northern Analytical Laboratory Services',
+        note: 'Northern BC’s Environment & Climate Solutions Innovation Hub',
+        unitLayout: 'beside',
+        titleLayout: 'inline'
+      }
     ],
     roleLayout: 'inline'
   }

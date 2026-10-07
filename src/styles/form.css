@@ -133,27 +133,35 @@ textarea::placeholder {
 
 /* ---------- Sign type + department ---------- */
 
-/* Side by side when the section is wide enough for both, stacked otherwise. The type keeps a
-   dropdown's natural width and the department search takes the rest. */
+/* The type and the department search share a row wherever there's room for both; the chosen
+   department's summary runs the full width of the card underneath them, so a long name isn't
+   squeezed into the search box's column. The brand kit renders the search and the summary as
+   siblings, so the department wrapper steps aside (display: contents) to let both join the grid. */
 .sign-basics {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: minmax(150px, 1fr) minmax(0, 1.6fr);
+    align-items: start;
     gap: 0 12px;
 }
 
 .sign-basics__type {
-    flex: 1 1 180px;
     margin-bottom: 0;
 }
 
 .sign-basics .department-field {
-    flex: 2 1 230px;
-    min-width: 0;
+    display: contents;
+}
+
+.sign-basics .department-field .department-selection-display {
+    grid-column: 1 / -1;
 }
 
 /* Stacked (phones), the two fields need the usual gap between them. */
 @media (max-width: 599px) {
+    .sign-basics {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
     .sign-basics__type {
         margin-bottom: 16px;
     }
@@ -269,6 +277,75 @@ textarea::placeholder {
 
 .department-field .search-result-detail {
     color: var(--ui-text-muted);
+}
+
+/* The chosen path, one level per line, each a step further in than the one above, with a rule
+   down the left tying a level to its parent. */
+.department-level-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.department-level-row {
+    display: grid;
+    gap: 4px;
+    margin-left: calc(var(--depth, 0) * 14px);
+}
+
+.department-level-row + .department-level-row {
+    padding-left: 10px;
+    border-left: 2px solid var(--ui-accent-soft-strong);
+}
+
+.department-level-row__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ui-text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.department-level-row__badge {
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--ui-accent);
+    color: #fff;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+}
+
+/* Long names (a faculty, a portfolio) wrap in the trigger instead of trailing off. */
+.department-level-row .custom-select__trigger {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    background-color: var(--ui-surface);
+    font-size: 0.9rem;
+}
+
+.department-level-row .custom-select__value {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.department-level-row--custom {
+    margin-bottom: 12px;
+}
+
+.department-level-row__custom {
+    color: var(--ui-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.department-level-row__note {
+    color: var(--ui-text-muted);
+    font-size: 0.76rem;
 }
 
 /* ---------- Contact rows ---------- */
@@ -463,26 +540,90 @@ textarea::placeholder {
     font-weight: 600;
 }
 
-/* ---------- Roles (position | department pairs) ---------- */
+/* ---------- Positions (position | department, with optional subtext) ---------- */
 
 .roles-editor__list {
     display: grid;
-    gap: 8px;
+    gap: 10px;
     margin: 0 0 10px;
     padding: 0;
     list-style: none;
 }
 
-.roles-editor__row {
+.role-card {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+}
+
+/* The position with its buttons beside it, and its department underneath — both need the
+   width, since either can run to a long name. */
+.role-card__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 6px;
+    align-items: start;
+}
+
+.role-card__fields input {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+.role-card__fields .roles-editor__actions {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* One line tall until Enter adds another; the field keeps a typed break for the sign. */
+.role-card__fields textarea {
+    min-height: 0;
+    height: auto;
+    field-sizing: content;
+    resize: none;
+}
+
+.role-card__note {
+    font-style: italic;
+}
+
+.role-card__options {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 8px 16px;
+}
+
+.role-card__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.role-card__option-label {
+    color: var(--ui-text-muted);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.role-card__option .segmented {
+    flex-wrap: nowrap;
+    background: var(--ui-surface);
+}
+
+.role-card__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
 }
 
 .roles-editor__actions {
     display: flex;
     gap: 2px;
+    padding-top: 6px;
 }
 
 .roles-editor__actions button {
@@ -530,17 +671,4 @@ textarea::placeholder {
 .roles-editor__add:hover {
     border-color: var(--ui-text-muted);
     background: var(--ui-surface-hover);
-}
-
-/* On a phone the two fields stack, with the buttons under them. */
-@media (max-width: 520px) {
-    .roles-editor__row {
-        grid-template-columns: minmax(0, 1fr);
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--ui-border);
-    }
-
-    .roles-editor__actions {
-        justify-content: flex-end;
-    }
 }

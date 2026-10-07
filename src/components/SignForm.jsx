@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { DepartmentSelector } from '@unbc/logo'
 import { CustomSelect } from './CustomSelect'
+import { DepartmentField } from './DepartmentField'
 import { FormSection } from './FormSection'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
 import { RolesEditor } from './RolesEditor'
+import { NAME_TITLES, emailFromName, getDefaultValues } from '../sign/signDefaults'
 
 const ROOM_TYPES = ['lab', 'general-room', 'custodian-closet']
 
@@ -24,12 +25,12 @@ const SECONDARY_ROOM_ENTRY_OPTIONS = [
 
 const ALUMNI_TYPES = ['faculty', 'staff']
 
-// Honorifics left off the front of a name when it labels a tab ("Dr. Jane Doe" → "Jane").
-const TITLES = /^(dr|prof|professor|mr|mrs|ms|mx|miss|rev|sir|dame)\.?$/i
+const TAGLINE_HINT = 'Prints in italics. Wrap a line in *asterisks* to print it upright instead, and press Enter for a line break you want kept on the sign.'
 
+// A name labels a tab by its first word after any title ("Dr. Jane Doe" → "Jane").
 export const firstName = (name) => {
   const words = (name || '').trim().split(/\s+/).filter(Boolean)
-  const first = words.find(word => !TITLES.test(word)) || ''
+  const first = words.find(word => !NAME_TITLES.test(word)) || ''
   return first.length > 18 ? `${first.slice(0, 17)}…` : first
 }
 
@@ -140,12 +141,21 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
     setActiveEntry(1)
   }
 
+  // Left blank, a person's email prints as first.last@unbc.ca from their name; the field shows
+  // the address it will use.
+  const emailPlaceholder = (suffix) => {
+    if (!isPerson) return 'name@unbc.ca'
+    const name = suffix ? signData.name2 : signData.name || getDefaultValues(signData.signType).name
+    const derived = emailFromName(name)
+    return derived ? `${derived} (from the name)` : 'first.last@unbc.ca'
+  }
+
   const contactRows = (suffix, withLabels) => [
     {
       id: `email${suffix}`,
       title: 'Email',
       type: 'email',
-      placeholder: 'name@unbc.ca',
+      placeholder: emailPlaceholder(suffix),
       onChange: handleInputChange,
       labelId: withLabels ? 'emailLabel' : null,
       labelPlaceholder: 'No label'
@@ -208,7 +218,7 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
       <p className="form-subheading__hint">
         {suffix
           ? `Printed with the same labels as ${isPerson ? `${tabLabels[0]}’s` : 'the room’s'}.`
-          : 'Each line prints as “Label: value”. Clear a label to print the value on its own.'}
+          : `Each line prints as “Label: value”. Clear a label to print the value on its own.${isPerson ? ' A blank email prints as first.last@unbc.ca.' : ''}`}
       </p>
       <div className="contact-rows">{contactRows(suffix, !suffix)}</div>
     </div>
@@ -224,15 +234,6 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
         value={signData.name}
         onChange={handleInputChange}
       />
-      <TextField
-        id="position"
-        label="Position"
-        multiline
-        placeholder="e.g. Associate Professor"
-        hint="Press Enter for a line break you want kept on the sign. Add more jobs as roles below."
-        value={signData.position}
-        onChange={handleInputChange}
-      />
       <RolesEditor
         id="roles"
         roles={signData.roles}
@@ -244,7 +245,7 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
         multiline
         rows={3}
         placeholder="Optional — e.g. Supporting the Spark Lab"
-        hint="Press Enter for a line break you want kept on the sign."
+        hint={TAGLINE_HINT}
         value={signData.tagline}
         onChange={handleInputChange}
       />
@@ -299,18 +300,11 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
             value={signData.name2}
             onChange={handleInputChange}
           />
-          <TextField
-            id="position2"
-            label="Position"
-            multiline
-            placeholder="e.g. Research Associate"
-            value={signData.position2}
-            onChange={handleInputChange}
-          />
           <RolesEditor
             id="roles2"
             roles={signData.roles2}
             onChange={(roles2) => onUpdate({ roles2 })}
+            placeholder="e.g. Research Associate"
           />
           <TextField
             id="tagline2"
@@ -318,6 +312,7 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
             multiline
             rows={3}
             placeholder="Optional — e.g. Supporting the Spark Lab"
+            hint={TAGLINE_HINT}
             value={signData.tagline2}
             onChange={handleInputChange}
           />
@@ -378,7 +373,7 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
           </div>
 
           <div className="department-field">
-            <DepartmentSelector
+            <DepartmentField
               departments={departments}
               value={signData}
               onChange={onUpdate}
