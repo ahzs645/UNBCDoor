@@ -174,13 +174,28 @@ const taglineLines = (tagline) => tagline
   })
   .filter(line => line.text)
 
+const isRoomSign = (content) =>
+  content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet'
+
+// How many people a person sign prints: the first, plus the second and third when they are on
+// the sign and named. Room signs have none.
+const countPeople = (content) => isRoomSign(content)
+  ? 0
+  : 1 +
+    (content.showSecondOccupant && content.name2 ? 1 : 0) +
+    (content.showSecondOccupant && content.showThirdOccupant && content.name3 ? 1 : 0)
+
 // Block sizes are fractions of the viewable height, matched against the production
 // Illustrator files: names ≈ 10% H, positions ≈ 5% H, contact lines ≈ 4.6% H.
 const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
   const blocks = []
-  const isRoom = content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet'
-  const compactTwoPerson = !isRoom && content.showSecondOccupant && content.name2 && content.twoPersonSpacing !== 'relaxed'
-  const contentScale = content.contentSize === 'largest' ? 1.55 : content.contentSize === 'large' ? 1.2 : 1
+  const isRoom = isRoomSign(content)
+  const peopleCount = countPeople(content)
+  const compactTwoPerson = peopleCount > 1 && content.twoPersonSpacing !== 'relaxed'
+  // Three people share the two-person card at four fifths the size, so all three fit under the
+  // header without the auto-shrink squeezing their gaps shut.
+  const contentScale = (content.contentSize === 'largest' ? 1.55 : content.contentSize === 'large' ? 1.2 : 1) *
+    (peopleCount > 2 ? 0.8 : 1)
   const compactContent = content.contentSpacing === 'compact'
   const spacingScale = compactContent ? 0.48 : 1
   // 'largest' is the NUGSS production size: ≈6.6% of the window, as big as a position line.
@@ -363,7 +378,7 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
     )
   }
 
-  const groupGap = gap(H * (compactTwoPerson ? 0.045 : 0.07))
+  const groupGap = gap(H * (peopleCount > 2 ? 0.035 : compactTwoPerson ? 0.045 : 0.07))
 
   if (isRoom) {
     if (content.roomContactGrouping === 'by-field' && content.showSecondOccupant && content.secondaryEntryType === 'contact') {
@@ -430,6 +445,16 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
       phone: content.showPhone2 ? content.phone2 : '',
       cellPhone: content.showCellPhone2 ? content.cellPhone2 : ''
     }, blocks.length ? groupGap : 0, 'secondary')
+  }
+  if (content.showSecondOccupant && content.showThirdOccupant) {
+    pushPersonGroup({
+      name: content.name3,
+      roles: content.roles3,
+      tagline: content.tagline3,
+      email: content.showEmail3 ? content.email3 : '',
+      phone: content.showPhone3 ? content.phone3 : '',
+      cellPhone: content.showCellPhone3 ? content.cellPhone3 : ''
+    }, blocks.length ? groupGap : 0, 'tertiary')
   }
 
   return blocks
@@ -502,27 +527,31 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
   const logoX = header.logoX - VL
   const logoY = header.logoY - VT
 
-  const isRoom = content.signType === 'lab' || content.signType === 'general-room' || content.signType === 'custodian-closet'
+  const isRoom = isRoomSign(content)
   const hasSecondPerson = !isRoom && Boolean(content.showSecondOccupant && content.name2)
-  const compactTwoPerson = hasSecondPerson && content.twoPersonSpacing !== 'relaxed'
+  const hasThirdPerson = !isRoom && Boolean(content.showSecondOccupant && content.showThirdOccupant && content.name3)
+  const peopleCount = countPeople(content)
+  const compactTwoPerson = peopleCount > 1 && content.twoPersonSpacing !== 'relaxed'
   const showPrimaryAlumni = !isRoom && Boolean(content.showAlumni)
   const showSecondaryAlumni = hasSecondPerson && Boolean(content.showAlumni2)
-  const hasAlumni = showPrimaryAlumni || showSecondaryAlumni
+  const showTertiaryAlumni = hasThirdPerson && Boolean(content.showAlumni3)
+  const hasAlumni = showPrimaryAlumni || showSecondaryAlumni || showTertiaryAlumni
   const bodyHeight = VH - HEADER_H
-  const baseBadgeHeight = bodyHeight * (hasSecondPerson ? 0.3 : 0.34)
+  const baseBadgeHeight = bodyHeight * (peopleCount > 2 ? 0.24 : peopleCount > 1 ? 0.3 : 0.34)
   const badgeSizeScale = ALUMNI_CREST_SIZE_SCALE[content.alumniCrestSize] || 1
-  // The largest preset is capped at 37.5% of a two-person body or 42.5% of a
-  // single-person body so crests cannot overrun their occupant area.
-  const maxBadgeHeight = bodyHeight * (hasSecondPerson ? 0.375 : 0.425)
+  // The largest preset is capped at 29% of a three-person body, 37.5% of a two-person body or
+  // 42.5% of a single-person body so crests cannot overrun their occupant area.
+  const maxBadgeHeight = bodyHeight * (peopleCount > 2 ? 0.29 : peopleCount > 1 ? 0.375 : 0.425)
   const badgeHeight = Math.min(baseBadgeHeight * badgeSizeScale, maxBadgeHeight)
   const badgeScale = badgeHeight / 67.82
   const badgeWidth = 59.27 * badgeScale
   const badgeX = VW - PAD_X - badgeWidth
   const badgeCenterY = HEADER_H + (bodyHeight - badgeHeight) / 2
-  const fallbackPrimaryBadgeY = hasSecondPerson
-    ? HEADER_H + bodyHeight * 0.25 - badgeHeight / 2
-    : badgeCenterY
-  const fallbackSecondaryBadgeY = HEADER_H + bodyHeight * 0.75 - badgeHeight / 2
+  // Without text to centre on, each crest sits in the middle of an equal share of the body.
+  const fallbackBadgeY = (index) => HEADER_H + bodyHeight * (index + 0.5) / peopleCount - badgeHeight / 2
+  const fallbackPrimaryBadgeY = peopleCount > 1 ? fallbackBadgeY(0) : badgeCenterY
+  const fallbackSecondaryBadgeY = fallbackBadgeY(1)
+  const fallbackTertiaryBadgeY = fallbackBadgeY(2)
 
   // The source two-person templates let long names run close to their individual crest.
   // Relaxed/single-person layouts retain a little more breathing room beside the badge.
@@ -633,6 +662,7 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
   }
   const primaryBadgeY = badgeYFor('primary', fallbackPrimaryBadgeY)
   const secondaryBadgeY = badgeYFor('secondary', fallbackSecondaryBadgeY)
+  const tertiaryBadgeY = badgeYFor('tertiary', fallbackTertiaryBadgeY)
 
   // Canvas-space top-left of the viewable window (bleed + frame inset).
   const originX = BLEED + VL
@@ -654,10 +684,12 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
     isRoom,
     showPrimaryAlumni,
     showSecondaryAlumni,
+    showTertiaryAlumni,
     badgeX,
     badgeScale,
     primaryBadgeY,
     secondaryBadgeY,
+    tertiaryBadgeY,
     originX,
     originY,
     headerBottom,
@@ -672,8 +704,8 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
   const {
     W, H, BLEED, CW, CH, VW,
     header, logoX, logoY, headerColor, PAD_X,
-    texts, showPrimaryAlumni, showSecondaryAlumni,
-    badgeX, badgeScale, primaryBadgeY, secondaryBadgeY,
+    texts, showPrimaryAlumni, showSecondaryAlumni, showTertiaryAlumni,
+    badgeX, badgeScale, primaryBadgeY, secondaryBadgeY, tertiaryBadgeY,
     originX, originY, headerBottom
   } = layoutSignArtwork(content, fontFamily)
   const ligatures = content.ligatures === 'on'
@@ -768,6 +800,13 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
           <AlumniCrest
             occupant="secondary"
             transform={`translate(${badgeX}, ${secondaryBadgeY}) scale(${badgeScale})`}
+          />
+        )}
+
+        {showTertiaryAlumni && (
+          <AlumniCrest
+            occupant="tertiary"
+            transform={`translate(${badgeX}, ${tertiaryBadgeY}) scale(${badgeScale})`}
           />
         )}
       </g>

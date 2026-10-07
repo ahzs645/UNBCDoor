@@ -80,7 +80,18 @@ const SHORT_KEYS = {
   roles2: 'ro2',
   roleLayout: 'rly',
   organization: 'org',
-  ligatures: 'lg'
+  ligatures: 'lg',
+  showThirdOccupant: 'so3',
+  name3: 'n3',
+  tagline3: 'tl3',
+  roles3: 'ro3',
+  email3: 'e3',
+  phone3: 'ph3',
+  cellPhone3: 'c3',
+  showEmail3: 'se3',
+  showPhone3: 'sp3',
+  showCellPhone3: 'sc3',
+  showAlumni3: 'a3'
 }
 
 // Encode order: drop every field still at its default (most of a sign), then shorten the keys.

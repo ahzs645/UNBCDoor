@@ -25,6 +25,9 @@ const SECONDARY_ROOM_ENTRY_OPTIONS = [
 
 const ALUMNI_TYPES = ['faculty', 'staff']
 
+// The fields one person carries, as stored with a 2 or 3 suffix for the second and third person.
+const THIRD_PERSON_FIELDS = ['name', 'roles', 'tagline', 'email', 'phone', 'cellPhone', 'showEmail', 'showPhone', 'showCellPhone', 'showAlumni']
+
 const TAGLINE_HINT = 'Prints in italics. Wrap a line in *asterisks* to print it upright instead, and press Enter for a line break you want kept on the sign.'
 
 // A name labels a tab by its first word after any title ("Dr. Jane Doe" → "Jane").
@@ -112,7 +115,7 @@ const ContactRow = ({
 )
 
 export const SignForm = ({ signData, onUpdate, departments }) => {
-  // Which of the two people (or the room and its extra entry) the tabbed section shows.
+  // Which of the people (or the room and its extra entry) the tabbed section shows.
   const [activeEntry, setActiveEntry] = useState(1)
 
   const handleInputChange = (e) => {
@@ -128,24 +131,46 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
   const isPerson = !isRoom
   const supportsAlumni = ALUMNI_TYPES.includes(signData.signType)
   const hasSecond = Boolean(signData.showSecondOccupant)
-  const entry = hasSecond ? activeEntry : 1
+  // A third person only shares a person sign, and only alongside the second.
+  const hasThird = isPerson && hasSecond && Boolean(signData.showThirdOccupant)
+  const entryCount = hasThird ? 3 : hasSecond ? 2 : 1
+  const entry = Math.min(activeEntry, entryCount)
 
-  const addSecond = () => {
-    onUpdate({ showSecondOccupant: true })
-    setActiveEntry(2)
+  const addEntry = () => {
+    if (!hasSecond) {
+      onUpdate({ showSecondOccupant: true })
+      setActiveEntry(2)
+    } else {
+      onUpdate({ showThirdOccupant: true })
+      setActiveEntry(3)
+    }
   }
 
-  // The second entry's fields are kept, so turning it back on restores them.
+  // A removed entry's fields are kept, so turning it back on restores them. Removing the second
+  // person while there is a third moves the third up into the second place.
   const removeSecond = () => {
-    onUpdate({ showSecondOccupant: false })
+    if (hasThird) {
+      onUpdate({
+        ...Object.fromEntries(THIRD_PERSON_FIELDS.map(field => [`${field}2`, signData[`${field}3`]])),
+        position2: '',
+        showThirdOccupant: false
+      })
+    } else {
+      onUpdate({ showSecondOccupant: false })
+    }
     setActiveEntry(1)
+  }
+
+  const removeThird = () => {
+    onUpdate({ showThirdOccupant: false })
+    setActiveEntry(2)
   }
 
   // Left blank, a person's email prints as first.last@unbc.ca from their name; the field shows
   // the address it will use.
   const emailPlaceholder = (suffix) => {
     if (!isPerson) return 'name@unbc.ca'
-    const name = suffix ? signData.name2 : signData.name || getDefaultValues(signData.signType).name
+    const name = suffix ? signData[`name${suffix}`] : signData.name || getDefaultValues(signData.signType).name
     const derived = emailFromName(name)
     return derived ? `${derived} (from the name)` : 'first.last@unbc.ca'
   }
@@ -179,7 +204,7 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
       labelPlaceholder: 'No label'
     }] : [])
   ].map(row => {
-    const base = row.id.replace(/2$/, '')
+    const base = row.id.replace(/[23]$/, '')
     const showName = `show${base[0].toUpperCase()}${base.slice(1)}${suffix}`
     return (
       <ContactRow
@@ -196,7 +221,8 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
   })
 
   const tabLabels = isPerson
-    ? [firstName(signData.name) || 'Person 1', firstName(signData.name2) || 'Person 2']
+    ? [firstName(signData.name) || 'Person 1', firstName(signData.name2) || 'Person 2', firstName(signData.name3) || 'Person 3']
+        .slice(0, entryCount)
     : ['Room', signData.secondaryEntryType === 'room' ? 'Second room' : 'Contact']
 
   const alumniSwitch = (field, label) => supportsAlumni && (
@@ -354,7 +380,45 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
     </>
   )
 
+  const thirdPanel = (
+    <>
+      <TextField
+        id="name3"
+        label="Name"
+        placeholder="e.g. Dr. Alex Lee"
+        autoComplete="off"
+        value={signData.name3}
+        onChange={handleInputChange}
+      />
+      <RolesEditor
+        id="roles3"
+        roles={signData.roles3}
+        onChange={(roles3) => onUpdate({ roles3 })}
+        placeholder="e.g. Research Associate"
+      />
+      <TextField
+        id="tagline3"
+        label="Extra line"
+        multiline
+        rows={3}
+        placeholder="Optional — e.g. Supporting the Spark Lab"
+        hint={TAGLINE_HINT}
+        value={signData.tagline3}
+        onChange={handleInputChange}
+      />
+      {alumniSwitch('showAlumni3', firstName(signData.name3))}
+      {contactDetails('3')}
+
+      <div className="occupant-remove">
+        <button type="button" className="text-btn text-btn--danger" onClick={removeThird}>
+          {`Remove ${firstName(signData.name3) || 'third person'} from the sign`}
+        </button>
+      </div>
+    </>
+  )
+
   const addLabel = isPerson ? 'Add person' : 'Add contact or room'
+  const canAdd = !hasSecond || (isPerson && !hasThird)
 
   return (
     <>
@@ -394,12 +458,14 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
       <FormSection
         title={isPerson ? (hasSecond ? 'People' : 'Person') : 'Room'}
         className="occupant-section"
-        action={!hasSecond && (
+        action={canAdd && (
           <button
             type="button"
             className="add-entry-btn"
-            onClick={addSecond}
-            aria-label={isPerson ? 'Add a second person who shares this door' : 'Add another contact, room, or lab to this sign'}
+            onClick={addEntry}
+            aria-label={isPerson
+              ? `Add a ${hasSecond ? 'third' : 'second'} person who shares this door`
+              : 'Add another contact, room, or lab to this sign'}
           >
             <span aria-hidden="true">+</span> {addLabel}
           </button>
@@ -423,7 +489,8 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
                   onKeyDown={(event) => {
                     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
                       event.preventDefault()
-                      const next = tab === 1 ? 2 : 1
+                      const step = event.key === 'ArrowRight' ? 1 : -1
+                      const next = ((tab - 1 + step + entryCount) % entryCount) + 1
                       setActiveEntry(next)
                       document.getElementById(`occupant-tab-${next}`)?.focus()
                     }
@@ -442,7 +509,7 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
           role={hasSecond ? 'tabpanel' : undefined}
           aria-labelledby={hasSecond ? `occupant-tab-${entry}` : undefined}
         >
-          {entry === 1 ? firstPanel : secondPanel}
+          {entry === 1 ? firstPanel : entry === 2 ? secondPanel : thirdPanel}
         </div>
       </FormSection>
     </>

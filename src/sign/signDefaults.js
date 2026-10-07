@@ -61,7 +61,7 @@ const filledRoles = (roles, position, positionLayout) => foldPositionIntoRoles(
   .filter(role => role.title || role.unit || role.note)
 
 // Resolves the text fields shown on the sign, falling back to the per-type placeholders.
-// Optional fields (tagline, contact line, cell, second occupant) have no placeholders — they
+// Optional fields (tagline, contact line, cell, second and third occupants) have no placeholders — they
 // only appear on the sign when filled in. A person's email defaults to first.last@unbc.ca from
 // their name, and a sign with no position shows the placeholder one.
 export const resolveSignValues = (signData) => {
@@ -74,6 +74,7 @@ export const resolveSignValues = (signData) => {
     position: roles.length ? '' : defaults.position || '',
     roles,
     roles2: filledRoles(signData.roles2, signData.position2, signData.positionLayout),
+    roles3: filledRoles(signData.roles3, '', signData.positionLayout),
     email: signData.email || (isPerson ? emailFromName(name) : ''),
     phone: signData.phone || defaults.phone || '',
     roomName: signData.roomName || defaults.roomName || '',
@@ -87,6 +88,11 @@ export const resolveSignValues = (signData) => {
     phone2: signData.phone2 || '',
     cellPhone2: signData.cellPhone2 || '',
     roomName2: signData.roomName2 || '',
-    contactName2: signData.contactName2 || ''
+    contactName2: signData.contactName2 || '',
+    name3: signData.name3 || '',
+    tagline3: signData.tagline3 || '',
+    email3: signData.email3 || (isPerson ? emailFromName(signData.name3) : ''),
+    phone3: signData.phone3 || '',
+    cellPhone3: signData.cellPhone3 || ''
   }
 }
