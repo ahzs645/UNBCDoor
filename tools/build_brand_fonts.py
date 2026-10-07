@@ -1,7 +1,9 @@
-"""Builds the sign artwork's Helvetica Neue LT Pro faces from the source files.
+"""Builds the sign artwork's Helvetica Neue LT Pro faces from the font package.
 
 The signs use Helvetica Neue LT Pro (55 Roman, 56 Italic, 75 Bold, 95 Black), the cut UNBC's own
-documents are set in (e.g. the ORI "Ready Roadmap"). The copies we have each lack a table:
+documents are set in (e.g. the ORI "Ready Roadmap"). The package lives in the UNBC logo kit
+(vendor/unbc-logo/fonts/source/, every weight and width), which builds the same four faces the
+same way for the lockup. The package's copies each lack a table:
 
   * Roman, Italic and Bold have no kerning. Their letters have exactly the advance widths of the
     older Helvetica Neue faces in Fonts/ (only rare symbols such as ® differ), and Linotype's
@@ -14,7 +16,8 @@ It writes Fonts/HelveticaNeueLTPro-*.otf for the browser (preview and PNG), a Tr
 Italic, Bold and Black (Fonts/HelveticaNeueLTPro-*.ttf) for the PDF export, since jsPDF can only
 embed TrueType outlines, and src/sign/brandFontCoverage.js, the characters each face has (about
 380; the older faces stand in for the rest). It also writes TrueType copies of the older Bold and
-Black for the PDF export's fallback. Run from the repository root:
+Black for the PDF export's fallback. Run from the repository root, with the logo kit checked out
+(`git submodule update --init`):
 
     python3 tools/build_brand_fonts.py
 """
@@ -28,7 +31,7 @@ from fontTools.ttLib import TTFont, newTable
 
 ROOT = Path(__file__).resolve().parent.parent
 FONTS = ROOT / 'Fonts'
-SOURCE = FONTS / 'source'
+SOURCE = ROOT / 'vendor' / 'unbc-logo' / 'fonts' / 'source'
 
 # (source file, output name, older face to take kerning from or None, make a TrueType copy)
 FACES = [

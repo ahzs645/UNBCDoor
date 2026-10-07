@@ -383,7 +383,8 @@ git submodule update --remote vendor/json-url
 - Inter font family - For the app's own interface
 - Helvetica Neue LT Pro (55 Roman, 56 Italic, 75 Bold, 95 Black) - The sign artwork, matching
   UNBC's own documents. `python3 tools/build_brand_fonts.py` builds `Fonts/HelveticaNeueLTPro-*`
-  from `Fonts/source/` (adding the kerning and ligatures those copies lack); the older
+  from the font package in the logo kit, `vendor/unbc-logo/fonts/source/` (adding the kerning
+  and ligatures those copies lack); the older
   Helvetica Neue faces in `Fonts/` stand in for characters LT Pro doesn't have.
 
 ## Browser Support
