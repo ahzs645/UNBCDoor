@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf'
 import { svg2pdf } from 'svg2pdf.js'
 import {
+  applyFaceLigatures,
   registerArtworkFonts,
   getEmbeddedArtworkFontCss,
   ARTWORK_ITALIC_FAMILY,
@@ -21,6 +22,7 @@ const cloneArtworkForExport = (source, availableFonts = {}) => {
   const italicFamily = availableFonts[ARTWORK_ITALIC_FAMILY]
   const boldFamily = availableFonts[ARTWORK_BOLD_FAMILY]
   const blackFamily = availableFonts[ARTWORK_BLACK_FAMILY]
+  const ligatures = source.getAttribute('data-ligatures') === 'on'
 
   const useFamily = (node, family) => {
     // The embedded face already carries its weight/slant, so reference it as normal/normal.
@@ -30,6 +32,7 @@ const cloneArtworkForExport = (source, availableFonts = {}) => {
     node.style.fontFamily = family
     node.style.fontStyle = 'normal'
     node.style.fontWeight = 'normal'
+    if (ligatures) node.textContent = applyFaceLigatures(node.textContent, family)
   }
 
   // Italic, Bold, and Black route to the matching embedded Helvetica Neue faces. Roman text

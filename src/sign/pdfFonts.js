@@ -10,6 +10,24 @@ export const ARTWORK_ITALIC_FAMILY = 'hnitalic'
 export const ARTWORK_BOLD_FAMILY = 'hnbold'
 export const ARTWORK_BLACK_FAMILY = 'hnblack'
 
+// jsPDF draws text character by character, so it never applies a font's 'liga' feature. With
+// ligatures on, the export writes them as their Unicode characters instead, and only the ones
+// each face's own 'liga' makes (the browser draws the same glyphs for the preview). Black has
+// ff/ffi/ffl and no fi/fl; Bold the reverse. Roman text goes out in jsPDF's standard Helvetica,
+// which has no ligatures at all.
+const LIGATURE_CHARACTERS = { ffi: '\ufb03', ffl: '\ufb04', ff: '\ufb00', fi: '\ufb01', fl: '\ufb02' }
+const FACE_LIGATURES = {
+  [ARTWORK_ITALIC_FAMILY]: ['ffi', 'ffl', 'ff', 'fi', 'fl'],
+  [ARTWORK_BOLD_FAMILY]: ['fi', 'fl'],
+  [ARTWORK_BLACK_FAMILY]: ['ffi', 'ffl', 'ff']
+}
+
+export const applyFaceLigatures = (text, family) => {
+  const sequences = FACE_LIGATURES[family]
+  if (!sequences) return text
+  return text.replace(new RegExp(sequences.join('|'), 'g'), sequence => LIGATURE_CHARACTERS[sequence])
+}
+
 const EMBEDDED_FONTS = [
   { url: italicFontUrl, vfs: 'HelveticaNeueItalic.ttf', family: ARTWORK_ITALIC_FAMILY },
   { url: boldFontUrl, vfs: 'HelveticaNeueBold.ttf', family: ARTWORK_BOLD_FAMILY },

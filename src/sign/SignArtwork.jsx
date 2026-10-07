@@ -44,12 +44,14 @@ const getMeasureContext = () => {
   return measureContext
 }
 
-// The sign is drawn with ligatures off (see <SignArtwork>): Helvetica Neue's "ffi"/"fi" glyphs
-// pinch the f's together, and the PDF export can't use them anyway, so preview and print would
-// disagree. A canvas has no switch for that, so measured text gets a zero-width non-joiner after
-// each f, which breaks the ligature without adding any width.
+// Ligatures ("ff", "ffi" and friends drawn as one joined glyph) are a per-sign choice, off by
+// default: Helvetica Neue's pinch the f's together. <SignArtwork> switches them with CSS, but a
+// canvas has no such switch, so with them off the measured text gets a zero-width non-joiner
+// after each f, which breaks the ligature without adding any width.
 const NO_LIGATURE = '\u200c'
-const measureText = (ctx, text) => ctx.measureText(text.replace(/f(?=\S)/g, `f${NO_LIGATURE}`))
+const measureText = (ctx, text, ligatures = false) => ctx.measureText(
+  ligatures ? text : text.replace(/f(?=\S)/g, `f${NO_LIGATURE}`)
+)
 
 // Spaces inside a phrase that should wrap as one unit (a designation kept together) are joined
 // with this no-break space. The wrapper treats the phrase as a single word, falls back to normal
@@ -57,7 +59,7 @@ const measureText = (ctx, text) => ctx.measureText(text.replace(/f(?=\S)/g, `f${
 const KEEP_TOGETHER = '\u00a0'
 const keepTogether = (text) => text.replace(/ +/g, KEEP_TOGETHER)
 
-const wrapText = (text, { weight, style, size, family, maxWidth }) => {
+const wrapText = (text, { weight, style, size, family, maxWidth, ligatures }) => {
   const value = (text || '').toString().trim()
   if (!value) return []
 
@@ -72,14 +74,14 @@ const wrapText = (text, { weight, style, size, family, maxWidth }) => {
     const words = paragraph
       .split(/[^\S\u00a0]+/)
       .flatMap(word => (
-        word.includes(KEEP_TOGETHER) && measureText(ctx, word).width > maxWidth
+        word.includes(KEEP_TOGETHER) && measureText(ctx, word, ligatures).width > maxWidth
           ? word.split(KEEP_TOGETHER)
           : [word]
       ))
     let current = ''
     words.forEach((word) => {
       const candidate = current ? `${current} ${word}` : word
-      if (measureText(ctx, candidate).width > maxWidth && current) {
+      if (measureText(ctx, candidate, ligatures).width > maxWidth && current) {
         lines.push(current)
         current = word
       } else {
@@ -124,12 +126,12 @@ const layoutRoles = (roles, { aligned, font, noteFont }) => {
   let column = Boolean(aligned && ctx && paired.length)
   if (column) {
     ctx.font = `${font.style} ${font.weight} ${font.size}px ${font.family}`
-    const space = measureText(ctx, ' ').width
-    const titleWidth = Math.max(...paired.map(row => measureText(ctx, row.title).width))
+    const space = measureText(ctx, ' ', font.ligatures).width
+    const titleWidth = Math.max(...paired.map(row => measureText(ctx, row.title, font.ligatures).width))
     separatorX = titleWidth + space
     // With no bar in the column at all, the gap the bar would have filled is closed up.
     unitX = paired.some(row => row.bar)
-      ? separatorX + measureText(ctx, ROLE_SEPARATOR).width + space
+      ? separatorX + measureText(ctx, ROLE_SEPARATOR, font.ligatures).width + space
       : titleWidth + space * 2
     if (unitX > font.maxWidth * 0.5) column = false
   }
@@ -436,12 +438,12 @@ const buildBlocks = (content, { H, nameColor, secondaryColor }) => {
 // Ink extent of a laid-out line, for centring the body on what is actually printed rather than on
 // line boxes (which carry extra leading under the last line). Falls back to typical Helvetica
 // proportions when there is no canvas to measure with.
-const measureInk = (item, fontFamily) => {
+const measureInk = (item, fontFamily, ligatures) => {
   const text = item.segments ? item.segments.map(segment => segment.text).join(' ') : item.text
   const ctx = getMeasureContext()
   if (ctx && text) {
     ctx.font = `${item.style} ${item.weight} ${item.size}px ${fontFamily}`
-    const metrics = measureText(ctx, text)
+    const metrics = measureText(ctx, text, ligatures)
     if (Number.isFinite(metrics.actualBoundingBoxAscent) && Number.isFinite(metrics.actualBoundingBoxDescent)) {
       return { ascent: metrics.actualBoundingBoxAscent, descent: metrics.actualBoundingBoxDescent }
     }
@@ -454,6 +456,7 @@ const measureInk = (item, fontFamily) => {
 // holder window and the margins, so the guides can never drift from the artwork.
 export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
   const insert = content.insert || DEFAULT_INSERT_SIZE
+  const ligatures = content.ligatures === 'on'
   const W = insert.width * PT_PER_INCH
   const H = insert.height * PT_PER_INCH
 
@@ -543,7 +546,7 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
     }
     if (block.kind === 'roles') {
       const aligned = content.roleLayout !== 'inline' && content.textAlignment !== 'center'
-      const font = { weight: block.weight, style: block.style, size: block.size, family: fontFamily, maxWidth: textMaxWidth }
+      const font = { weight: block.weight, style: block.style, size: block.size, family: fontFamily, maxWidth: textMaxWidth, ligatures }
       const noteFont = { ...font, style: 'italic', size: block.noteSize }
       layoutRoles(block.roles, { aligned, font, noteFont }).forEach(({ segments, note }, index) => {
         const lineFont = note ? noteFont : font
@@ -561,7 +564,7 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
       return
     }
     const lines = block.wrap
-      ? wrapText(block.text, { weight: block.weight, style: block.style, size: block.size, family: fontFamily, maxWidth: textMaxWidth })
+      ? wrapText(block.text, { weight: block.weight, style: block.style, size: block.size, family: fontFamily, maxWidth: textMaxWidth, ligatures })
       : [(block.text || '').toString()]
     lines.filter(Boolean).forEach((line, index) => {
       items.push({
@@ -598,10 +601,10 @@ export const layoutSignArtwork = (content, fontFamily = ARTWORK_FONT) => {
   const first = items[0]
   const last = items[items.length - 1]
   const inkTop = first && first.kind !== 'logo'
-    ? first.marginTop + first.size * 0.8 - measureInk(first, fontFamily).ascent
+    ? first.marginTop + first.size * 0.8 - measureInk(first, fontFamily, ligatures).ascent
     : (first?.marginTop || 0)
   const inkBottom = last && last.kind !== 'logo'
-    ? totalHeight - last.lineHeight + last.size * 0.8 + measureInk(last, fontFamily).descent
+    ? totalHeight - last.lineHeight + last.size * 0.8 + measureInk(last, fontFamily, ligatures).descent
     : totalHeight
   const centredStart = HEADER_H + ((VH - HEADER_H) - (inkBottom - inkTop)) / 2 - inkTop
   let cursorY = Math.max(centredStart, HEADER_H + VH * 0.02)
@@ -673,6 +676,7 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
     badgeX, badgeScale, primaryBadgeY, secondaryBadgeY,
     originX, originY, headerBottom
   } = layoutSignArtwork(content, fontFamily)
+  const ligatures = content.ligatures === 'on'
 
   return (
     <svg
@@ -683,7 +687,8 @@ export const SignArtwork = forwardRef(({ content, fontFamily = ARTWORK_FONT }, r
       height="100%"
       preserveAspectRatio="xMidYMid meet"
       fontFamily={fontFamily}
-      style={{ fontVariantLigatures: 'none' }}
+      style={{ fontVariantLigatures: ligatures ? 'normal' : 'none' }}
+      data-ligatures={ligatures ? 'on' : 'off'}
       data-bleed={BLEED}
       data-trim-width={W}
       data-trim-height={H}

@@ -36,6 +36,7 @@ export const normalizeSignData = (value = {}) => {
   if (!['regular', 'bold', 'black'].includes(normalized.headlineWeight)) {
     normalized.headlineWeight = INITIAL_SIGN_DATA.headlineWeight
   }
+  if (!['off', 'on'].includes(normalized.ligatures)) normalized.ligatures = INITIAL_SIGN_DATA.ligatures
   if (!['standard', 'italic'].includes(normalized.roomNameStyle)) {
     normalized.roomNameStyle = INITIAL_SIGN_DATA.roomNameStyle
   }
