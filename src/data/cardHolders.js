@@ -50,6 +50,27 @@ export const cardHolders = {
     plateStyle: 'grey',
     notes: 'Matches the "NON-Building 10" template (6.85" × 3.94"). Later Building 4 revisions used slightly taller inserts (up to 4.16") — confirm against the specific holder.'
   },
+  'Building 6': {
+    name: 'Building 6 Holder (measured)',
+    description: 'Building 6 holders (195mm × 101mm insert; the frame hides 13mm at each side and nothing at the top or bottom).',
+    insertSize: {
+      width: 7.677,
+      height: 3.976
+    },
+    viewableSize: {
+      width: 6.654,
+      height: 3.976
+    },
+    viewableOffset: {
+      top: 0,
+      bottom: 0,
+      left: 0.512,
+      right: 0.512
+    },
+    plateStyle: 'line',
+    plateLineColor: '#b0234e',
+    notes: 'Measured by hand. The plate line colour was matched by eye from a screenshot — replace it with the exact colour if you have it.'
+  },
   'Number-Only Plate': {
     name: 'Plain Black Plate (estimated from photos)',
     description: 'The newer plain black plates with just the room number (Buildings 7 and 9), on the standard 174mm × 100mm insert.',
