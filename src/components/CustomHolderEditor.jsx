@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { SegmentedControl } from './SegmentedControl'
 import { LineColorPicker } from './LineColorPicker'
 import { DEFAULT_LINE_COLOR, PLATE_STYLES, resolveHolderPlate } from './HolderMockup'
-import { MAX_HOLDER_NAME, validateCustomHolder } from '../sign/customHolders'
+import { MAX_HOLDER_NAME, MAX_ROOM_NUMBER, validateCustomHolder } from '../sign/customHolders'
 import { MM_PER_INCH } from '../sign/templateGeometry'
 
 const EDGES = [
@@ -64,6 +64,7 @@ export const CustomHolderEditor = ({ initial, editingName, takenNames, onSave, o
   const initialPlate = resolveHolderPlate(initial)
   const [plateStyle, setPlateStyle] = useState(initialPlate.style)
   const [lineColor, setLineColor] = useState(initialPlate.lineColor || DEFAULT_LINE_COLOR)
+  const [roomNumber, setRoomNumber] = useState(initial.roomNumber || '')
   const [notes, setNotes] = useState(editingName ? initial.notes || '' : '')
   const [showProblems, setShowProblems] = useState(false)
 
@@ -84,6 +85,7 @@ export const CustomHolderEditor = ({ initial, editingName, takenNames, onSave, o
     viewableOffset: Object.fromEntries(Object.entries(offset).map(([edge, text]) => [edge, toInches(text, units)])),
     plateStyle,
     plateLineColor: lineColor,
+    roomNumber: roomNumber.trim(),
     notes: notes.trim()
   }
   const problems = validateCustomHolder(holder, takenNames)
@@ -164,6 +166,17 @@ export const CustomHolderEditor = ({ initial, editingName, takenNames, onSave, o
         {plateStyle === 'line' && (
           <LineColorPicker name="holderEditorLineColor" value={lineColor} onChange={setLineColor} />
         )}
+        <div className="holder-editor__field">
+          <label htmlFor="holder-editor-room">Room no.</label>
+          <input
+            id="holder-editor-room"
+            type="text"
+            value={roomNumber}
+            maxLength={MAX_ROOM_NUMBER}
+            placeholder="Optional — the number on this plate"
+            onChange={(event) => setRoomNumber(event.target.value)}
+          />
+        </div>
       </fieldset>
 
       <div className="holder-editor__field">

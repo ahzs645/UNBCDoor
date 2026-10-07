@@ -9,9 +9,12 @@ const NEW_HOLDER = '__new-custom-holder__'
 const plateDescription = (holder) => {
   const { style, lineColor } = resolveHolderPlate(holder)
   const label = PLATE_STYLES[style].label.toLowerCase()
-  if (style !== 'line' || !lineColor) return label
-  const named = LINE_COLORS.find(color => color.value === lineColor.toLowerCase())
-  return `${label}, ${named ? named.label.toLowerCase() : lineColor} line`
+  const named = lineColor && LINE_COLORS.find(color => color.value === lineColor.toLowerCase())
+  return [
+    label,
+    style === 'line' && lineColor ? `${named ? named.label.toLowerCase() : lineColor} line` : null,
+    holder?.roomNumber ? `room ${holder.roomNumber}` : null
+  ].filter(Boolean).join(', ')
 }
 
 // Picks the physical holder the insert goes into. Its sizes are listed by the export panel

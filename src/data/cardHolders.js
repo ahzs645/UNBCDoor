@@ -8,6 +8,8 @@
 // PLATE_STYLES in components/HolderMockup.jsx): 'plain' (number only), or a line under the number
 // and a braille strip — 'line' (with an optional `plateLineColor`), or the shorthands 'grey' and
 // 'green'. Left out, the on-the-door preview starts on the default line + braille plate.
+// `roomNumber`, for a holder measured at one particular door, is the number on that plate; the
+// on-the-door preview starts on it and it can still be typed over there.
 export const cardHolders = {
   'Building 10': {
     name: 'Building 10 Acrylic Holder',
@@ -104,6 +106,8 @@ export const cardHolders = {
       left: 0.394,
       right: 0.394
     },
+    plateStyle: 'plain',
+    roomNumber: '6-352',
     notes: 'Measured, not estimated. The NUGSS artboards fit this frame exactly: the 11mm it hides at the top is the extra blue above the NUGSS logo.'
   },
   'Legacy Letter-Half': {

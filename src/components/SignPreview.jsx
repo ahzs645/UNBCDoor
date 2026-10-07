@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { SignArtwork } from '../sign/SignArtwork'
+import { MAX_ROOM_NUMBER } from '../sign/customHolders'
 import { resolveCardHolderGeometry, getPrintLayout, formatInches } from '../sign/signGeometry'
 import { exportSignPNG, exportPrintRunPDF } from '../sign/signExport'
 import { PAPER_ORDER, PAPER_DIMENSIONS } from '../sign/signConstants'
@@ -85,10 +86,9 @@ export const SignPreview = ({
   const [sheetPage, setSheetPage] = useState(0)
   const printSheet = usePrintSheet()
   const sheetOptions = printSheet.options
-  const [roomNumber, setRoomNumber] = useState('')
-  // The plate (and its line colour) follows the holder preset; a pick in the door view holds
-  // until the holder changes.
-  const [plateChoice, setPlateChoice] = useState({ holder: null, style: null, lineColor: null })
+  // The plate (its style, line colour and room number) follows the holder preset; a pick in the
+  // door view holds until the holder changes.
+  const [plateChoice, setPlateChoice] = useState({ holder: null, style: null, lineColor: null, roomNumber: null })
   const [doorView, setDoorView] = useState('mounted')
 
   const selectedCardHolder = signData.cardHolderType ? cardHolders[signData.cardHolderType] : null
@@ -106,8 +106,10 @@ export const SignPreview = ({
   const choice = plateChoice.holder === holderKey ? plateChoice : {}
   const plateStyle = choice.style || holderPlate.style
   const lineColor = choice.lineColor || holderPlate.lineColor || DEFAULT_LINE_COLOR
+  // An emptied box is a choice too (no number on the plate), so only null falls back.
+  const roomNumber = choice.roomNumber ?? selectedCardHolder?.roomNumber ?? ''
   const choosePlate = (change) => setPlateChoice(prev => ({
-    ...(prev.holder === holderKey ? prev : { style: null, lineColor: null }),
+    ...(prev.holder === holderKey ? prev : { style: null, lineColor: null, roomNumber: null }),
     ...change,
     holder: holderKey
   }))
@@ -328,9 +330,9 @@ export const SignPreview = ({
                 <input
                   type="text"
                   value={roomNumber}
-                  onChange={(e) => setRoomNumber(e.target.value)}
+                  onChange={(e) => choosePlate({ roomNumber: e.target.value })}
                   placeholder="4-257"
-                  maxLength={8}
+                  maxLength={MAX_ROOM_NUMBER}
                 />
               </label>
             </div>

@@ -6,6 +6,8 @@ export const CUSTOM_HOLDERS_KEY = 'unbc-door-sign:custom-holders'
 const STORAGE_VERSION = 1
 
 export const MAX_HOLDER_NAME = 40
+// The room-number box in the on-the-door preview takes this many characters.
+export const MAX_ROOM_NUMBER = 8
 // Generous bounds — anything outside them is a typo, not a holder.
 const MAX_INSERT_INCHES = 20
 const EDGES = ['top', 'right', 'bottom', 'left']
@@ -60,18 +62,23 @@ export const toCardHolder = (record) => {
     viewableOffset,
     ...(record.plateStyle ? { plateStyle: record.plateStyle } : {}),
     ...(record.plateLineColor ? { plateLineColor: record.plateLineColor } : {}),
+    ...(record.roomNumber ? { roomNumber: record.roomNumber } : {}),
     ...(record.notes ? { notes: record.notes } : {})
   }
 }
 
 // Just what's worth storing for a holder.
-export const toCustomRecord = ({ insertSize, viewableOffset, plateStyle, plateLineColor, notes }) => ({
-  insertSize: { width: round(insertSize.width), height: round(insertSize.height) },
-  viewableOffset: Object.fromEntries(EDGES.map(edge => [edge, round(viewableOffset[edge])])),
-  ...(plateStyle ? { plateStyle } : {}),
-  ...(plateStyle !== 'plain' && /^#[0-9a-f]{6}$/i.test(plateLineColor || '') ? { plateLineColor } : {}),
-  ...(notes ? { notes: String(notes).slice(0, 500) } : {})
-})
+export const toCustomRecord = ({ insertSize, viewableOffset, plateStyle, plateLineColor, roomNumber, notes }) => {
+  const room = typeof roomNumber === 'string' ? roomNumber.trim().slice(0, MAX_ROOM_NUMBER) : ''
+  return {
+    insertSize: { width: round(insertSize.width), height: round(insertSize.height) },
+    viewableOffset: Object.fromEntries(EDGES.map(edge => [edge, round(viewableOffset[edge])])),
+    ...(plateStyle ? { plateStyle } : {}),
+    ...(plateStyle !== 'plain' && /^#[0-9a-f]{6}$/i.test(plateLineColor || '') ? { plateLineColor } : {}),
+    ...(room ? { roomNumber: room } : {}),
+    ...(notes ? { notes: String(notes).slice(0, 500) } : {})
+  }
+}
 
 // Parses what's in storage, dropping anything malformed (storage is shared with whatever else
 // ran on this origin, and older versions of the app).
