@@ -54,6 +54,10 @@ A web-based tool for generating standardized door signs for the University of No
 - **Department Management**
   - Hierarchical department structure
   - Search functionality for departments
+  - The chosen department shows as its path, one level per line (area, portfolio, faculty or
+    office, department or unit); each level is a dropdown of the other choices at that level,
+    so a sign can move to a sibling unit or stop a level higher without searching again.
+    Departments saved by name alone are placed in the path automatically
   - Clear the department to print the plain UNBC logo
   - Support for academic and administrative departments
   - Sub-departments and units

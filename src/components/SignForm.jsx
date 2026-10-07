@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { DepartmentSelector } from '@unbc/logo'
 import { CustomSelect } from './CustomSelect'
+import { DepartmentField } from './DepartmentField'
 import { FormSection } from './FormSection'
 import { SegmentedControl } from './SegmentedControl'
 import { Switch } from './Switch'
@@ -373,7 +373,7 @@ export const SignForm = ({ signData, onUpdate, departments }) => {
           </div>
 
           <div className="department-field">
-            <DepartmentSelector
+            <DepartmentField
               departments={departments}
               value={signData}
               onChange={onUpdate}
