@@ -9,9 +9,9 @@ import {
   readSignFromUrl,
   removeSignShareToken
 } from './signShare.js'
-import { INITIAL_SIGN_DATA } from './signData.js'
-import { signDataDiffers } from './signArchiveSearch.js'
-import { normalizeSignData } from './signArchive.js'
+import { INITIAL_SIGN_DATA } from '../../vendor/door-sign/src/core.js'
+import { signDataDiffers } from '../../vendor/door-sign/src/core.js'
+import { normalizeSignData } from '../../vendor/door-sign/src/core.js'
 import archive from '../../data/door-sign-archive.json' with { type: 'json' }
 
 const EDITOR = 'https://ahzs645.github.io/UNBCDoor/'

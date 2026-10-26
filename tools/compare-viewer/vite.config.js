@@ -9,10 +9,7 @@ export default defineConfig({
   plugins: [react()],
   base: './',
   resolve: {
-    alias: {
-      // Mirrors the alias in the root vite.config.js — the viewer builds from its own config.
-      '@unbc/logo': fileURLToPath(new URL('../../vendor/unbc-logo/src/index.js', import.meta.url))
-    }
+    dedupe: ['react', 'react-dom']
   },
   publicDir: 'public',
   server: {

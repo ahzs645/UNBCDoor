@@ -10,7 +10,7 @@
     {
       "name": "unbc-logo",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "vendor/unbc-logo", "run", "dev", "--", "--port", "5183"],
+      "runtimeArgs": ["--prefix", "vendor/door-sign/vendor/unbc-logo", "run", "dev", "--", "--port", "5183"],
       "port": 5183
     }
   ]

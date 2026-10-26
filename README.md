@@ -296,11 +296,11 @@ under `tools/compare-viewer`; it is never included in the production website.
 - Header band and logo lockup sized as in the production Illustrator files (the lockup at its
   native size), but measured from the holder window: the visible band is 20.5% of the window
   height, and the green above the logo always matches the green below it
-  (`src/sign/headerGeometry.js`). With no holder this is the production band exactly
+  (`headerGeometry.js` in the door-sign package). With no holder this is the production band exactly
 - The body text is centred on its ink, so the white above the first line matches the white below
   the last
-- Department names wrap by the UNBC logo kit's rule (`splitDepartmentText` from the
-  `vendor/unbc-logo` submodule), so "Northern Analytical Laboratory Services" takes two lines
+- Department names wrap by the UNBC logo kit's rule (`splitDepartmentText` from the logo kit
+  inside the door-sign package), so "Northern Analytical Laboratory Services" takes two lines
   and the band grows to fit, keeping the same margin under the last line. **Appearance → Department line → Full width** instead runs a long
   name across the band on one line, to match older printed signs
 - Enhanced form validation and formatting
@@ -308,55 +308,44 @@ under `tools/compare-viewer`; it is never included in the production website.
 
 ## File Structure
 
-- `index.html` - Main application file
-- `saved-signs/index.html` - Saved signs page
-- `measuring-sheets/index.html` - Measuring sheets page
-- `src/components` - Form, preview, archive, export controls, and the measuring sheets page
-- `src/sign` - Sign defaults, geometry, artwork, archive, and export logic
-- `src/sign/measuringSheets.js` - One entry point for the three printable measuring sheets
-- `src/sign/signTemplate.js` - Printable 1:1 template for a known holder (optional grid)
-- `src/sign/signGrid.js` - Printable 1" cutting grid for an unmeasured holder
-- `src/sign/signContent.js` - Builds the artwork content from the editor's sign data
-- `src/sign/headerGeometry.js` - Header band, lockup position, and department-line width
-- `src/sign/organizations.js` - UNBC and NUGSS: band colour, logo, starting appearance
-- `src/assets/nugssLogo.js` - The NUGSS logo as outlines (from `nugss.ai`)
-- `src/sign/printSheet.js` - Cards per sheet, cut positions, crop marks and cut lines for the PDF
-  and the Sheet preview
-- `src/sign/pdfPrimitives.js` - Drawing helpers shared by the measuring sheets
-- `src/sign/signShare.js` - Share links: the sign compressed into the URL with json-url
-- `vendor/unbc-logo` - UNBC brand kit, as a git submodule (see below)
+The sign itself — its renderer, geometry, exports, print sheets, card holders, archives and the
+editor — lives in the [door-sign](https://github.com/ahzs645/door-sign) package, vendored at
+`vendor/door-sign`, so other apps (such as brandkit's UNBC Door signs tab) draw and print the same
+sign. This repository is the app around it:
+
+- `index.html`, `saved-signs/index.html`, `measuring-sheets/index.html` - The three pages, each
+  with the package's `door-sign-app` style scope on `<html>`
+- `src/App.jsx` - Page routing, the package's `DoorSignEditor`, the saved-signs and measuring-sheets
+  pages, and shared-sign links
+- `src/components/AppHeader.jsx`, `ThemeToggle.jsx` - The app bar and the light/dark switch
+- `src/components/ShareLinkButton.jsx`, `src/sign/signShare.js` - Share links: the sign compressed
+  into the URL with json-url, passed into the editor's export card
+- `src/index.css` - The package's stylesheet
+- `data/door-sign-archive.json` - Re-importable production-sign archive, passed to the package as
+  its production archive
+- `vendor/door-sign` - The door-sign package, as a git submodule (see below)
 - `vendor/json-url` - [ahzs645/json-url](https://github.com/ahzs645/json-url), as a git submodule (see below)
-- `data/door-sign-archive.json` - Re-importable production-sign archive
 
-## The UNBC brand kit submodule
+## The door-sign package submodule
 
-The logo lockup, department-line wrapping, department hierarchy, and artwork assets live in
-their own repository — [ahzs645/unbc-logo](https://github.com/ahzs645/unbc-logo) — so other
-projects can reuse them. It is vendored here as a git submodule and imported through the
-`@unbc/logo` alias defined in `vite.config.js`.
-
-Clone with it:
+[ahzs645/door-sign](https://github.com/ahzs645/door-sign) carries its own submodule, the
+[UNBC logo kit](https://github.com/ahzs645/unbc-logo) (lockup, department-line wrapping, the
+department hierarchy), so clone recursively:
 
 ```bash
 git clone --recurse-submodules https://github.com/ahzs645/UNBCDoor.git
-```
-
-Already cloned without it:
-
-```bash
+# or, already cloned:
 git submodule update --init --recursive
 ```
 
-It also ships a standalone generator for building a lockup from custom department text, live at
-<http://projects.ahmadjalil.com/unbc-logo/>.
-
-To pull a newer version of the brand kit into this app:
+To pull a newer package into this app, then commit the updated pointer:
 
 ```bash
-git submodule update --remote vendor/unbc-logo
+git submodule update --remote vendor/door-sign
 ```
 
-Then commit the updated submodule pointer.
+Changes to the sign, the editor or its styles belong in the package (its README covers the
+parts, the scoped styles and the font build); changes to the app around it belong here.
 
 ## Share links (json-url submodule)
 
@@ -384,10 +373,8 @@ git submodule update --remote vendor/json-url
 - html2canvas - For export functionality
 - Inter font family - For the app's own interface
 - Helvetica Neue LT Pro (55 Roman, 56 Italic, 75 Bold, 95 Black) - The sign artwork, matching
-  UNBC's own documents. `python3 tools/build_brand_fonts.py` builds `Fonts/HelveticaNeueLTPro-*`
-  from the font package in the logo kit, `vendor/unbc-logo/fonts/source/` (adding the kerning
-  and ligatures those copies lack); the older
-  Helvetica Neue faces in `Fonts/` stand in for characters LT Pro doesn't have.
+  UNBC's own documents. The faces, and the script that builds them from the logo kit's font
+  package, are in the door-sign package (`fonts/`, `scripts/build-fonts.py`).
 
 ## Browser Support
 

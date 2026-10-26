@@ -1,7 +1,7 @@
-[submodule "vendor/unbc-logo"]
-	path = vendor/unbc-logo
-	url = https://github.com/ahzs645/unbc-logo.git
 [submodule "vendor/json-url"]
 	path = vendor/json-url
 	url = https://github.com/ahzs645/json-url.git
 	branch = master
+[submodule "vendor/door-sign"]
+	url = https://github.com/ahzs645/door-sign.git
+	path = vendor/door-sign

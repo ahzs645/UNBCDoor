@@ -1,16 +1,4 @@
-/* Style manifest. The rules were split out of this file into ./styles/* partials by
-   contiguous source order, so importing them here in the same order keeps the cascade
-   byte-for-byte identical to the original single stylesheet. Order matters — do not
-   reorder these imports. */
-
-@import './styles/fonts.css';            /* @font-face brand faces + Google Inter import */
-@import './styles/base.css';             /* light + dark design tokens, reset, app bar, workspace, pages */
-@import './styles/preview.css';          /* output cards, preview stage, print guides, holder window, specs */
-@import './styles/form.css';             /* editor sections, fields, sign type, department, contact rows */
-@import './styles/select.css';           /* custom (non-native) dropdown trigger + listbox */
-@import './styles/sign.css';             /* rendered door-sign artwork, designations, export buttons */
-@import './styles/switch.css';           /* email/phone show-on-sign toggle switch */
-@import './styles/responsive.css';       /* compact (<960px) editor tabs + dock, phone (<600px) tweaks */
-@import './styles/export-controls.css';  /* fit warning, segmented control, appearance panel, measuring sheets */
-@import './styles/archive.css';         /* saved-signs browser, sign search combobox, editor archive navigator */
-@import './styles/a11y.css';             /* focus rings, reduced-motion, export-button breakpoint */
+/* The editor's styles come from the door-sign package, scoped to .door-sign-app; index.html and
+   the saved-signs and measuring-sheets pages put that class on <html>, so they style the whole
+   app, its app bar and pages included. */
+@import '../vendor/door-sign/src/styles/door-sign.css';

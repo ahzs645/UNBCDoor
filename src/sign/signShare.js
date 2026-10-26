@@ -8,8 +8,7 @@
 // an npm arborist crash on json-url's dev tooling. `npm run vendor:build` (run automatically
 // before dev, build and test) builds dist/ from the submodule.
 import createWebShareEngine from '../../vendor/json-url/dist/web-share.js'
-import { INITIAL_SIGN_DATA } from './signData.js'
-import { normalizeSignData } from './signArchive.js'
+import { INITIAL_SIGN_DATA, normalizeSignData } from '../../vendor/door-sign/src/core.js'
 
 export const SHARE_PARAM = 'sign'
 const SHARE_LOCATION = 'hash'

@@ -21,10 +21,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        # The UNBC brand kit (ahzs645/unbc-logo) and json-url (ahzs645/json-url, for share links)
-        # are submodules the build imports from, so a plain checkout would leave vendor/ empty
-        # and the build would fail. Both repositories are public, so the default token can clone
-        # them. `npm ci` then builds vendor/json-url's dist/ through the prepare script.
+        # The door-sign package (ahzs645/door-sign, with the UNBC logo kit inside it) and json-url
+        # (ahzs645/json-url, for share links) are submodules the build imports from, so a plain
+        # checkout would leave vendor/ empty and the build would fail. All are public, so the
+        # default token can clone them. `npm ci` then builds vendor/json-url's dist/ through the prepare script.
         submodules: recursive
 
     - name: Setup Node.js

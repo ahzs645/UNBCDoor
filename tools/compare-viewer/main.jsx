@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import archive from './generated-manifest.json'
-import { SignArtwork } from '../../src/sign/SignArtwork'
-import { normalizeSignData } from '../../src/sign/signArchive'
-import { buildSignContent } from '../../src/sign/signContent'
-import { cardHolders } from '../../src/data/cardHolders'
-import '../../src/styles/fonts.css'
+import { SignArtwork, buildSignContent, cardHolders, normalizeSignData } from '../../vendor/door-sign/src/index.js'
+import '../../vendor/door-sign/src/styles/fonts.css'
 import './viewer.css'
 
 // The review renders the trimmed card (no bleed) so it lines up with the source artboards.

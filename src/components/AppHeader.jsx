@@ -1,7 +1,6 @@
 import React from 'react'
 import { ThemeToggle } from './ThemeToggle'
-import { SettingsMenu } from './SettingsMenu'
-import { OrganizationSwitcher } from './OrganizationSwitcher'
+import { OrganizationSwitcher, SettingsMenu } from '../../vendor/door-sign/src/index.js'
 
 const NAV_ITEMS = [
   { page: 'editor', label: 'Editor' },
